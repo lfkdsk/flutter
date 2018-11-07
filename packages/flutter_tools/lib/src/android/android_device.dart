@@ -369,7 +369,7 @@ class AndroidDevice extends Device {
 
     BuildInfo buildInfo = debuggingOptions.buildInfo;
     if (buildInfo.targetPlatform == null && devicePlatform == TargetPlatform.android_arm64)
-      buildInfo = buildInfo.withTargetPlatform(TargetPlatform.android_arm64);
+      buildInfo = buildInfo.withTargetPlatform(TargetPlatform.android_arm);
 
     if (!prebuiltApplication || androidSdk.licensesAvailable && androidSdk.latestVersion == null) {
       printTrace('Building APK');

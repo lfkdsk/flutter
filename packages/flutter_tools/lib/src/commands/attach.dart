@@ -232,7 +232,7 @@ class AttachCommand extends FlutterCommand {
           usesIpv6 = observatoryDiscovery.ipv6;
           printStatus('Done.'); // FYI, this message is used as a sentinel in tests.
         } finally {
-          await observatoryDiscovery?.cancel();
+//          await observatoryDiscovery?.cancel();
         }
       }
     } else {

@@ -521,7 +521,7 @@ class _InkResponseState<T extends InkResponse> extends State<T> with AutomaticKe
     updateHighlight(false);
   }
 
-  void _handleDoubleTap() {
+  void _handleDoubleTap(DoubleTapDetails details) {
     _currentSplash?.confirm();
     _currentSplash = null;
     if (widget.onDoubleTap != null)

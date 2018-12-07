@@ -264,7 +264,7 @@ class GestureDetector extends StatelessWidget {
 
   /// The user has tapped the screen at the same location twice in quick
   /// succession.
-  final GestureTapCallback onDoubleTap;
+  final GestureDoubleTapCallback onDoubleTap;
 
   /// Called when a long press gesture has been recognized.
   ///

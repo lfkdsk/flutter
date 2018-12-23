@@ -109,6 +109,13 @@ class FlutterPatchPlugin implements Plugin<Project> {
                 project.logger.error("Plugin project :$name not found. Please update settings.gradle.")
             }
         }
+        
+        if (project.hasProperty('localEngineOut')) {
+            String engineOutPath = project.property('localEngineOut')
+            File engineOut = project.file(engineOutPath)
+            File flutterJar = Paths.get(engineOut.absolutePath, "flutter.jar").toFile()
+            createJarContainsArmeabi(flutterJar, excludesFiles)
+        }
 
         createJarContainsArmeabi(debugFlutterJar, excludesFiles)
         createJarContainsArmeabi(profileFlutterJar, excludesFiles)
@@ -177,18 +184,24 @@ class FlutterPatchPlugin implements Plugin<Project> {
         return "release"
     }
 
-    private File createJarContainsArmeabi(File file, Set<String> excludesFiles) {
-        // 生成的文件与flutter.jar目录相同，加上后缀_armeabi，该jar内只有一个libflutter.so文件
-
+    private void createJarContainsArmeabi(File file, Set<String> excludesFiles) {
+        // flutter_origin.jar为原文件的备份
         File originFile = new File(file.getParent() + File.separator + "flutter_origin.jar")
-        if (file.exists() && !originFile.exists()) {
+
+        JarFile flutterJarFile = new JarFile(file)
+        // 说明是新的flutter.jar，需要重新复制flutter_origin.jar
+        if (flutterJarFile.getJarEntry("lib/armeabi/libflutter.so") == null) {
             FileUtils.copyFile(file, originFile)
+        } else {
+            // 已经是处理好的jar了
+            if (excludesFiles.isEmpty()) {
+                return
+            }
         }
 
         String path = file.path
         file.delete()
         File result = new File(path)
-
 
         JarFile jarFile = new JarFile(originFile)
         JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(result))

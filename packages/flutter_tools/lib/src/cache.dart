@@ -565,7 +565,18 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (String pkgName in getPackageDirs()) {
-      await _downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      final String pkgPath = fs.path.join(pkgDir.path, pkgName);
+      final Directory dir = fs.directory(pkgPath);
+      if (dir.existsSync())
+        dir.deleteSync(recursive: true);
+      if (customEngineArtifacts.contains(pkgName)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        logger.printStatus('Downloading from TT ' + customEngineUrl + pkgName + '.zip');
+        await _downloadZipArchive('Downloading package $pkgName...',
+          Uri.parse(customEngineUrl + pkgName + '.zip'), pkgDir);
+      } else {
+        await _downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      }
     }
 
     for (List<String> toolsDir in getBinaryDirs()) {
@@ -979,12 +990,12 @@ const List<List<String>> _macOSDesktopBinaryDirs = <List<String>>[
 const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-arm-profile/darwin-x64', 'android-arm-profile/darwin-x64.zip'],
   <String>['android-arm-release/darwin-x64', 'android-arm-release/darwin-x64.zip'],
-  <String>['android-arm64-profile/darwin-x64', 'android-arm64-profile/darwin-x64.zip'],
-  <String>['android-arm64-release/darwin-x64', 'android-arm64-release/darwin-x64.zip'],
-  <String>['android-arm-dynamic-profile/darwin-x64', 'android-arm-dynamic-profile/darwin-x64.zip'],
-  <String>['android-arm-dynamic-release/darwin-x64', 'android-arm-dynamic-release/darwin-x64.zip'],
-  <String>['android-arm64-dynamic-profile/darwin-x64', 'android-arm64-dynamic-profile/darwin-x64.zip'],
-  <String>['android-arm64-dynamic-release/darwin-x64', 'android-arm64-dynamic-release/darwin-x64.zip'],
+//  <String>['android-arm64-profile/darwin-x64', 'android-arm64-profile/darwin-x64.zip'],
+//  <String>['android-arm64-release/darwin-x64', 'android-arm64-release/darwin-x64.zip'],
+//  <String>['android-arm-dynamic-profile/darwin-x64', 'android-arm-dynamic-profile/darwin-x64.zip'],
+//  <String>['android-arm-dynamic-release/darwin-x64', 'android-arm-dynamic-release/darwin-x64.zip'],
+//  <String>['android-arm64-dynamic-profile/darwin-x64', 'android-arm64-dynamic-profile/darwin-x64.zip'],
+//  <String>['android-arm64-dynamic-release/darwin-x64', 'android-arm64-dynamic-release/darwin-x64.zip'],
 ];
 
 const List<List<String>> _linuxBinaryDirs = <List<String>>[
@@ -1010,18 +1021,18 @@ const List<List<String>> _windowsBinaryDirs = <List<String>>[
 ];
 
 const List<List<String>> _androidBinaryDirs = <List<String>>[
-  <String>['android-x86', 'android-x86/artifacts.zip'],
-  <String>['android-x64', 'android-x64/artifacts.zip'],
+//  <String>['android-x86', 'android-x86/artifacts.zip'],
+//  <String>['android-x64', 'android-x64/artifacts.zip'],
   <String>['android-arm', 'android-arm/artifacts.zip'],
   <String>['android-arm-profile', 'android-arm-profile/artifacts.zip'],
   <String>['android-arm-release', 'android-arm-release/artifacts.zip'],
-  <String>['android-arm64', 'android-arm64/artifacts.zip'],
-  <String>['android-arm64-profile', 'android-arm64-profile/artifacts.zip'],
-  <String>['android-arm64-release', 'android-arm64-release/artifacts.zip'],
-  <String>['android-arm-dynamic-profile', 'android-arm-dynamic-profile/artifacts.zip'],
-  <String>['android-arm-dynamic-release', 'android-arm-dynamic-release/artifacts.zip'],
-  <String>['android-arm64-dynamic-profile', 'android-arm64-dynamic-profile/artifacts.zip'],
-  <String>['android-arm64-dynamic-release', 'android-arm64-dynamic-release/artifacts.zip'],
+//  <String>['android-arm64', 'android-arm64/artifacts.zip'],
+//  <String>['android-arm64-profile', 'android-arm64-profile/artifacts.zip'],
+//  <String>['android-arm64-release', 'android-arm64-release/artifacts.zip'],
+//  <String>['android-arm-dynamic-profile', 'android-arm-dynamic-profile/artifacts.zip'],
+//  <String>['android-arm-dynamic-release', 'android-arm-dynamic-release/artifacts.zip'],
+//  <String>['android-arm64-dynamic-profile', 'android-arm64-dynamic-profile/artifacts.zip'],
+//  <String>['android-arm64-dynamic-release', 'android-arm64-dynamic-release/artifacts.zip'],
 ];
 
 const List<List<String>> _iosBinaryDirs = <List<String>>[

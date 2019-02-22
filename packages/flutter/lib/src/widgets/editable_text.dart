@@ -302,6 +302,7 @@ class EditableText extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
     this.enableInteractiveSelection,
     this.scrollPhysics,
+    this.toolBarPosition = ToolBarPosition.Top,
   }) : assert(controller != null),
        assert(focusNode != null),
        assert(obscureText != null),
@@ -731,6 +732,9 @@ class EditableText extends StatefulWidget {
   /// Defaults to false, resulting in a typical blinking cursor.
   static bool debugDeterministicCursor = false;
 
+  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  final ToolBarPosition toolBarPosition;
+
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
 
@@ -1133,6 +1137,7 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
         selectionControls: widget.selectionControls,
         selectionDelegate: this,
         dragStartBehavior: widget.dragStartBehavior,
+        toolBarPosition: widget.toolBarPosition,
       );
       final bool longPress = cause == SelectionChangedCause.longPress;
       if (cause != SelectionChangedCause.keyboard && (_value.text.isNotEmpty || longPress))

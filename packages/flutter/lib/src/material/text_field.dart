@@ -166,6 +166,7 @@ class TextField extends StatefulWidget {
     this.onTap,
     this.buildCounter,
     this.scrollPhysics,
+    this.toolBarPosition = ToolBarPosition.Top,
   }) : assert(textAlign != null),
        assert(autofocus != null),
        assert(obscureText != null),
@@ -462,6 +463,9 @@ class TextField extends StatefulWidget {
 
   /// {@macro flutter.widgets.edtiableText.scrollPhysics}
   final ScrollPhysics scrollPhysics;
+
+  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  final ToolBarPosition toolBarPosition;
 
   @override
   _TextFieldState createState() => _TextFieldState();
@@ -898,6 +902,7 @@ class _TextFieldState extends State<TextField> with AutomaticKeepAliveClientMixi
         enableInteractiveSelection: widget.enableInteractiveSelection,
         dragStartBehavior: widget.dragStartBehavior,
         scrollPhysics: widget.scrollPhysics,
+        toolBarPosition: widget.toolBarPosition,
       ),
     );
 

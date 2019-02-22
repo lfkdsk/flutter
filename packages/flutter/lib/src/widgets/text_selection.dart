@@ -233,6 +233,14 @@ abstract class TextSelectionControls {
   }
 }
 
+///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
+enum ToolBarPosition {
+  ///[TextSelectionControls.buildToolbar] is above [TextField]. It's the default value.
+  Top,
+  ///[TextSelectionControls.buildToolbar] is under [TextField].
+  Bottom,
+}
+
 /// An object that manages a pair of text selection handles.
 ///
 /// The selection handles are displayed in the [Overlay] that most closely
@@ -250,6 +258,7 @@ class TextSelectionOverlay {
     this.selectionControls,
     this.selectionDelegate,
     this.dragStartBehavior = DragStartBehavior.start,
+    this.toolBarPosition,
   }) : assert(value != null),
        assert(context != null),
        _value = value {
@@ -305,6 +314,9 @@ class TextSelectionOverlay {
 
   /// Controls the fade-in and fade-out animations for the toolbar and handles.
   static const Duration fadeDuration = Duration(milliseconds: 150);
+
+  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  final ToolBarPosition toolBarPosition;
 
   AnimationController _toolbarController;
   Animation<double> get _toolbarOpacity => _toolbarController.view;
@@ -421,11 +433,26 @@ class TextSelectionOverlay {
 
     // Find the horizontal midpoint, just above the selected text.
     final List<TextSelectionPoint> endpoints = renderObject.getEndpointsForSelection(_selection);
+
+    double _midpointDy;
+    if (toolBarPosition == ToolBarPosition.Bottom) {
+      /// In Android Platform
+      /// 66 = 44 + 22;
+      /// 44: ToolBar's height. See material/text_selection.dart's 53 line => _TextSelectionToolbar
+      /// 22: ToolBar handle's height. See material/text_selection.dart's 16 line => _kHandleSize
+      /// In IOS Platform
+      /// 66 = 36 + 30;
+      /// 36: ToolBar's height. See cupertino/text_selection.dart's 19 line => _kToolbarHeight
+      /// 30: ToolBar handle's height. See cupertino/text_selection.dart's 30 line => _kSelectionOffset
+      _midpointDy = endpoints[0].point.dy + 66;
+    } else {
+      _midpointDy = endpoints[0].point.dy - renderObject.preferredLineHeight;
+    }
     final Offset midpoint = Offset(
       (endpoints.length == 1) ?
         endpoints[0].point.dx :
         (endpoints[0].point.dx + endpoints[1].point.dx) / 2.0,
-      endpoints[0].point.dy - renderObject.preferredLineHeight,
+      _midpointDy,
     );
 
     final Rect editingRegion = Rect.fromPoints(

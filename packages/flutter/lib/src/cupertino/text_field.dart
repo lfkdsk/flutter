@@ -187,6 +187,7 @@ class CupertinoTextField extends StatefulWidget {
     this.scrollPadding = const EdgeInsets.all(20.0),
     this.dragStartBehavior = DragStartBehavior.start,
     this.scrollPhysics,
+    this.toolBarPosition = ToolBarPosition.Top,
   }) : assert(textAlign != null),
        assert(autofocus != null),
        assert(obscureText != null),
@@ -428,6 +429,9 @@ class CupertinoTextField extends StatefulWidget {
 
   /// {@macro flutter.widgets.edtiableText.scrollPhysics}
   final ScrollPhysics scrollPhysics;
+
+  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  final ToolBarPosition toolBarPosition;
 
   @override
   _CupertinoTextFieldState createState() => _CupertinoTextFieldState();
@@ -755,6 +759,7 @@ class _CupertinoTextFieldState extends State<CupertinoTextField> with AutomaticK
           backgroundCursorColor: CupertinoColors.inactiveGray,
           scrollPadding: widget.scrollPadding,
           keyboardAppearance: keyboardAppearance,
+          toolBarPosition: widget.toolBarPosition,
           dragStartBehavior: widget.dragStartBehavior,
           scrollPhysics: widget.scrollPhysics,
         ),

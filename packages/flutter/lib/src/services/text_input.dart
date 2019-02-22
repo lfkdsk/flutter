@@ -7,6 +7,7 @@ import 'dart:io' show Platform;
 import 'dart:ui' show TextAffinity, hashValues, Offset;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/src/widgets/text_selection.dart';
 
 import 'message_codec.dart';
 import 'system_channels.dart';
@@ -585,6 +586,9 @@ abstract class TextSelectionDelegate {
   /// Brings the provided [TextPosition] into the visible area of the text
   /// input.
   void bringIntoView(TextPosition position);
+
+  ///Get [TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  ToolBarPosition getToolBarPosition();
 }
 
 /// An interface to receive information from [TextInput].

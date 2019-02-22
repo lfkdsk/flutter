@@ -1137,7 +1137,6 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
         selectionControls: widget.selectionControls,
         selectionDelegate: this,
         dragStartBehavior: widget.dragStartBehavior,
-        toolBarPosition: widget.toolBarPosition,
       );
       final bool longPress = cause == SelectionChangedCause.longPress;
       if (cause != SelectionChangedCause.keyboard && (_value.text.isNotEmpty || longPress))
@@ -1382,6 +1381,11 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
   @override
   void hideToolbar() {
     _selectionOverlay?.hide();
+  }
+
+  @override
+  ToolBarPosition getToolBarPosition() {
+    return widget.toolBarPosition;
   }
 
   VoidCallback _semanticsOnCopy(TextSelectionControls controls) {

@@ -10,6 +10,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/src/material/theme.dart';
 
 import 'basic.dart';
 import 'container.dart';
@@ -258,7 +259,6 @@ class TextSelectionOverlay {
     this.selectionControls,
     this.selectionDelegate,
     this.dragStartBehavior = DragStartBehavior.start,
-    this.toolBarPosition,
   }) : assert(value != null),
        assert(context != null),
        _value = value {
@@ -314,9 +314,6 @@ class TextSelectionOverlay {
 
   /// Controls the fade-in and fade-out animations for the toolbar and handles.
   static const Duration fadeDuration = Duration(milliseconds: 150);
-
-  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
-  final ToolBarPosition toolBarPosition;
 
   AnimationController _toolbarController;
   Animation<double> get _toolbarOpacity => _toolbarController.view;
@@ -435,16 +432,23 @@ class TextSelectionOverlay {
     final List<TextSelectionPoint> endpoints = renderObject.getEndpointsForSelection(_selection);
 
     double _midpointDy;
-    if (toolBarPosition == ToolBarPosition.Bottom) {
-      /// In Android Platform
-      /// 66 = 44 + 22;
-      /// 44: ToolBar's height. See material/text_selection.dart's 53 line => _TextSelectionToolbar
-      /// 22: ToolBar handle's height. See material/text_selection.dart's 16 line => _kHandleSize
-      /// In IOS Platform
-      /// 66 = 36 + 30;
-      /// 36: ToolBar's height. See cupertino/text_selection.dart's 19 line => _kToolbarHeight
-      /// 30: ToolBar handle's height. See cupertino/text_selection.dart's 30 line => _kSelectionOffset
-      _midpointDy = endpoints[0].point.dy + 66;
+    if (selectionDelegate.getToolBarPosition() == ToolBarPosition.Bottom) {
+      if (Theme
+          .of(context)
+          .platform == TargetPlatform.iOS) {
+        /// In IOS Platform
+        /// 55 = 36 + 9 + 10;
+        /// 36: ToolBar's height. See cupertino/text_selection.dart's 19 line => _kToolbarHeight
+        /// 9: ToolBar's height. See cupertino/text_selection.dart's 31 line => _kToolbarTriangleSize
+        /// 10: ToolBar handle's height. See cupertino/text_selection.dart's 128 line => const Padding(padding: EdgeInsets.only(bottom: 10.0))
+        _midpointDy = endpoints[0].point.dy + 55;
+      } else {
+        /// In Android Platform
+        /// 66 = 44 + 22;
+        /// 44: ToolBar's height. See material/text_selection.dart's 53 line => _TextSelectionToolbar
+        /// 22: ToolBar handle's height. See material/text_selection.dart's 16 line => _kHandleSize
+        _midpointDy = endpoints[0].point.dy + 66;
+      }
     } else {
       _midpointDy = endpoints[0].point.dy - renderObject.preferredLineHeight;
     }

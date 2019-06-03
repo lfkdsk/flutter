@@ -292,6 +292,7 @@ class Cache {
           await artifact.update(requiredArtifacts);
         }
       }
+      cache.setStampFor(customEngineName, customEngineVersion);
     } on SocketException catch (e) {
       if (_hostsBlockedInChina.contains(e.address?.host)) {
         printError(
@@ -321,6 +322,24 @@ class Cache {
     return allAvailible;
   }
 }
+
+YamlMap _customEngineConfig;
+
+YamlMap get customEngineConfig {
+  _customEngineConfig ??= loadYaml(fs
+    .file(fs.path
+    .join(Cache.flutterRoot, 'bin', 'internal', 'tt_engine.yaml'))
+    .readAsStringSync());
+  return _customEngineConfig;
+}
+
+const String customEngineName = 'tt_engine';
+
+String get customEngineVersion => customEngineConfig['ref'];
+
+YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
+
+String get customEngineDownloadUrl => customEngineConfig['url'];
 
 /// An artifact managed by the cache.
 abstract class CachedArtifact {
@@ -611,7 +630,6 @@ abstract class EngineCachedArtifact extends CachedArtifact {
       await licenseSource.copy(licenseDestinationPath);
     }
 
-    cache.setStampFor(customEngineName, customEngineVersion);
   }
 
   Future<bool> checkForArtifacts(String engineVersion) async {
@@ -650,23 +668,6 @@ abstract class EngineCachedArtifact extends CachedArtifact {
     }
   }
 
-  YamlMap _customEngineConfig;
-
-  YamlMap get customEngineConfig {
-    _customEngineConfig ??= loadYaml(fs
-        .file(fs.path
-        .join(Cache.flutterRoot, 'bin', 'internal', 'tt_engine.yaml'))
-        .readAsStringSync());
-    return _customEngineConfig;
-  }
-
-  String get customEngineVersion => customEngineConfig['ref'];
-
-  YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
-
-  String get customEngineDownloadUrl => customEngineConfig['url'];
-
-  String get customEngineName => 'tt_engine';
 }
 
 

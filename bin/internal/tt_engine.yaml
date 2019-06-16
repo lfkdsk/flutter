@@ -1,5 +1,5 @@
 url: http://voffline.byted.org/download/tos/schedule/toutiao.ios.arch/flutter/framework
-ref: 493626e740271c4a493fd2c7c692a0640a60f5b9
+ref: 1a03cb3d4780ff10b76a58b3a266ef35578d21ab
 #artifacts: [ios, ios-profile, ios-release]
 artifacts: [
     ios,

@@ -1,38 +1,14 @@
-import java.lang.reflect.Field
+import org.apache.commons.io.FileUtils
+import org.gradle.api.GradleException
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
 import java.nio.file.Path
 import java.nio.file.Paths
-
-import com.android.builder.model.AndroidProject
-import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
-import org.gradle.api.Project
-import org.gradle.api.Plugin
-import org.gradle.api.Task
-import org.gradle.api.file.CopySpec
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
-import org.gradle.api.tasks.bundling.Jar
-
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarInputStream
 import java.util.jar.JarOutputStream
-
-import com.android.build.gradle.api.ApkVariant
-import com.android.build.gradle.internal.ide.ArtifactDependencyGraph
-import com.android.build.gradle.internal.tasks.AppPreBuildTask
-import com.android.builder.model.Dependencies
-import com.android.builder.model.SyncIssue
-import com.google.common.collect.ImmutableMap
-import org.gradle.api.artifacts.transform.ArtifactTransform
-import org.gradle.api.Project
-
-import java.util.function.Consumer
-import org.apache.commons.io.FileUtils
 
 buildscript {
     repositories {
@@ -55,8 +31,6 @@ class FlutterPatchPlugin implements Plugin<Project> {
     private File debugFlutterJar
     private File profileFlutterJar
     private File releaseFlutterJar
-    private File dynamicProfileFlutterJar
-    private File dynamicReleaseFlutterJar
     private String targetArch
     static final String flutterBuildPrefix = "flutterBuild"
 
@@ -81,31 +55,13 @@ class FlutterPatchPlugin implements Plugin<Project> {
         debugFlutterJar = baseEnginePath.resolve("android-${targetArch}").resolve("flutter.jar").toFile()
         profileFlutterJar = baseEnginePath.resolve("android-${targetArch}-profile").resolve("flutter.jar").toFile()
         releaseFlutterJar = baseEnginePath.resolve("android-${targetArch}-release").resolve("flutter.jar").toFile()
-        dynamicProfileFlutterJar = baseEnginePath.resolve("android-${targetArch}-dynamic-profile").resolve("flutter.jar").toFile()
-        dynamicReleaseFlutterJar = baseEnginePath.resolve("android-${targetArch}-dynamic-release").resolve("flutter.jar").toFile()
 
-        Set<String> excludesFiles = new HashSet<>()
-
-        if (project.hasProperty("EXCLUDE_FLUTTER_JAR_FILES")) {
-            String excludesStr = project.property("EXCLUDE_FLUTTER_JAR_FILES")
-            if (excludesStr != null) {
-                excludesFiles.addAll(excludesStr.split(',').toList())
-            }
-        }
         File pluginsFile = new File(project.projectDir.parentFile.parentFile, '.flutter-plugins')
         Properties plugins = readPropertiesIfExist(pluginsFile)
 
         plugins.each { name, _ ->
             def pluginProject = project.rootProject.findProject(":$name")
-            if (pluginProject != null) {
-                // 解析需要自定义的类，从jar中排除
-                if (pluginProject.hasProperty("EXCLUDE_FLUTTER_JAR_FILES")) {
-                    String excludesStr = pluginProject.property("EXCLUDE_FLUTTER_JAR_FILES")
-                    if (excludesStr != null) {
-                        excludesFiles.addAll(excludesStr.split(',').toList())
-                    }
-                }
-            } else {
+            if (pluginProject == null) {
                 project.logger.error("Plugin project :$name not found. Please update settings.gradle.")
             }
         }
@@ -114,77 +70,15 @@ class FlutterPatchPlugin implements Plugin<Project> {
             String engineOutPath = project.property('localEngineOut')
             File engineOut = project.file(engineOutPath)
             File flutterJar = Paths.get(engineOut.absolutePath, "flutter.jar").toFile()
-            createJarContainsArmeabi(flutterJar, excludesFiles)
+            createJarContainsArmeabi(flutterJar)
         }
 
-        createJarContainsArmeabi(debugFlutterJar, excludesFiles)
-        createJarContainsArmeabi(profileFlutterJar, excludesFiles)
-        createJarContainsArmeabi(releaseFlutterJar, excludesFiles)
-
-        def addFlutterDeps = { variant ->
-            if (project.plugins.hasPlugin("com.android.library")) {
-                File file = getFlutterJar(variant.buildType)
-                File icudtlFile = new File(getFlutterJar(variant.buildType).parent + File.separator + "icudtl.dat")
-
-                // 从flutter.jar中解压出icudtl.dat，放到flutter.jar所在目录
-                if (!icudtlFile.exists()) {
-                    JarFile jarFile = new JarFile(file)
-                    Enumeration<JarEntry> entries = jarFile.entries()
-                    while (entries.hasMoreElements()) {
-                        JarEntry jarEntry = entries.nextElement();
-                        if (jarEntry.getName().contains("icudtl.dat")) {
-                            InputStream inputStream = jarFile.getInputStream(jarEntry)
-                            writeFile(inputStream, icudtlFile)
-                            inputStream.close()
-                        }
-                    }
-                }
-
-                // 在处理资源时添加将icudtl.dat复制到目标位置的Task
-                Task copyIcudtlTask = project.tasks.create(name: "copyIcudtlAssets${variant.name.capitalize()}", type: Copy) {
-                    from icudtlFile.toString()
-                    into variant.mergeAssets.outputDir.path + "/flutter_shared"
-                }
-                copyIcudtlTask.doLast {
-                    icudtlFile.delete()
-                }
-                variant.outputs[0].processResources.dependsOn(copyIcudtlTask)
-            }
-        }
-
-        if (project.android.hasProperty("applicationVariants")) {
-            project.android.applicationVariants.all addFlutterDeps
-        } else {
-            project.android.libraryVariants.all addFlutterDeps
-        }
-
+        createJarContainsArmeabi(debugFlutterJar)
+        createJarContainsArmeabi(profileFlutterJar)
+        createJarContainsArmeabi(releaseFlutterJar)
     }
 
-    private File getFlutterJar(buildType) {
-        String buildMode = buildModeFor(buildType)
-        if (buildMode == "debug") {
-            debugFlutterJar
-        } else if (buildMode == "profile") {
-            profileFlutterJar
-        } else {
-            releaseFlutterJar
-        }
-    }
-
-    private static String buildModeFor(buildType) {
-        if (buildType.name == "profile") {
-            return "profile"
-        } else if (buildType.name == "dynamicProfile") {
-            return "dynamicProfile"
-        } else if (buildType.name == "dynamicRelease") {
-            return "dynamicRelease"
-        } else if (buildType.debuggable) {
-            return "debug"
-        }
-        return "release"
-    }
-
-    private void createJarContainsArmeabi(File file, Set<String> excludesFiles) {
+    private void createJarContainsArmeabi(File file) {
         // flutter_origin.jar为原文件的备份
         File originFile = new File(file.getParent() + File.separator + "flutter_origin.jar")
 
@@ -194,9 +88,7 @@ class FlutterPatchPlugin implements Plugin<Project> {
             FileUtils.copyFile(file, originFile)
         } else {
             // 已经是处理好的jar了
-            if (excludesFiles.isEmpty()) {
-                return
-            }
+            return
         }
 
         String path = file.path
@@ -209,9 +101,7 @@ class FlutterPatchPlugin implements Plugin<Project> {
         JarEntry jarEntry
         // copy所有文件，同时排除gradle.properties中排除的文件
         while ((jarEntry = jarInputStream.nextJarEntry) != null) {
-            if (!jarEntry.isDirectory() && (excludesFiles == null || !excludesFiles.any {
-                jarEntry.name.startsWith(it.trim())
-            })) {
+            if (!jarEntry.isDirectory()) {
                 jarOutputStream.putNextEntry(jarEntry)
                 copyStream(jarFile.getInputStream(jarEntry), jarOutputStream)
                 jarOutputStream.closeEntry()
@@ -264,17 +154,6 @@ class FlutterPatchPlugin implements Plugin<Project> {
         return result
     }
 
-    void writeFile(InputStream is, File file) throws Exception {
-        if (file != null) {
-            OutputStream os = new BufferedOutputStream(new FileOutputStream(file))
-            byte[] bytes = new byte[2048]
-            int len
-            while ((len = is.read(bytes)) != -1) {
-                os.write(bytes, 0, len)
-            }
-            os.close()
-        }
-    }
 }
 
 

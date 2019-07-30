@@ -589,6 +589,17 @@ class FlutterPlugin implements Plugin<Project> {
                 dependsOn compileTasks
                 // Add the ELF library.
                 compileTasks.each { compileTask ->
+                    // Bytedance ADD
+                    // 复制armeabi-v7a的libapp.so到armeabi
+                    if (compileTask.abi.equals(ARCH_ARM32)) {
+                        from(compileTask.intermediateDir) {
+                            include '*.so'
+                            rename { String filename ->
+                                return "lib/armeabi/lib${filename}"
+                            }
+                        }
+                    }
+                    // Bytedance ADD END
                     from(compileTask.intermediateDir) {
                         include '*.so'
                         rename { String filename ->

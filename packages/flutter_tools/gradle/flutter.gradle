@@ -430,6 +430,10 @@ class FlutterPlugin implements Plugin<Project> {
                 Task mergeAssets = project.tasks.findByPath(":${mainModuleName}:merge${variant.name.capitalize()}Assets")
                 if (mergeAssets) {
                     mergeAssets.dependsOn(copyFlutterAssetsTask)
+                } else {
+                    // Bytedance ADD 兼容Task找不到
+                    def processResources = variant.outputs.first().processResources
+                    processResources.dependsOn(copyFlutterAssetsTask)
                 }
             } else {
                 variant.outputs[0].processResources.dependsOn(copyFlutterAssetsTask)

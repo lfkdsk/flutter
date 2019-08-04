@@ -81,6 +81,12 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     RouteSettings settings,
   }) : super(settings: settings);
 
+  /// BD ADD:
+  /// If true, AnimatedBuilder will removed from the [_ModalScopeState.build]'s widget tree,
+  /// then we can reuse the widgets when the transitions animation is executing.
+  /// https://jira.bytedance.com/browse/FLUTTER-121
+  static bool canReuseTransitionsWidget = false;
+
   /// This future completes only once the transition itself has finished, after
   /// the overlay entries have been removed from the navigator's overlay.
   ///
@@ -631,7 +637,30 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
           child: FocusScope(
             node: widget.route.focusScopeNode, // immutable
             child: RepaintBoundary(
-              child: AnimatedBuilder(
+              // BD MOD: START
+              // child: AnimatedBuilder(
+              child: TransitionRoute.canReuseTransitionsWidget ?
+                widget.route.buildTransitions(
+                  context,
+                  widget.route.animation,
+                  widget.route.secondaryAnimation,
+                  IgnorePointer(
+                    ignoring: widget.route.animation?.status == AnimationStatus.reverse,
+                    child:  _page ??= RepaintBoundary(
+                      key: widget.route._subtreeKey, // immutable
+                      child: Builder(
+                        builder: (BuildContext context) {
+                          return widget.route.buildPage(
+                            context,
+                            widget.route.animation,
+                            widget.route.secondaryAnimation,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ) : AnimatedBuilder(
+              // END
                 animation: _listenable, // immutable
                 builder: (BuildContext context, Widget child) {
                   return widget.route.buildTransitions(

@@ -349,4 +349,22 @@ class TestWindow implements Window {
     clearTextScaleFactorTestValue();
     clearViewInsetsTestValue();
   }
+
+  /// BD Add
+  @override
+  List getFps(int threadType, int fpsType, bool doClear) {
+    return _window.getFps(threadType, fpsType, doClear);
+  }
+
+
+  @override
+  int getFpsMaxSamples() {
+    return _window.getFpsMaxSamples();
+  }
+
+  @override
+  void addNextFrameCallback(callback) {
+    _window.addNextFrameCallback(callback);
+  }
+
 }

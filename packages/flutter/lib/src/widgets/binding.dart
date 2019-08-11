@@ -4,13 +4,17 @@
 
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures;
+// BD MOD:
+// import 'dart:ui' as ui show AppLifecycleState, Locale, AccessibilityFeatures;
+import 'dart:ui' as ui show AppLifecycleState, Locale, AccessibilityFeatures, window;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+// BD ADD:
+import 'package:flutter/widgets.dart';
 
 import 'app.dart';
 import 'debug.dart';
@@ -984,8 +988,14 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
   /// binding instance to a [TestWidgetsFlutterBinding], not a
   /// [WidgetsFlutterBinding].
   static WidgetsBinding ensureInitialized() {
-    if (WidgetsBinding.instance == null)
+    if (WidgetsBinding.instance == null) {
       WidgetsFlutterBinding();
+      // BD ADD: START
+      ui.window.exitApp = () {
+        runApp(Container());
+      };
+      // END
+    }
     return WidgetsBinding.instance;
   }
 }

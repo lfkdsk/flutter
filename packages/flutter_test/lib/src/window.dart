@@ -350,7 +350,7 @@ class TestWindow implements Window {
     clearViewInsetsTestValue();
   }
 
-  /// BD Add
+  // BD Add: START
   @override
   List getFps(int threadType, int fpsType, bool doClear) {
     return _window.getFps(threadType, fpsType, doClear);
@@ -366,5 +366,6 @@ class TestWindow implements Window {
   void addNextFrameCallback(callback) {
     _window.addNextFrameCallback(callback);
   }
+  // END
 
 }

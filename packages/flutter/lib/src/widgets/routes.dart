@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-
+// BD ADD:
+import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
 
 import 'basic.dart';
@@ -80,12 +81,6 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
   TransitionRoute({
     RouteSettings settings,
   }) : super(settings: settings);
-
-  /// BD ADD:
-  /// If true, AnimatedBuilder will removed from the [_ModalScopeState.build]'s widget tree,
-  /// then we can reuse the widgets when the transitions animation is executing.
-  /// https://jira.bytedance.com/browse/FLUTTER-121
-  static bool canReuseTransitionsWidget = false;
 
   /// This future completes only once the transition itself has finished, after
   /// the overlay entries have been removed from the navigator's overlay.
@@ -639,7 +634,7 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
             child: RepaintBoundary(
               // BD MOD: START
               // child: AnimatedBuilder(
-              child: TransitionRoute.canReuseTransitionsWidget ?
+              child: Boost.reuseTransitionsWidget ?
                 widget.route.buildTransitions(
                   context,
                   widget.route.animation,

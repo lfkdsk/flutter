@@ -31,12 +31,17 @@ class Boost {
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-80
   static const int _kEnableExtendBufferQueue = 1 << 5;
+
   ///
   static const Duration kMaxBoostDuration = Duration(seconds: 30);
+
+  ///
+  static const Duration _kMaxDisableGCDuration = Duration(seconds: 5);
 
   /// if true, will close semantics calculate when draw a frame.
   /// See also: https://jira.bytedance.com/browse/FLUTTER-3
   static bool _disabledSemantics = true;
+
   ///
   static bool get disabledSemantics => _disabledSemantics;
 
@@ -44,6 +49,7 @@ class Boost {
   /// then we can reuse the widgets when the transitions animation is executing.
   /// https://jira.bytedance.com/browse/FLUTTER-121
   static bool _reuseTransitionsWidget = true;
+
   ///
   static bool get reuseTransitionsWidget => _reuseTransitionsWidget;
 
@@ -63,28 +69,28 @@ class Boost {
       bool delayPlatformMessage,
       bool extendBufferQueue) {
     if (enableAll) {
-      return _kAllFlags;
+      return _kAllFlags.toUnsigned(16);
     }
     int flags = 0;
     if (disableGC) {
-      flags &= _kDisableGC;
+      flags |= _kDisableGC;
     }
     if (disableAA) {
-      flags &= _kDisableAA;
+      flags |= _kDisableAA;
     }
     if (waitSwapBuffer) {
-      flags &= _kEnableWaitSwapBuffer;
+      flags |= _kEnableWaitSwapBuffer;
     }
     if (delayFuture) {
-      flags &= _kDelayFuture;
+      flags |= _kDelayFuture;
     }
     if (delayPlatformMessage) {
-      flags &= _kDelayPlatformMessage;
+      flags |= _kDelayPlatformMessage;
     }
     if (extendBufferQueue) {
-      flags &= _kEnableExtendBufferQueue;
+      flags |= _kEnableExtendBufferQueue;
     }
-    return flags;
+    return flags.toUnsigned(16);
   }
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-61
@@ -96,10 +102,15 @@ class Boost {
       bool delayFuture = false,
       bool delayPlatformMessage = false,
       bool extendBufferQueue = false}) {
-    final int flags = _ensureFlags(enabledAll, disableGC, disableAA, waitSwapBuffer,
-        delayFuture, delayPlatformMessage, extendBufferQueue);
+    final int flags = _ensureFlags(enabledAll, disableGC, disableAA,
+        waitSwapBuffer, delayFuture, delayPlatformMessage, extendBufferQueue);
     if (kMaxBoostDuration < duration) {
       duration = kMaxBoostDuration;
+    }
+    if (enabledAll || disableGC) {
+      if (duration > _kMaxDisableGCDuration) {
+        duration = _kMaxDisableGCDuration;
+      }
     }
     startBoost(flags, duration.inMilliseconds);
   }
@@ -113,8 +124,8 @@ class Boost {
       bool delayFuture = false,
       bool delayPlatformMessage = false,
       bool extendBufferQueue = false}) {
-    final int flags = _ensureFlags(finishAll, disableGC, disableAA, waitSwapBuffer,
-        delayFuture, delayPlatformMessage, extendBufferQueue);
+    final int flags = _ensureFlags(finishAll, disableGC, disableAA,
+        waitSwapBuffer, delayFuture, delayPlatformMessage, extendBufferQueue);
     finishBoost(flags);
   }
 

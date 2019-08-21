@@ -4496,7 +4496,9 @@ abstract class RenderObjectElement extends Element {
   void mount(Element parent, dynamic newSlot) {
     super.mount(parent, newSlot);
     _renderObject = widget.createRenderObject(this);
-    assert(() { _debugUpdateRenderObjectOwner(); return true; }());
+    //BD MOD
+    //assert(() { _debugUpdateRenderObjectOwner(); return true; }());
+    _debugUpdateRenderObjectOwner();
     assert(_slot == newSlot);
     attachRenderObject(newSlot);
     _dirty = false;
@@ -4511,11 +4513,13 @@ abstract class RenderObjectElement extends Element {
     _dirty = false;
   }
 
+  //BD MOD
   void _debugUpdateRenderObjectOwner() {
-    assert(() {
-      _renderObject.debugCreator = _DebugCreator(this);
-      return true;
-    }());
+    //assert(() {
+    //  _renderObject.debugCreator = _DebugCreator(this);
+    //  return true;
+    //}());
+    _renderObject.debugCreator = _DebugCreator(this);
   }
 
   @override

@@ -11,6 +11,8 @@ import 'package:flutter/rendering.dart';
 
 import 'debug.dart';
 import 'focus_manager.dart';
+// BD ADD:
+import 'widget_inspector.dart';
 
 export 'dart:ui' show hashValues, hashList;
 
@@ -3739,7 +3741,15 @@ abstract class ComponentElement extends Element {
       built = build();
       debugWidgetBuilderValue(widget, built);
     } catch (e, stack) {
-      built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
+      // BD MOD: START
+      //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
+      built = ErrorWidget.builder(_debugReportException(
+          'building $this', e, stack,
+          informationCollector: (StringBuffer information) {
+            information?.writeln(
+                'ErrorWidgetLocation:' + getCreationLocationForError(this));
+          }));
+      // END
     } finally {
       // We delay marking the element as clean until after calling build() so
       // that attempts to markNeedsBuild() during build() will be ignored.
@@ -3750,7 +3760,15 @@ abstract class ComponentElement extends Element {
       _child = updateChild(_child, built, slot);
       assert(_child != null);
     } catch (e, stack) {
-      built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
+      // BD MOD: START
+      //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
+      built = ErrorWidget.builder(_debugReportException(
+          'building $this', e, stack,
+          informationCollector: (StringBuffer information) {
+            information?.writeln(
+                'ErrorWidgetLocation:' + getCreationLocationForError(this));
+          }));
+      // END
       _child = updateChild(null, built, slot);
     }
 

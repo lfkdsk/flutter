@@ -13,6 +13,8 @@ library services;
 export 'src/services/asset_bundle.dart';
 export 'src/services/binding.dart';
 export 'src/services/clipboard.dart';
+// BD ADD:
+export 'src/services/flutter_version.dart';
 export 'src/services/font_loader.dart';
 export 'src/services/haptic_feedback.dart';
 export 'src/services/keyboard_key.dart';

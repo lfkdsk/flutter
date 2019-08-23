@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 
 import 'debug.dart';
 import 'framework.dart';
+// BD ADD:
+import 'widget_inspector.dart';
 
 /// The signature of the [LayoutBuilder] builder function.
 typedef LayoutWidgetBuilder = Widget Function(BuildContext context, BoxConstraints constraints);
@@ -113,14 +115,32 @@ class _LayoutBuilderElement extends RenderObjectElement {
           built = widget.builder(this, constraints);
           debugWidgetBuilderValue(widget, built);
         } catch (e, stack) {
-          built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
+          // BD MOD: START
+          //built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
+          built = ErrorWidget.builder(_debugReportException(
+              'building $widget', e, stack,
+              informationCollector: (StringBuffer information) {
+                information?.writeln(
+                    'ErrorWidgetLocation:' +
+                        getCreationLocationForError(this));
+              }));
+          // END
         }
       }
       try {
         _child = updateChild(_child, built, null);
         assert(_child != null);
       } catch (e, stack) {
-        built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
+        // BD MOD: START
+        //built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
+        built = ErrorWidget.builder(
+            _debugReportException('building $widget', e, stack,
+                informationCollector: (StringBuffer information) {
+                  information?.writeln(
+                      'ErrorWidgetLocation:' +
+                          getCreationLocationForError(this));
+                }));
+        // END
         _child = updateChild(null, built, slot);
       }
     });
@@ -229,12 +249,15 @@ FlutterErrorDetails _debugReportException(
   String context,
   dynamic exception,
   StackTrace stack,
-) {
+  //BD ADD:
+  {InformationCollector informationCollector,}) {
   final FlutterErrorDetails details = FlutterErrorDetails(
     exception: exception,
     stack: stack,
     library: 'widgets library',
     context: context,
+    // BD ADD:
+    informationCollector: informationCollector,
   );
   FlutterError.reportError(details);
   return details;

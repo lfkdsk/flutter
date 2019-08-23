@@ -227,14 +227,18 @@ class FlutterError extends AssertionError {
   /// recommended.
   static FlutterExceptionHandler onError = dumpErrorToConsole;
 
-  static int _errorCount = 0;
+  // BD MOD:
+  //static int _errorCount = 0;
+  static int errorCount = 0;
 
   /// Resets the count of errors used by [dumpErrorToConsole] to decide whether
   /// to show a complete error message or an abbreviated one.
   ///
   /// After this is called, the next error message will be shown in full.
   static void resetErrorCount() {
-    _errorCount = 0;
+    // BD MOD:
+    //_errorCount = 0;
+    errorCount = 0;
   }
 
   /// The width to which [dumpErrorToConsole] will wrap lines.
@@ -266,7 +270,9 @@ class FlutterError extends AssertionError {
     }());
     if (!reportError && !forceReport)
       return;
-    if (_errorCount == 0 || forceReport) {
+    // BD MOD:
+    //if (_errorCount == 0 || forceReport) {
+    if (errorCount == 0 || forceReport) {
       final String header = '\u2550\u2550\u2561 EXCEPTION CAUGHT BY ${details.library} \u255E'.toUpperCase();
       final String footer = '\u2550' * wrapWidth;
       debugPrint('$header${"\u2550" * (footer.length - header.length)}');
@@ -341,7 +347,9 @@ class FlutterError extends AssertionError {
     } else {
       debugPrint('Another exception was thrown: ${details.exceptionAsString().split("\n")[0].trimLeft()}');
     }
-    _errorCount += 1;
+    // BD MOD:
+    //_errorCount += 1;
+    errorCount += 1;
   }
 
   /// Converts a stack to a string that is more readable by omitting stack

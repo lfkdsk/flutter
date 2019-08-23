@@ -38,6 +38,8 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         defaultsTo: false,
         help: 'Report timing information about build steps in machine readable form,',
       )
+      // BD ADD
+      ..addFlag('track-widget-creation', defaultsTo: false, hide: true,)
       ..addMultiOption('ios-arch',
         splitCommas: true,
         defaultsTo: defaultIOSArchs.map<String>(getNameForIOSArch),
@@ -89,7 +91,9 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         buildMode: buildMode,
         mainPath: mainPath,
         packagesPath: PackageMap.globalPackagesPath,
-        trackWidgetCreation: false,
+        // BD MOD
+        //trackWidgetCreation: false,
+        trackWidgetCreation: argResults['track-widget-creation'],
         outputPath: outputPath,
         extraFrontEndOptions: argResults[FlutterOptions.kExtraFrontEndOptions],
       );

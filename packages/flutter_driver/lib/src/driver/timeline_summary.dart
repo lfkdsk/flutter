@@ -83,6 +83,11 @@ class TimelineSummary {
   /// The total number of frames recorded in the timeline.
   int countFrames() => _extractFrameDurations().length;
 
+  // BD ADD:
+  /// The total number of request vsync in the timeline
+  int countVsyncs() => _extractNamedEvents("VsyncSchedulingOverhead").length ~/ 2;
+
+
   /// Encodes this summary as JSON.
   Map<String, dynamic> get summaryJson {
     return <String, dynamic>{
@@ -97,6 +102,10 @@ class TimelineSummary {
       'worst_frame_rasterizer_time_millis': computeWorstFrameRasterizerTimeMillis(),
       'missed_frame_rasterizer_budget_count': computeMissedFrameRasterizerBudgetCount(),
       'frame_count': countFrames(),
+       // BD ADD : START
+      'vsync_count': countVsyncs(),
+      'missed_framevsync_count': countVsyncs() - countFrames(),
+       // END
       'frame_build_times': _extractFrameDurations()
         .map<int>((Duration duration) => duration.inMicroseconds)
         .toList(),

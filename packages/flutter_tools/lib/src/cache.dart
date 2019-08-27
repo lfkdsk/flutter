@@ -197,6 +197,12 @@ class Cache {
   }
   String _fuchsiaRevision;
 
+  String get customEngineRevision {
+    _customEngineRevision ??= getVersionFor('ttengine');
+    return _customEngineRevision;
+  }
+  String _customEngineRevision;
+
   static Cache get instance => context[Cache];
 
   /// Return the top-level directory in the cache; this is `bin/cache`.
@@ -292,7 +298,7 @@ class Cache {
           await artifact.update(requiredArtifacts);
         }
       }
-      cache.setStampFor(customEngineName, customEngineVersion);
+      cache.setStampFor(customEngineName, customEngineRevision);
     } on SocketException catch (e) {
       if (_hostsBlockedInChina.contains(e.address?.host)) {
         printError(
@@ -335,8 +341,6 @@ YamlMap get customEngineConfig {
 
 const String customEngineName = 'tt_engine';
 
-String get customEngineVersion => customEngineConfig['ref'];
-
 YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
 
 String get customEngineDownloadUrl => customEngineConfig['url'];
@@ -357,6 +361,7 @@ abstract class CachedArtifact {
 
   Directory get location => cache.getArtifactDirectory(name);
   String get version => cache.getVersionFor(name);
+  String get customEngineVersion => cache.customEngineRevision;
 
   /// Keep track of the files we've downloaded for this execution so we
   /// can delete them after completion. We don't delete them right after

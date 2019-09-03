@@ -991,8 +991,8 @@ const List<List<String>> _macOSDesktopBinaryDirs = <List<String>>[
 const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-arm-profile/darwin-x64', 'android-arm-profile/darwin-x64.zip'],
   <String>['android-arm-release/darwin-x64', 'android-arm-release/darwin-x64.zip'],
-//  <String>['android-arm64-profile/darwin-x64', 'android-arm64-profile/darwin-x64.zip'],
-//  <String>['android-arm64-release/darwin-x64', 'android-arm64-release/darwin-x64.zip'],
+  <String>['android-arm64-profile/darwin-x64', 'android-arm64-profile/darwin-x64.zip'],
+  <String>['android-arm64-release/darwin-x64', 'android-arm64-release/darwin-x64.zip'],
 //  <String>['android-arm-dynamic-profile/darwin-x64', 'android-arm-dynamic-profile/darwin-x64.zip'],
 //  <String>['android-arm-dynamic-release/darwin-x64', 'android-arm-dynamic-release/darwin-x64.zip'],
 //  <String>['android-arm64-dynamic-profile/darwin-x64', 'android-arm64-dynamic-profile/darwin-x64.zip'],
@@ -1022,14 +1022,14 @@ const List<List<String>> _windowsBinaryDirs = <List<String>>[
 ];
 
 const List<List<String>> _androidBinaryDirs = <List<String>>[
-//  <String>['android-x86', 'android-x86/artifacts.zip'],
-//  <String>['android-x64', 'android-x64/artifacts.zip'],
+  <String>['android-x86', 'android-x86/artifacts.zip'],
+  <String>['android-x64', 'android-x64/artifacts.zip'],
   <String>['android-arm', 'android-arm/artifacts.zip'],
   <String>['android-arm-profile', 'android-arm-profile/artifacts.zip'],
   <String>['android-arm-release', 'android-arm-release/artifacts.zip'],
-//  <String>['android-arm64', 'android-arm64/artifacts.zip'],
-//  <String>['android-arm64-profile', 'android-arm64-profile/artifacts.zip'],
-//  <String>['android-arm64-release', 'android-arm64-release/artifacts.zip'],
+  <String>['android-arm64', 'android-arm64/artifacts.zip'],
+  <String>['android-arm64-profile', 'android-arm64-profile/artifacts.zip'],
+  <String>['android-arm64-release', 'android-arm64-release/artifacts.zip'],
 //  <String>['android-arm-dynamic-profile', 'android-arm-dynamic-profile/artifacts.zip'],
 //  <String>['android-arm-dynamic-release', 'android-arm-dynamic-release/artifacts.zip'],
 //  <String>['android-arm64-dynamic-profile', 'android-arm64-dynamic-profile/artifacts.zip'],

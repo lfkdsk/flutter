@@ -87,6 +87,7 @@ class AOTSnapshotter {
     @required bool buildSharedLibrary,
     IOSArch iosArch,
     List<String> extraGenSnapshotOptions = const <String>[],
+    bool compressSize = false
   }) async {
     FlutterProject flutterProject;
     if (fs.file('pubspec.yaml').existsSync()) {
@@ -141,6 +142,9 @@ class AOTSnapshotter {
       printTrace('Extra gen_snapshot options: $extraGenSnapshotOptions');
       genSnapshotArgs.addAll(extraGenSnapshotOptions);
     }
+    if (platform != TargetPlatform.ios) {
+      compressSize = false;
+    }
 
     final String assembly = fs.path.join(outputDir.path, 'snapshot_assembly.S');
     if (buildSharedLibrary || platform == TargetPlatform.ios) {
@@ -148,6 +152,14 @@ class AOTSnapshotter {
       outputPaths.add(assembly);
       genSnapshotArgs.add('--snapshot_kind=app-aot-assembly');
       genSnapshotArgs.add('--assembly=$assembly');
+      if (compressSize) {
+        final String isolateSnapshotData = fs.path.join(
+            outputDir.path, 'isolate_snapshot_data');
+        final String vmSnapshotData = fs.path.join(
+            outputDir.path, 'vm_snapshot_data');
+        genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
+        genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
+      }
     } else {
       // Blob AOT snapshot.
       final String vmSnapshotData = fs.path.join(outputDir.path, 'vm_snapshot_data');

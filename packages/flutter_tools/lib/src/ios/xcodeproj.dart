@@ -35,6 +35,7 @@ Future<void> updateGeneratedXcodeProperties({
   @required FlutterProject project,
   @required BuildInfo buildInfo,
   String targetOverride,
+  bool compressSize = false,
 }) async {
   final StringBuffer localsBuffer = StringBuffer();
 
@@ -91,6 +92,9 @@ Future<void> updateGeneratedXcodeProperties({
 
   if (buildInfo.trackWidgetCreation) {
     localsBuffer.writeln('TRACK_WIDGET_CREATION=true');
+  }
+  if (compressSize) {
+    localsBuffer.writeln('COMPRESS_SIZE=true');
   }
 
   final File generatedXcodePropertiesFile = project.ios.generatedXcodePropertiesFile;

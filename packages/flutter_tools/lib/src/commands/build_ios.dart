@@ -39,7 +39,10 @@ class BuildIOSCommand extends BuildSubCommand {
       ..addFlag('codesign',
         defaultsTo: true,
         help: 'Codesign the application bundle (only available on device builds).',
-      );
+      )
+      ..addFlag('compress-size',
+      help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
+      negatable: false,);
   }
 
   @override
@@ -81,12 +84,16 @@ class BuildIOSCommand extends BuildSubCommand {
 
     final String typeName = artifacts.getEngineType(TargetPlatform.ios, buildInfo.mode);
     printStatus('Building $app for $logTarget ($typeName)...');
+    final bool compressSize = buildInfo.mode == BuildMode.release
+        ? argResults['compress-size']
+        : false;
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,
       targetOverride: targetFile,
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
+      compressSize: compressSize
     );
 
     if (!result.success) {

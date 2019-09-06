@@ -50,11 +50,18 @@ class Boost {
   /// If can reuse widget while transitions executing
   static bool get reuseTransitionsWidget => _reuseTransitionsWidget;
 
-  /// enable or disable semantics, reuseWidget
-  static void enable({bool disableSemantics = true, bool reuseWidget = true}) {
+  /// https://jira.bytedance.com/browse/FLUTTER-234
+  static bool _ignoreTransitionsFirstFrameTimeCost = true;
+
+  /// If true, will ignore first frame time cost when drive the transitions.
+  static bool get ignoreTransitionsFirstFrameTimeCost => _ignoreTransitionsFirstFrameTimeCost;
+
+  /// enable or disable semantics, reuseWidget and so on.
+  static void enable({bool disableSemantics = true, bool reuseWidget = true, bool ignoreTransitionsFirstFrameTimeCost = true}) {
     _disabledSemantics = disableSemantics;
     RendererBinding?.instance?.setSemanticsEnabled(!disableSemantics);
     _reuseTransitionsWidget = reuseWidget;
+    _ignoreTransitionsFirstFrameTimeCost = ignoreTransitionsFirstFrameTimeCost;
   }
 
   /// ensure boost flags

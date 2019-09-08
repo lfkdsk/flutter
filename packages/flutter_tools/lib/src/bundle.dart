@@ -219,9 +219,9 @@ Future<void> assemble({
       assetEntries[_kVMSnapshotData] = DevFSFileContent(fs.file(vmSnapshotData));
       assetEntries[_kIsolateSnapshotData] = DevFSFileContent(fs.file(isolateSnapshotData));
     }
-    // BD ADD:
-    assetEntries[_KFlutterVersion] = DevFSFileContent(fs.file(fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
   }
+  // BD ADD:
+  assetEntries[_KFlutterVersion] = DevFSFileContent(fs.file(fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
 
   printTrace('Writing asset files to $assetDirPath');
   ensureDirectoryExists(assetDirPath);

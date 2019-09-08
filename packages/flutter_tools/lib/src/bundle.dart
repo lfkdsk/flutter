@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+// BD ADD:
+import 'package:flutter_tools/src/cache.dart';
 import 'package:meta/meta.dart';
 
 import 'artifacts.dart';
@@ -46,6 +48,8 @@ const String _kKernelKey = 'kernel_blob.bin';
 const String _kVMSnapshotData = 'vm_snapshot_data';
 const String _kIsolateSnapshotData = 'isolate_snapshot_data';
 const String _kIsolateSnapshotInstr = 'isolate_snapshot_instr';
+// BD ADD:
+const String _KFlutterVersion = 'flutter_version';
 
 Future<void> build({
   TargetPlatform platform,
@@ -215,6 +219,8 @@ Future<void> assemble({
       assetEntries[_kVMSnapshotData] = DevFSFileContent(fs.file(vmSnapshotData));
       assetEntries[_kIsolateSnapshotData] = DevFSFileContent(fs.file(isolateSnapshotData));
     }
+    // BD ADD:
+    assetEntries[_KFlutterVersion] = DevFSFileContent(fs.file(fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
   }
 
   printTrace('Writing asset files to $assetDirPath');

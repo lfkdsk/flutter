@@ -4,10 +4,8 @@
 
 import 'dart:async';
 
-// BD ADD: START
+// BD ADD:
 import 'package:flutter/boost.dart';
-import 'dart:ui' as ui;
-// END
 import 'package:flutter/foundation.dart';
 
 import 'basic.dart';
@@ -19,6 +17,7 @@ import 'navigator.dart';
 import 'overlay.dart';
 import 'page_storage.dart';
 import 'transitions.dart';
+import 'dart:ui' as ui;
 
 // Examples can assume:
 // dynamic routeObserver;

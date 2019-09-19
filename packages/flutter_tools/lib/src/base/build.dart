@@ -87,6 +87,7 @@ class AOTSnapshotter {
     @required bool buildSharedLibrary,
     IOSArch iosArch,
     List<String> extraGenSnapshotOptions = const <String>[],
+    // BD ADD:
     bool compressSize = false
   }) async {
     FlutterProject flutterProject;
@@ -142,24 +143,32 @@ class AOTSnapshotter {
       printTrace('Extra gen_snapshot options: $extraGenSnapshotOptions');
       genSnapshotArgs.addAll(extraGenSnapshotOptions);
     }
+    // BD ADD: START
     if (platform != TargetPlatform.ios) {
       compressSize = false;
     }
+    // END
 
     final String assembly = fs.path.join(outputDir.path, 'snapshot_assembly.S');
+    // BD ADD: START
+    String isolateSnapshotData;
+    String vmSnapshotData;
+    // END
     if (buildSharedLibrary || platform == TargetPlatform.ios) {
       // Assembly AOT snapshot.
       outputPaths.add(assembly);
       genSnapshotArgs.add('--snapshot_kind=app-aot-assembly');
       genSnapshotArgs.add('--assembly=$assembly');
+      // BD ADD: START
       if (compressSize) {
-        final String isolateSnapshotData = fs.path.join(
+        isolateSnapshotData = fs.path.join(
             outputDir.path, 'isolate_snapshot_data');
-        final String vmSnapshotData = fs.path.join(
+        vmSnapshotData = fs.path.join(
             outputDir.path, 'vm_snapshot_data');
         genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
         genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
       }
+      // END
     } else {
       // Blob AOT snapshot.
       final String vmSnapshotData = fs.path.join(outputDir.path, 'vm_snapshot_data');
@@ -234,7 +243,9 @@ class AOTSnapshotter {
     // On iOS, we use Xcode to compile the snapshot into a dynamic library that the
     // end-developer can link into their app.
     if (platform == TargetPlatform.ios) {
-      final RunResult result = await _buildIosFramework(iosArch: iosArch, assemblyPath: assembly, outputPath: outputDir.path);
+      // BD MOD:
+      // final RunResult result = await _buildIosFramework(iosArch: iosArch, assemblyPath: assembly, outputPath: outputDir.path);
+      final RunResult result = await _buildIosFramework(iosArch: iosArch, assemblyPath: assembly, outputPath: outputDir.path, isolateSnapshotData: isolateSnapshotData, vmSnapshotData: vmSnapshotData);
       if (result.exitCode != 0)
         return result.exitCode;
     } else if (buildSharedLibrary) {
@@ -256,6 +267,10 @@ class AOTSnapshotter {
     @required IOSArch iosArch,
     @required String assemblyPath,
     @required String outputPath,
+    // BD ADD: START
+    String isolateSnapshotData,
+    String vmSnapshotData,
+    // END
   }) async {
     final String targetArch = iosArch == IOSArch.armv7 ? 'armv7' : 'arm64';
     printStatus('Building App.framework for $targetArch...');
@@ -279,6 +294,17 @@ class AOTSnapshotter {
         '-o', appLib,
         assemblyO,
     ]);
+
+    // BD ADD: START
+    if (isolateSnapshotData != null && vmSnapshotData != null) {
+        await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
+
+        await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
+    }
+    // END
+
     final RunResult linkResult = await xcode.clang(linkArgs);
     if (linkResult.exitCode != 0) {
       printError('Failed to link AOT snapshot. Linker terminated with exit code ${compileResult.exitCode}');

@@ -272,27 +272,6 @@ BuildApp() {
     ${local_engine_flag}                                                    \
     ${track_widget_creation_flag}
 
-  if [[ "$compress_size_flag" != "" ]]; then
-    for arch in "${archs[@]}"; do
-      local path="engine_armv7"
-      if [[ "$arch" == "arm64" ]]; then
-        path="engine_arm64"
-      fi
-      if [[ ! -d "${asset_dir}/${path}" ]]; then
-        RunCommand rm -rf "${asset_dir}/${path}"
-      fi
-      RunCommand mkdir -p -- "${asset_dir}/${path}"
-      RunCommand cp -f --  "${build_dir}/aot/${arch}/isolate_snapshot_data" "${asset_dir}/${path}/isolate_snapshot_data"
-      RunCommand cp -f --  "${build_dir}/aot/${arch}/vm_snapshot_data" "${asset_dir}/${path}/vm_snapshot_data"
-      RunCommand cp -f --   "${flutter_framework}/icudtl.dat" "${asset_dir}/${path}/icudtl.dat"
-      local current_path=`pwd`
-      RunCommand cd ${asset_dir}/${path}
-      zip -q -r ../${path}.zip ./*
-      RunCommand cd ${current_path}
-      RunCommand rm -rf "${asset_dir}/${path}"
-    done
-  fi
-
   if [[ $? -ne 0 ]]; then
     EchoError "Failed to package ${project_path}."
     exit -1

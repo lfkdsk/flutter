@@ -272,6 +272,15 @@ BuildApp() {
     ${local_engine_flag}                                                    \
     ${track_widget_creation_flag}
 
+  if [[ "$compress_size_flag" != "" ]]; then
+    RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${asset_dir}/icudtl.dat"
+    local current_path=`pwd`
+    RunCommand cd ${asset_dir}/
+    zip -q -r ./../${assets_path}.zip ./*
+    RunCommand cd ${current_path}
+    RunCommand rm -rf "${asset_dir}"
+  fi
+
   if [[ $? -ne 0 ]]; then
     EchoError "Failed to package ${project_path}."
     exit -1

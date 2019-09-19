@@ -256,7 +256,8 @@ BuildApp() {
     precompilation_flag="--precompiled"
   fi
 
-  local asset_dir="${derived_dir}/App.framework/${assets_path}"
+  local app_framework_dir="${derived_dir}/App.framework"
+  local asset_dir="${app_framework_dir}/${assets_path}"
 
   StreamOutput " ├─Assembling Flutter resources..."
   RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics             \
@@ -273,12 +274,18 @@ BuildApp() {
     ${track_widget_creation_flag}
 
   if [[ "$compress_size_flag" != "" ]]; then
-    RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${asset_dir}/icudtl.dat"
+    RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${app_framework_dir}/icudtl.dat"
     local current_path=`pwd`
-    RunCommand cd ${asset_dir}/
-    zip -q -r ./../${assets_path}.zip ./*
+    RunCommand cd ${app_framework_dir}/
+    zip -q -r flutter_compress_assets.zip icudtl.dat ${assets_path}
+    RunCommand rm -f icudtl.dat
+    local dirPath=`dirname ${assets_path}`
+    if [ "${dirPath}" == "." ];then
+      RunCommand rm -rf "${assets_path}"
+    else
+      RunCommand rm -rf "${dirPath}"
+    fi
     RunCommand cd ${current_path}
-    RunCommand rm -rf "${asset_dir}"
   fi
 
   if [[ $? -ne 0 ]]; then

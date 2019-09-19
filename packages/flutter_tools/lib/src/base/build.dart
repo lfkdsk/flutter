@@ -245,7 +245,7 @@ class AOTSnapshotter {
     if (platform == TargetPlatform.ios) {
       // BD MOD:
       // final RunResult result = await _buildIosFramework(iosArch: iosArch, assemblyPath: assembly, outputPath: outputDir.path);
-      final RunResult result = await _buildIosFramework(iosArch: iosArch, assemblyPath: assembly, outputPath: outputDir.path, isolateSnapshotData: isolateSnapshotData, vmSnapshotData: vmSnapshotData);
+      final RunResult result = await _buildIosFramework(iosArch: iosArch, assemblyPath: assembly, outputPath: outputDir.path, compressSize: compressSize, isolateSnapshotData: isolateSnapshotData, vmSnapshotData: vmSnapshotData);
       if (result.exitCode != 0)
         return result.exitCode;
     } else if (buildSharedLibrary) {
@@ -268,6 +268,7 @@ class AOTSnapshotter {
     @required String assemblyPath,
     @required String outputPath,
     // BD ADD: START
+    bool compressSize = false,
     String isolateSnapshotData,
     String vmSnapshotData,
     // END
@@ -296,10 +297,12 @@ class AOTSnapshotter {
     ]);
 
     // BD ADD: START
-    if (isolateSnapshotData != null && vmSnapshotData != null) {
+    if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
+        await runCheckedAsync(['rm', '-f', '$isolateSnapshotData.gz']);
         await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
         linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
 
+        await runCheckedAsync(['rm', '-f', '$vmSnapshotData.gz']);
         await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
         linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
     }

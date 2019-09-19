@@ -11,8 +11,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/animation.dart' show Curves;
-// BD ADD:
-import 'package:flutter/boost.dart';
 
 const double _kBackGestureWidth = 20.0;
 const double _kMinFlingVelocity = 1.0; // Screen widths per second.
@@ -143,11 +141,6 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
       'Cannot read the previousTitle for a route that has not yet been installed',
     );
     return _previousTitle;
-  }
-  // BD ADD:
-  @override
-  bool ignoreFirstFrameTimeCost() {
-    return Boost.ignoreTransitionsFirstFrameTimeCost;
   }
 
   @override

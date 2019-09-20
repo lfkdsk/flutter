@@ -174,17 +174,14 @@ class FlutterPlugin implements Plugin<Project> {
 
             // Add x86/x86_64 native library. Debug mode only, for now.
             flutterX86Jar = project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/flutter-x86.jar")
-            Task flutterX86JarTask
-            if (flutterX86Jar.isFile()) {
-                flutterX86JarTask = project.tasks.create("${flutterBuildPrefix}X86Jar", Jar) {
-                    destinationDir flutterX86Jar.parentFile
-                    archiveName flutterX86Jar.name
-                    from("${flutterRoot}/bin/cache/artifacts/engine/android-x86/libflutter.so") {
-                        into "lib/x86"
-                    }
-                    from("${flutterRoot}/bin/cache/artifacts/engine/android-x64/libflutter.so") {
-                        into "lib/x86_64"
-                    }
+            Task flutterX86JarTask = project.tasks.create("${flutterBuildPrefix}X86Jar", Jar) {
+                destinationDir flutterX86Jar.parentFile
+                archiveName flutterX86Jar.name
+                from("${flutterRoot}/bin/cache/artifacts/engine/android-x86/libflutter.so") {
+                    into "lib/x86"
+                }
+                from("${flutterRoot}/bin/cache/artifacts/engine/android-x64/libflutter.so") {
+                    into "lib/x86_64"
                 }
             }
             // Add flutter.jar dependencies to all <buildType>Api configurations, including custom ones
@@ -428,13 +425,17 @@ class FlutterPlugin implements Plugin<Project> {
                 }
                 // Only include configurations that exist in parent project.
                 Task mergeAssets = project.tasks.findByPath(":${mainModuleName}:merge${variant.name.capitalize()}Assets")
+                // BD MOD:START
+                //if (mergeAssets) {
+                //    mergeAssets.dependsOn(copyFlutterAssetsTask)
+                //}
                 if (mergeAssets) {
                     mergeAssets.dependsOn(copyFlutterAssetsTask)
                 } else {
-                    // Bytedance ADD 兼容Task找不到
                     def processResources = variant.outputs.first().processResources
                     processResources.dependsOn(copyFlutterAssetsTask)
                 }
+                // END
             } else {
                 variant.outputs[0].processResources.dependsOn(copyFlutterAssetsTask)
             }

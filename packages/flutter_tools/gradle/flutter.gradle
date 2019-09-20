@@ -39,7 +39,17 @@ android {
     }
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+
 apply plugin: FlutterPlugin
+apply from: "$flutterRoot/packages/flutter_tools/gradle/tt_flutter.gradle"
 
 class FlutterPlugin implements Plugin<Project> {
     // The platforms that can be passed to the `--Ptarget-platform` flag.

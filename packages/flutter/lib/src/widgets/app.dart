@@ -79,6 +79,8 @@ typedef LocaleResolutionCallback = Locale Function(Locale locale, Iterable<Local
 ///
 /// This function must not return null.
 typedef GenerateAppTitle = String Function(BuildContext context);
+// BD ADD:
+typedef WidgetBuildInterceptor = Widget Function(BuildContext context);
 
 /// The signature of [WidgetsApp.pageRouteBuilder].
 ///
@@ -699,6 +701,10 @@ class WidgetsApp extends StatefulWidget {
   /// with "s".
   static bool debugAllowBannerOverride = true;
 
+  /// BD ADD:
+  /// Allow external add callback to determine the WidgetApp build result.
+  static WidgetBuildInterceptor widgetBuildInterceptor;
+
   @override
   _WidgetsAppState createState() => _WidgetsAppState();
 }
@@ -1083,6 +1089,14 @@ class _WidgetsAppState extends State<WidgetsApp> implements WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
+    // BD ADD: START
+    if (WidgetsApp.widgetBuildInterceptor != null) {
+      Widget result = WidgetsApp.widgetBuildInterceptor(context);
+      if (result is Widget) {
+        return result;
+      }
+    }
+    // END
     Widget navigator;
     if (_navigator != null) {
       navigator = Navigator(

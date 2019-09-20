@@ -7,6 +7,7 @@ import 'dart:io' show Platform;
 import 'dart:ui' show TextAffinity, hashValues, Offset;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/src/widgets/text_selection.dart';
 
 import 'message_codec.dart';
 import 'system_channels.dart';
@@ -605,6 +606,11 @@ abstract class TextSelectionDelegate {
 
   /// Whether select all is enabled, must not be null.
   bool get selectAllEnabled => true;
+
+  // BD ADD: ShiShuo
+  ///Get [TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  ToolBarPosition getToolBarPosition();
+  // END
 }
 
 /// An interface to receive information from [TextInput].

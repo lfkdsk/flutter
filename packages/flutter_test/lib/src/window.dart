@@ -417,4 +417,23 @@ class TestWindow implements Window {
   dynamic noSuchMethod(Invocation invocation) {
     return null;
   }
+
+  // BD Add: START
+  @override
+  List getFps(int threadType, int fpsType, bool doClear) {
+    return _window.getFps(threadType, fpsType, doClear);
+  }
+
+
+  @override
+  int getFpsMaxSamples() {
+    return _window.getFpsMaxSamples();
+  }
+
+  @override
+  void addNextFrameCallback(callback) {
+    _window.addNextFrameCallback(callback);
+  }
+  // END
+
 }

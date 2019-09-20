@@ -397,6 +397,9 @@ class EditableText extends StatefulWidget {
       paste: true,
       selectAll: true
     )
+    // BD ADD: ShiShuo
+    this.toolBarPosition = ToolBarPosition.Top,
+    // END
   }) : assert(controller != null),
        assert(focusNode != null),
        assert(obscureText != null),
@@ -946,6 +949,9 @@ class EditableText extends StatefulWidget {
   ///
   /// Defaults to false, resulting in a typical blinking cursor.
   static bool debugDeterministicCursor = false;
+
+  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
+  final ToolBarPosition toolBarPosition;
 
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
@@ -1673,6 +1679,13 @@ class EditableTextState extends State<EditableText> with AutomaticKeepAliveClien
       showToolbar();
     }
   }
+
+  // BD ADD: ShiShuo
+  @override
+  ToolBarPosition getToolBarPosition() {
+    return widget.toolBarPosition;
+  }
+  // END
 
   VoidCallback _semanticsOnCopy(TextSelectionControls controls) {
     return widget.selectionEnabled && copyEnabled && _hasFocus && controls?.canCopy(this) == true

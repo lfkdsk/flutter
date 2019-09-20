@@ -1431,6 +1431,29 @@ mixin WidgetInspectorService {
     return false;
   }
 
+  // BD ADD :START
+  /// 业务层创建的Widget，返回CreateLocation
+  /// 非业务层创建的Widget或者无法获取Location，返回null
+  String getLocationCreatedByLocalProject(Object value) {
+    final _Location creationLocation = _getCreationLocation(value);
+    if (creationLocation == null || creationLocation.file == null) {
+      return null;
+    }
+    final String file = Uri.parse(creationLocation.file).path;
+
+    // By default check whether the creation location was within package:flutter.
+    if (_pubRootDirectories == null) {
+      return file.contains('packages/flutter/') ? null : creationLocation.toString();
+    }
+    for (String directory in _pubRootDirectories) {
+      if (file.startsWith(directory)) {
+        return creationLocation.toString();
+      }
+    }
+    return null;
+  }
+  // END
+
   /// Wrapper around `json.encode` that uses a ring of cached values to prevent
   /// the Dart garbage collector from collecting objects between when
   /// the value is returned over the Observatory protocol and when the
@@ -2824,6 +2847,24 @@ String _describeCreationLocation(Object object) {
   final _Location location = _getCreationLocation(object);
   return location?.toString();
 }
+
+// BD ADD: START
+///Element向上遍历，寻找第一个由业务创建的Widget，返回创建地址
+String getCreationLocationForError(Element element) {
+  if (element == null) {
+    return 'none';
+  }
+  String location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(element);
+  if (location != null) {
+    return location;
+  }
+  element?.visitAncestorElements((ancestor) {
+    location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(ancestor);
+    return location == null;
+  });
+  return location ?? 'none';
+}
+// END
 
 /// Returns the creation location of an object if one is available.
 ///

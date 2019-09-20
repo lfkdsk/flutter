@@ -1,0 +1,33 @@
+url: http://voffline.byted.org/download/tos/schedule/toutiao.ios.arch/flutter/framework
+ref: 46ff944ffc4892f8adb6108d07969b6dc5947fe1
+#artifacts: [ios, ios-profile, ios-release]
+artifacts: [
+    ios,
+    ios-profile,
+    ios-release,
+
+    common,
+    sky_engine,
+    darwin-x64,
+
+    android-arm-profile/darwin-x64,
+    android-arm-release/darwin-x64,
+    android-arm64-profile/darwin-x64,
+    android-arm64-release/darwin-x64,
+    android-arm-dynamic-profile/darwin-x64,
+    android-arm-dynamic-release/darwin-x64,
+    android-arm64-dynamic-profile/darwin-x64,
+    android-arm64-dynamic-release/darwin-x64,
+
+    android-x86,
+    android-x64,
+    android-arm,
+    android-arm-profile,
+    android-arm-release,
+    android-arm64,
+    android-arm64-profile,
+    android-arm64-release,
+    android-arm-dynamic-profile,
+    android-arm-dynamic-release,
+    android-arm64-dynamic-profile,
+    android-arm64-dynamic-release]

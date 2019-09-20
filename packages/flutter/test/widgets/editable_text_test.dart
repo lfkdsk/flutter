@@ -2135,7 +2135,9 @@ void main() {
         composing: TextRange(start: 5, end: 14),
       ),
     );
-    final FocusNode focusNode = FocusNode(debugLabel: 'Test Focus Node');
+    final GlobalKey<EditableTextState> editableTextKey =
+        GlobalKey<EditableTextState>();
+    final FocusNode focusNode = FocusNode();
 
     await tester.pumpWidget(MaterialApp( // So we can show overlays.
       home: EditableText(
@@ -2182,7 +2184,7 @@ void main() {
         child: SizedBox(
           width: 100,
           child: EditableText(
-            showSelectionHandles: true,
+            key: editableTextKey,
             controller: controller,
             focusNode: FocusNode(),
             style: Typography(platform: TargetPlatform.android).black.subhead,
@@ -2227,7 +2229,7 @@ void main() {
       final FadeTransition left = transitions[1];
       final FadeTransition right = transitions[2];
 
-      if (expectedLeftVisibleBefore)
+      if (leftVisibleBefore)
         expect(left.opacity.value, equals(1.0));
       if (expectedRightVisibleBefore)
         expect(right.opacity.value, equals(1.0));
@@ -2262,38 +2264,13 @@ void main() {
 
       final Size viewport = renderEditable.size;
 
-      void testPosition(double pos, HandlePositionInViewport expected) {
-        switch (expected) {
-          case HandlePositionInViewport.leftEdge:
-            expect(
-              pos,
-              inExclusiveRange(
-                0 - kMinInteractiveDimension,
-                0 + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          case HandlePositionInViewport.rightEdge:
-            expect(
-              pos,
-              inExclusiveRange(
-                viewport.width - kMinInteractiveDimension,
-                viewport.width + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          case HandlePositionInViewport.within:
-            expect(
-              pos,
-              inExclusiveRange(
-                0 - kMinInteractiveDimension,
-                viewport.width + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          default:
-            throw TestFailure('HandlePositionInViewport can\'t be null.');
-        }
+      void testPosition(double pos, Symbol expected) {
+        if (expected == #left)
+          expect(pos, equals(0.0));
+        if (expected == #right)
+          expect(pos, equals(viewport.width));
+        if (expected == #middle)
+          expect(pos, inExclusiveRange(0.0, viewport.width));
       }
       expect(state.selectionOverlay.handlesAreVisible, isTrue);
       testPosition(handles[0].localToGlobal(Offset.zero).dx, leftPosition);
@@ -2304,7 +2281,7 @@ void main() {
     await tester.tapAt(const Offset(20, 10));
     renderEditable.selectWord(cause: SelectionChangedCause.longPress);
     await tester.pump();
-    await verifyVisibility(HandlePositionInViewport.leftEdge, true, HandlePositionInViewport.within, true);
+    await verifyVisibility(true, #left, true, #middle);
 
     // Drag the text slightly so the first word is partially visible. Only the
     // right handle should be visible.
@@ -2335,239 +2312,8 @@ void main() {
     // Drag the text all the way to the right, so the second word is not visible
     // at all. Again, both handles should be invisible.
     scrollable.controller.jumpTo(0);
-    await verifyVisibility(HandlePositionInViewport.rightEdge, false, HandlePositionInViewport.rightEdge, false);
-  }, skip: isBrowser);
-
-  testWidgets('text selection handle visibility RTL', (WidgetTester tester) async {
-    // Text with two separate words to select.
-    const String testText = 'XXXXX          XXXXX';
-    final TextEditingController controller = TextEditingController(text: testText);
-
-    await tester.pumpWidget(MaterialApp(
-      home: Align(
-        alignment: Alignment.topLeft,
-        child: SizedBox(
-          width: 100,
-          child: EditableText(
-            controller: controller,
-            showSelectionHandles: true,
-            focusNode: FocusNode(),
-            style: Typography(platform: TargetPlatform.android).black.subhead,
-            cursorColor: Colors.blue,
-            backgroundCursorColor: Colors.grey,
-            selectionControls: materialTextSelectionControls,
-            keyboardType: TextInputType.text,
-            textAlign: TextAlign.right,
-          ),
-        ),
-      ),
-    ));
-
-    final EditableTextState state =
-        tester.state<EditableTextState>(find.byType(EditableText));
-
-    // Select the first word. Both handles should be visible.
-    await tester.tapAt(const Offset(20, 10));
-    state.renderEditable.selectWord(cause: SelectionChangedCause.longPress);
-    await tester.pump();
-    final List<RenderBox> handles = List<RenderBox>.from(
-      tester.renderObjectList<RenderBox>(
-        find.descendant(
-          of: find.byType(CompositedTransformFollower),
-          matching: find.byType(GestureDetector),
-        ),
-      ),
-    );
-    expect(
-      handles[0].localToGlobal(Offset.zero).dx,
-      inExclusiveRange(
-        -kMinInteractiveDimension,
-        kMinInteractiveDimension,
-      ),
-    );
-    expect(
-      handles[1].localToGlobal(Offset.zero).dx,
-      inExclusiveRange(
-        70.0 - kMinInteractiveDimension,
-        70.0 + kMinInteractiveDimension,
-      ),
-    );
-    expect(state.selectionOverlay.handlesAreVisible, isTrue);
-    expect(controller.selection.base.offset, 0);
-    expect(controller.selection.extent.offset, 5);
-  }, skip: isBrowser);
-
-  // Regression test for https://github.com/flutter/flutter/issues/31287
-  testWidgets('iOS text selection handle visibility', (WidgetTester tester) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-
-    // Text with two separate words to select.
-    const String testText = 'XXXXX          XXXXX';
-    final TextEditingController controller = TextEditingController(text: testText);
-
-    await tester.pumpWidget(MaterialApp(
-      home: Align(
-        alignment: Alignment.topLeft,
-        child: Container(
-          child: SizedBox(
-            width: 100,
-            child: EditableText(
-              showSelectionHandles: true,
-              controller: controller,
-              focusNode: FocusNode(),
-              style: Typography(platform: TargetPlatform.iOS).black.subhead,
-              cursorColor: Colors.blue,
-              backgroundCursorColor: Colors.grey,
-              selectionControls: cupertinoTextSelectionControls,
-              keyboardType: TextInputType.text,
-            ),
-          ),
-        ),
-      ),
-    ));
-
-    final EditableTextState state =
-        tester.state<EditableTextState>(find.byType(EditableText));
-    final RenderEditable renderEditable = state.renderEditable;
-    final Scrollable scrollable = tester.widget<Scrollable>(find.byType(Scrollable));
-
-    bool expectedLeftVisibleBefore = false;
-    bool expectedRightVisibleBefore = false;
-
-    Future<void> verifyVisibility(
-      HandlePositionInViewport leftPosition,
-      bool expectedLeftVisible,
-      HandlePositionInViewport rightPosition,
-      bool expectedRightVisible,
-    ) async {
-      await tester.pump();
-
-      // Check the signal from RenderEditable about whether they're within the
-      // viewport.
-
-      expect(renderEditable.selectionStartInViewport.value, equals(expectedLeftVisible));
-      expect(renderEditable.selectionEndInViewport.value, equals(expectedRightVisible));
-
-      // Check that the animations are functional and going in the right
-      // direction.
-
-      final List<Widget> transitions =
-        find.byType(FadeTransition).evaluate().map((Element e) => e.widget).toList();
-      final FadeTransition left = transitions[0];
-      final FadeTransition right = transitions[1];
-
-      if (expectedLeftVisibleBefore)
-        expect(left.opacity.value, equals(1.0));
-      if (expectedRightVisibleBefore)
-        expect(right.opacity.value, equals(1.0));
-
-      await tester.pump(TextSelectionOverlay.fadeDuration ~/ 2);
-
-      if (expectedLeftVisible != expectedLeftVisibleBefore)
-        expect(left.opacity.value, equals(0.5));
-      if (expectedRightVisible != expectedRightVisibleBefore)
-        expect(right.opacity.value, equals(0.5));
-
-      await tester.pump(TextSelectionOverlay.fadeDuration ~/ 2);
-
-      if (expectedLeftVisible)
-        expect(left.opacity.value, equals(1.0));
-      if (expectedRightVisible)
-        expect(right.opacity.value, equals(1.0));
-
-      expectedLeftVisibleBefore = expectedLeftVisible;
-      expectedRightVisibleBefore = expectedRightVisible;
-
-      // Check that the handles' positions are correct.
-
-      final List<RenderBox> handles = List<RenderBox>.from(
-        tester.renderObjectList<RenderBox>(
-          find.descendant(
-            of: find.byType(CompositedTransformFollower),
-            matching: find.byType(GestureDetector),
-          ),
-        ),
-      );
-
-      final Size viewport = renderEditable.size;
-
-      void testPosition(double pos, HandlePositionInViewport expected) {
-        switch (expected) {
-          case HandlePositionInViewport.leftEdge:
-            expect(
-              pos,
-              inExclusiveRange(
-                0 - kMinInteractiveDimension,
-                0 + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          case HandlePositionInViewport.rightEdge:
-            expect(
-              pos,
-              inExclusiveRange(
-                viewport.width - kMinInteractiveDimension,
-                viewport.width + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          case HandlePositionInViewport.within:
-            expect(
-              pos,
-              inExclusiveRange(
-                0 - kMinInteractiveDimension,
-                viewport.width + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          default:
-            throw TestFailure('HandlePositionInViewport can\'t be null.');
-        }
-      }
-      expect(state.selectionOverlay.handlesAreVisible, isTrue);
-      testPosition(handles[0].localToGlobal(Offset.zero).dx, leftPosition);
-      testPosition(handles[1].localToGlobal(Offset.zero).dx, rightPosition);
-    }
-
-    // Select the first word. Both handles should be visible.
-    await tester.tapAt(const Offset(20, 10));
-    renderEditable.selectWord(cause: SelectionChangedCause.longPress);
-    await tester.pump();
-    await verifyVisibility(HandlePositionInViewport.leftEdge, true, HandlePositionInViewport.within, true);
-
-    // Drag the text slightly so the first word is partially visible. Only the
-    // right handle should be visible.
-    scrollable.controller.jumpTo(20.0);
-    await verifyVisibility(HandlePositionInViewport.leftEdge, false, HandlePositionInViewport.within, true);
-
-    // Drag the text all the way to the left so the first word is not visible at
-    // all (and the second word is fully visible). Both handles should be
-    // invisible now.
-    scrollable.controller.jumpTo(200.0);
-    await verifyVisibility(HandlePositionInViewport.leftEdge, false, HandlePositionInViewport.leftEdge, false);
-
-    // Tap to unselect.
-    await tester.tap(find.byType(EditableText));
-    await tester.pump();
-
-    // Now that the second word has been dragged fully into view, select it.
-    await tester.tapAt(const Offset(80, 10));
-    renderEditable.selectWord(cause: SelectionChangedCause.longPress);
-    await tester.pump();
-    await verifyVisibility(HandlePositionInViewport.within, true, HandlePositionInViewport.within, true);
-
-    // Drag the text slightly to the right. Only the left handle should be
-    // visible.
-    scrollable.controller.jumpTo(150);
-    await verifyVisibility(HandlePositionInViewport.within, true, HandlePositionInViewport.rightEdge, false);
-
-    // Drag the text all the way to the right, so the second word is not visible
-    // at all. Again, both handles should be invisible.
-    scrollable.controller.jumpTo(0);
-    await verifyVisibility(HandlePositionInViewport.rightEdge, false, HandlePositionInViewport.rightEdge, false);
-
-    debugDefaultTargetPlatformOverride = null;
-  }, skip: isBrowser);
+    await verifyVisibility(false, #right, false, #right);
+  });
 }
 
 class MockTextSelectionControls extends Mock implements TextSelectionControls {

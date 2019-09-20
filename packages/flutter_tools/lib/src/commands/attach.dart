@@ -246,7 +246,7 @@ class AttachCommand extends FlutterCommand {
         } catch (error) {
           throwToolExit('Failed to establish a debug connection with ${device.name}: $error');
         } finally {
-          await observatoryDiscovery?.cancel();
+//          await observatoryDiscovery?.cancel();
         }
       }
     } else {

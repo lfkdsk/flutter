@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
+import 'package:yaml/yaml.dart';
 
 import 'base/common.dart';
 import 'base/context.dart';
@@ -324,6 +325,7 @@ class Cache {
           await artifact.update(requiredArtifacts);
         }
       }
+      cache.setStampFor(customEngineName, customEngineVersion);
     } on SocketException catch (e) {
       if (_hostsBlockedInChina.contains(e.address?.host)) {
         printError(
@@ -353,6 +355,24 @@ class Cache {
     return allAvailible;
   }
 }
+
+YamlMap _customEngineConfig;
+
+YamlMap get customEngineConfig {
+  _customEngineConfig ??= loadYaml(fs
+    .file(fs.path
+    .join(Cache.flutterRoot, 'bin', 'internal', 'tt_engine.yaml'))
+    .readAsStringSync());
+  return _customEngineConfig;
+}
+
+const String customEngineName = 'tt_engine';
+
+String get customEngineVersion => customEngineConfig['ref'];
+
+YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
+
+String get customEngineDownloadUrl => customEngineConfig['url'];
 
 /// An artifact managed by the cache.
 abstract class CachedArtifact {
@@ -575,6 +595,9 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
   @override
   bool isUpToDateInner() {
+    if (customEngineVersion != cache.getStampFor(customEngineName)) {
+      return false;
+    }
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (String pkgName in getPackageDirs()) {
       final String pkgPath = fs.path.join(pkgDir.path, pkgName);
@@ -605,14 +628,32 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (String pkgName in getPackageDirs()) {
-      await _downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      final String pkgPath = fs.path.join(pkgDir.path, pkgName);
+      final Directory dir = fs.directory(pkgPath);
+      if (dir.existsSync())
+        dir.deleteSync(recursive: true);
+      if (customEngineArtifacts.contains(pkgName)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        logger.printStatus('Downloading from TT ' + customEngineUrl + pkgName + '.zip');
+        await _downloadZipArchive('Downloading package $pkgName...',
+          Uri.parse(customEngineUrl + pkgName + '.zip'), pkgDir);
+      } else {
+        await _downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      }
     }
 
     for (List<String> toolsDir in getBinaryDirs()) {
       final String cacheDir = toolsDir[0];
       final String urlPath = toolsDir[1];
       final Directory dir = fs.directory(fs.path.join(location.path, cacheDir));
-      await _downloadZipArchive('Downloading $cacheDir tools...', Uri.parse(url + urlPath), dir);
+      if (customEngineArtifacts.contains(cacheDir)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        logger.printStatus('Downloading from TT ' + customEngineUrl + urlPath);
+        await _downloadZipArchive(
+            'Downloading $cacheDir tools...', Uri.parse(customEngineUrl + urlPath), dir);
+      } else
+        await _downloadZipArchive(
+            'Downloading $cacheDir tools...', Uri.parse(url + urlPath), dir);
 
       _makeFilesExecutable(dir);
 
@@ -632,6 +673,7 @@ abstract class EngineCachedArtifact extends CachedArtifact {
       final String licenseDestinationPath = fs.path.join(location.path, licenseDir, 'LICENSE');
       await licenseSource.copy(licenseDestinationPath);
     }
+
   }
 
   Future<bool> checkForArtifacts(String engineVersion) async {
@@ -672,6 +714,7 @@ abstract class EngineCachedArtifact extends CachedArtifact {
       }
     }
   }
+
 }
 
 

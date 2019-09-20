@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/base/common.dart';
+
 import 'base/io.dart';
 import 'device.dart';
 import 'globals.dart';
@@ -58,9 +60,21 @@ class ProtocolDiscovery {
   }
 
   void _handleLine(String line) {
-    Uri uri;
-    final RegExp r = RegExp('${RegExp.escape(serviceName)} listening on ((http|\/\/)[a-zA-Z0-9:/=_\\-\.\\[\\]]+)');
-    final Match match = r.firstMatch(line);
+    if (_completer.isCompleted) {
+      // observatory退出时退出attach
+      final RegExp exitR = RegExp('${RegExp.escape(
+        serviceName)} no longer listening on ((http|\/\/)[a-zA-Z0-9:/=_\\-\.\\[\\]]+)');
+      final Match exitMatch = exitR.firstMatch(line);
+      if (exitMatch != null) {
+        _stopScrapingLogs();
+        printStatus('所有Flutter页面已退出，请重新调用flutter attach进行监听.');
+        exit(0);
+      }
+    } else {
+      Uri uri;
+
+      final RegExp r = RegExp('${RegExp.escape(serviceName)} listening on ((http|\/\/)[a-zA-Z0-9:/=_\\-\.\\[\\]]+)');
+      final Match match = r.firstMatch(line);
 
     if (match != null) {
       try {
@@ -71,12 +85,11 @@ class ProtocolDiscovery {
       }
     }
 
-    if (uri != null) {
-      assert(!_completer.isCompleted);
-      _stopScrapingLogs();
-      _completer.complete(_forwardPort(uri));
+      if (uri != null) {
+        assert(!_completer.isCompleted);
+        _completer.complete(_forwardPort(uri));
+      }
     }
-
   }
 
   Future<Uri> _forwardPort(Uri deviceUri) async {

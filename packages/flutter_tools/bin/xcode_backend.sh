@@ -275,6 +275,11 @@ BuildApp() {
 
   if [[ "$compress_size_flag" != "" ]]; then
     RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${app_framework_dir}/icudtl.dat"
+    if [[ -e "${project_path}/.ios" ]]; then
+      RunCommand rm -rf -- "${derived_dir}/engine/Flutter.framework/icudtl.dat"
+    else
+      RunCommand rm -rf -- "${derived_dir}/Flutter.framework/icudtl.dat"
+    fi
     local current_path=`pwd`
     RunCommand cd ${app_framework_dir}/
     zip -q -r flutter_compress_assets.zip icudtl.dat ${assets_path}

@@ -104,11 +104,10 @@ class _LayoutBuilderElement<ConstraintType extends Constraints> extends RenderOb
           // BD MOD: START
           //built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
           built = ErrorWidget.builder(_debugReportException(
-              'building $widget', e, stack,
-              informationCollector: (StringBuffer information) {
-                information?.writeln(
-                    'ErrorWidgetLocation:' +
-                        getCreationLocationForError(this));
+              ErrorDescription('building $this'), e, stack,
+              informationCollector: () sync* {
+                yield ErrorDescription(
+                    'ErrorWidgetLocation:' + getCreationLocationForError(this));
               }));
           // END
         }
@@ -120,11 +119,11 @@ class _LayoutBuilderElement<ConstraintType extends Constraints> extends RenderOb
         // BD MOD: START
         //built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
         built = ErrorWidget.builder(
-            _debugReportException('building $widget', e, stack,
-                informationCollector: (StringBuffer information) {
-                  information?.writeln(
-                      'ErrorWidgetLocation:' +
-                          getCreationLocationForError(this));
+            _debugReportException(
+                ErrorDescription('building $this'), e, stack,
+                informationCollector: () sync* {
+                  yield ErrorDescription('ErrorWidgetLocation:' +
+                      getCreationLocationForError(this));
                 }));
         // END
         _child = updateChild(null, built, slot);

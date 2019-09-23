@@ -241,7 +241,6 @@ class CupertinoTextField extends StatefulWidget {
     this.onTap,
     this.scrollController,
     this.scrollPhysics,
-    this.toolBarPosition = ToolBarPosition.Top,
   }) : assert(textAlign != null),
        assert(readOnly != null),
        assert(autofocus != null),
@@ -527,11 +526,6 @@ class CupertinoTextField extends StatefulWidget {
 
   /// {@macro flutter.material.textfield.onTap}
   final GestureTapCallback onTap;
-
-  // BD ADD: ShiShuo
-  ///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
-  final ToolBarPosition toolBarPosition;
-  // END
 
   @override
   _CupertinoTextFieldState createState() => _CupertinoTextFieldState();
@@ -866,7 +860,6 @@ class _CupertinoTextFieldState extends State<CupertinoTextField> with AutomaticK
           backgroundCursorColor: CupertinoColors.inactiveGray,
           scrollPadding: widget.scrollPadding,
           keyboardAppearance: keyboardAppearance,
-          toolBarPosition: widget.toolBarPosition,
           dragStartBehavior: widget.dragStartBehavior,
           scrollController: widget.scrollController,
           scrollPhysics: widget.scrollPhysics,

@@ -10,7 +10,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/src/material/theme.dart';
 
 import 'basic.dart';
 import 'constants.dart';
@@ -256,14 +255,6 @@ abstract class TextSelectionControls {
     );
     delegate.bringIntoView(delegate.textEditingValue.selection.extent);
   }
-}
-
-///[TextSelectionControls.buildToolbar]'s position relative to [TextField]
-enum ToolBarPosition {
-  ///[TextSelectionControls.buildToolbar] is above [TextField]. It's the default value.
-  Top,
-  ///[TextSelectionControls.buildToolbar] is under [TextField].
-  Bottom,
 }
 
 /// An object that manages a pair of text selection handles.
@@ -535,35 +526,6 @@ class TextSelectionOverlay {
     // Find the horizontal midpoint, just above the selected text.
     final List<TextSelectionPoint> endpoints =
         renderObject.getEndpointsForSelection(_selection);
-    // BD ADD: ShiShuo
-    double _midpointDy;
-    if (selectionDelegate.getToolBarPosition() == ToolBarPosition.Bottom) {
-      if (Theme
-          .of(context)
-          .platform == TargetPlatform.iOS) {
-        /// In IOS Platform
-        /// 55 = 36 + 9 + 10;
-        /// 36: ToolBar's height. See cupertino/text_selection.dart's 19 line => _kToolbarHeight
-        /// 9: ToolBar's height. See cupertino/text_selection.dart's 31 line => _kToolbarTriangleSize
-        /// 10: ToolBar handle's height. See cupertino/text_selection.dart's 128 line => const Padding(padding: EdgeInsets.only(bottom: 10.0))
-        _midpointDy = endpoints[0].point.dy + 55;
-      } else {
-        /// In Android Platform
-        /// 66 = 44 + 22;
-        /// 44: ToolBar's height. See material/text_selection.dart's 53 line => _TextSelectionToolbar
-        /// 22: ToolBar handle's height. See material/text_selection.dart's 16 line => _kHandleSize
-        _midpointDy = endpoints[0].point.dy + 66;
-      }
-    } else {
-      _midpointDy = endpoints[0].point.dy - renderObject.preferredLineHeight;
-    }
-    // END
-    final Offset midpoint = Offset(
-      (endpoints.length == 1) ?
-        endpoints[0].point.dx :
-        (endpoints[0].point.dx + endpoints[1].point.dx) / 2.0,
-      _midpointDy,
-    );
 
     final Rect editingRegion = Rect.fromPoints(
       renderObject.localToGlobal(Offset.zero),

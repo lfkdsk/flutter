@@ -39,7 +39,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         help: 'Report timing information about build steps in machine readable form,',
       )
       // BD ADD
-      ..addFlag('track-widget-creation', defaultsTo: false, hide: true,)
+//      ..addFlag('track-widget-creation', defaultsTo: false, hide: true,)
       ..addMultiOption('ios-arch',
         splitCommas: true,
         defaultsTo: defaultIOSArchs.map<String>(getNameForDarwinArch),

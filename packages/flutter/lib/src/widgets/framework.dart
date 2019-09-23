@@ -3946,10 +3946,9 @@ abstract class ComponentElement extends Element {
       // BD MOD: START
       //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
       built = ErrorWidget.builder(_debugReportException(
-          'building $this', e, stack,
-          informationCollector: (StringBuffer information) {
-            information?.writeln(
-                'ErrorWidgetLocation:' + getCreationLocationForError(this));
+          ErrorDescription('building $this'), e, stack,
+          informationCollector:() sync*{
+            yield ErrorDescription('ErrorWidgetLocation:' + getCreationLocationForError(this));
           }));
       // END
     } finally {
@@ -3965,9 +3964,9 @@ abstract class ComponentElement extends Element {
       // BD MOD: START
       //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
       built = ErrorWidget.builder(_debugReportException(
-          'building $this', e, stack,
-          informationCollector: (StringBuffer information) {
-            information?.writeln(
+          ErrorDescription('building $this'), e, stack,
+          informationCollector: () sync* {
+            yield ErrorDescription(
                 'ErrorWidgetLocation:' + getCreationLocationForError(this));
           }));
       // END
@@ -4767,10 +4766,10 @@ abstract class RenderObjectElement extends Element {
   //BD MOD
   void _debugUpdateRenderObjectOwner() {
     //assert(() {
-    //  _renderObject.debugCreator = _DebugCreator(this);
+    //  _renderObject.debugCreator = DebugCreator(this);
     //  return true;
     //}());
-    _renderObject.debugCreator = _DebugCreator(this);
+    _renderObject.debugCreator = DebugCreator(this);
   }
 
   @override

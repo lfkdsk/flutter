@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-
+// BD ADD:
+import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
 
 import 'basic.dart';
@@ -15,6 +16,7 @@ import 'navigator.dart';
 import 'overlay.dart';
 import 'page_storage.dart';
 import 'transitions.dart';
+import 'dart:ui' as ui;
 
 // Examples can assume:
 // dynamic routeObserver;
@@ -179,12 +181,25 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     assert(_animation != null, '$runtimeType.createAnimation() returned null.');
     super.install(insertionPoint);
   }
+  // BD ADD:
+  /// If true, will ignore first frame time cost when drive the transitions.
+  bool ignoreFirstFrameTimeCost() {
+    return false;
+  }
 
   @override
   TickerFuture didPush() {
     assert(_controller != null, '$runtimeType.didPush called before calling install() or after calling dispose().');
     assert(!_transitionCompleter.isCompleted, 'Cannot reuse a $runtimeType after disposing it.');
     _animation.addStatusListener(_handleStatusChanged);
+    // BD ADD: START
+    if (ignoreFirstFrameTimeCost()) {
+      ui.window.addNextFrameCallback((){
+        _controller.forward();
+      });
+      return null;
+    }
+    // END
     return _controller.forward();
   }
 
@@ -631,7 +646,30 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
           child: FocusScope(
             node: widget.route.focusScopeNode, // immutable
             child: RepaintBoundary(
-              child: AnimatedBuilder(
+              // BD MOD: START
+              // child: AnimatedBuilder(
+              child: Boost.reuseTransitionsWidget ?
+                widget.route.buildTransitions(
+                  context,
+                  widget.route.animation,
+                  widget.route.secondaryAnimation,
+                  IgnorePointer(
+                    ignoring: widget.route.animation?.status == AnimationStatus.reverse,
+                    child:  _page ??= RepaintBoundary(
+                      key: widget.route._subtreeKey, // immutable
+                      child: Builder(
+                        builder: (BuildContext context) {
+                          return widget.route.buildPage(
+                            context,
+                            widget.route.animation,
+                            widget.route.secondaryAnimation,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ) : AnimatedBuilder(
+              // END
                 animation: _listenable, // immutable
                 builder: (BuildContext context, Widget child) {
                   return widget.route.buildTransitions(

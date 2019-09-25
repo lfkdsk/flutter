@@ -197,12 +197,13 @@ class Cache {
   }
   String _fuchsiaRevision;
 
+  /// BD ADD: START
   String get customEngineRevision {
     _customEngineRevision ??= getVersionFor('ttengine');
     return _customEngineRevision;
   }
   String _customEngineRevision;
-
+  /// END
   static Cache get instance => context[Cache];
 
   /// Return the top-level directory in the cache; this is `bin/cache`.
@@ -298,6 +299,8 @@ class Cache {
           await artifact.update(requiredArtifacts);
         }
       }
+      /// BD MOD:
+      /// cache.setStampFor(customEngineName, customEngineVersion);
       cache.setStampFor(customEngineName, customEngineRevision);
     } on SocketException catch (e) {
       if (_hostsBlockedInChina.contains(e.address?.host)) {
@@ -340,6 +343,8 @@ YamlMap get customEngineConfig {
 }
 
 const String customEngineName = 'tt_engine';
+/// BD DEL:
+/// String get customEngineVersion => customEngineConfig['ref'];
 
 YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
 
@@ -361,6 +366,7 @@ abstract class CachedArtifact {
 
   Directory get location => cache.getArtifactDirectory(name);
   String get version => cache.getVersionFor(name);
+  /// BD ADD:
   String get customEngineVersion => cache.customEngineRevision;
 
   /// Keep track of the files we've downloaded for this execution so we

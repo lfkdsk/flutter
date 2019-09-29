@@ -459,7 +459,16 @@ class FlutterValidator extends DoctorValidator {
 
     final FlutterVersion version = FlutterVersion.instance;
 
-    messages.add(ValidationMessage(userMessages.flutterVersion(version.frameworkVersion, Cache.flutterRoot)));
+    // BD MOD: START
+    // messages.add(ValidationMessage(userMessages.flutterVersion(version.frameworkVersion, Cache.flutterRoot)));
+    final String changelog =
+        'https://code.byted.org/tech_client/flutter/blob/${version.getBranchName()}/CHANGELOG.md';
+    messages.add(ValidationMessage(userMessages.flutterVersion(
+        version.frameworkVersion,
+        version.bdFrameworkVersion,
+        Cache.flutterRoot)));
+    messages.add(ValidationMessage(userMessages.flutterChangelog(changelog)));
+    // END
     messages.add(ValidationMessage(userMessages.flutterRevision(version.frameworkRevisionShort, version.frameworkAge, version.frameworkDate)));
     messages.add(ValidationMessage(userMessages.engineRevision(version.engineRevisionShort)));
     messages.add(ValidationMessage(userMessages.dartRevision(version.dartSdkVersion)));
@@ -477,9 +486,14 @@ class FlutterValidator extends DoctorValidator {
       valid = ValidationType.partial;
     }
 
+    // BD MOD: START
+    // return ValidationResult(valid, messages,
+    //   statusInfo: userMessages.flutterStatusInfo(version.channel, version.frameworkVersion, os.name, platform.localeName),
+    // );
     return ValidationResult(valid, messages,
-      statusInfo: userMessages.flutterStatusInfo(version.channel, version.frameworkVersion, os.name, platform.localeName),
+      statusInfo: userMessages.flutterStatusInfo(version.channel, version.frameworkVersion, version.bdFrameworkVersion, changelog, os.name, platform.localeName),
     );
+    // END
   }
 }
 

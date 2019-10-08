@@ -211,6 +211,14 @@ class Cache {
 
   static Cache get instance => context.get<Cache>();
 
+  /// BD ADD: START
+  String get customEngineRevision {
+    _customEngineRevision ??= getVersionFor('ttengine');
+    return _customEngineRevision;
+  }
+  String _customEngineRevision;
+  /// END
+
   /// Return the top-level directory in the cache; this is `bin/cache`.
   Directory getRoot() {
     if (_rootOverride != null)
@@ -325,7 +333,9 @@ class Cache {
           await artifact.update(requiredArtifacts);
         }
       }
-      cache.setStampFor(customEngineName, customEngineVersion);
+      /// BD MOD:
+      /// cache.setStampFor(customEngineName, customEngineVersion);
+      cache.setStampFor(customEngineName, customEngineRevision);
     } on SocketException catch (e) {
       if (_hostsBlockedInChina.contains(e.address?.host)) {
         printError(
@@ -367,8 +377,8 @@ YamlMap get customEngineConfig {
 }
 
 const String customEngineName = 'tt_engine';
-
-String get customEngineVersion => customEngineConfig['ref'];
+/// BD DEL:
+/// String get customEngineVersion => customEngineConfig['ref'];
 
 YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
 
@@ -393,6 +403,8 @@ abstract class CachedArtifact {
 
   Directory get location => cache.getArtifactDirectory(name);
   String get version => cache.getVersionFor(name);
+  /// BD ADD:
+  String get customEngineVersion => cache.customEngineRevision;
 
   /// Keep track of the files we've downloaded for this execution so we
   /// can delete them after completion. We don't delete them right after

@@ -1,5 +1,5 @@
-url: http://voffline.byted.org/download/tos/schedule/toutiao.ios.arch/flutter/framework
-ref: 235c4a19aa33c8af9df30fe983138d224d523ba1
+url: http://ios.bytedance.net/wlapi/tosDownload/toutiao.ios.arch/flutter/framework
+#ref: 版本号请改ttengine.version，这个地方已弃用
 #artifacts: [ios, ios-profile, ios-release]
 artifacts: [
     ios,

@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// BD ADD:
+import 'dart:async';
 import 'dart:typed_data' show ByteData;
 import 'dart:ui' hide window;
 
@@ -365,6 +367,15 @@ class TestWindow implements Window {
   @override
   void addNextFrameCallback(callback) {
     _window.addNextFrameCallback(callback);
+  }
+
+  @override
+  VoidCallback get exitApp => _exitApp;
+  VoidCallback _exitApp;
+  Zone _exitAppZone;
+  set exitApp(VoidCallback callback) {
+    _exitApp = callback;
+    _exitAppZone = Zone.current;
   }
   // END
 

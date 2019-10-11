@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
+// BD ADD:
 import 'package:flutter/gestures.dart';
 import 'transformations_demo_inertial_motion.dart';
 
@@ -89,6 +90,8 @@ class GestureTransformable extends StatefulWidget {
   final GestureTapUpCallback onTapUp;
   final GestureTapCallback onTap;
   final GestureTapCancelCallback onTapCancel;
+  // BD MOD:
+  // final GestureTapCallback onDoubleTap;
   final GestureDoubleTapCallback onDoubleTap;
   final GestureLongPressCallback onLongPress;
   final GestureLongPressUpCallback onLongPressUp;

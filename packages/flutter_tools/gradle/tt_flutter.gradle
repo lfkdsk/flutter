@@ -125,43 +125,6 @@ class FlutterPatchPlugin implements Plugin<Project> {
         createJarContainsArmeabi(profileFlutterJar, excludesFiles)
         createJarContainsArmeabi(releaseFlutterJar, excludesFiles)
 
-        def addFlutterDeps = { variant ->
-            if (project.plugins.hasPlugin("com.android.library")) {
-                File file = getFlutterJar(variant.buildType)
-                File icudtlFile = new File(getFlutterJar(variant.buildType).parent + File.separator + "icudtl.dat")
-
-                // 从flutter.jar中解压出icudtl.dat，放到flutter.jar所在目录
-                if (!icudtlFile.exists()) {
-                    JarFile jarFile = new JarFile(file)
-                    Enumeration<JarEntry> entries = jarFile.entries()
-                    while (entries.hasMoreElements()) {
-                        JarEntry jarEntry = entries.nextElement();
-                        if (jarEntry.getName().contains("icudtl.dat")) {
-                            InputStream inputStream = jarFile.getInputStream(jarEntry)
-                            writeFile(inputStream, icudtlFile)
-                            inputStream.close()
-                        }
-                    }
-                }
-
-                // 在处理资源时添加将icudtl.dat复制到目标位置的Task
-                Task copyIcudtlTask = project.tasks.create(name: "copyIcudtlAssets${variant.name.capitalize()}", type: Copy) {
-                    from icudtlFile.toString()
-                    into variant.mergeAssets.outputDir.path + "/flutter_shared"
-                }
-                copyIcudtlTask.doLast {
-                    icudtlFile.delete()
-                }
-                variant.outputs[0].processResources.dependsOn(copyIcudtlTask)
-            }
-        }
-
-        if (project.android.hasProperty("applicationVariants")) {
-            project.android.applicationVariants.all addFlutterDeps
-        } else {
-            project.android.libraryVariants.all addFlutterDeps
-        }
-
     }
 
     private File getFlutterJar(buildType) {

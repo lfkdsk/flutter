@@ -45,13 +45,13 @@ class Boost {
   /// If true, AnimatedBuilder will removed from the [_ModalScopeState.build]'s widget tree,
   /// then we can reuse the widgets when the transitions animation is executing.
   /// https://jira.bytedance.com/browse/FLUTTER-121
-  static bool _reuseTransitionsWidget = true;
+  static bool _reuseTransitionsWidget = false;
 
   /// If can reuse widget while transitions executing
   static bool get reuseTransitionsWidget => _reuseTransitionsWidget;
 
   /// https://jira.bytedance.com/browse/FLUTTER-234
-  static bool _ignoreTransitionsFirstFrameTimeCost = true;
+  static bool _ignoreTransitionsFirstFrameTimeCost = false;
 
   /// If true, will ignore first frame time cost when drive the transitions.
   static bool get ignoreTransitionsFirstFrameTimeCost => _ignoreTransitionsFirstFrameTimeCost;

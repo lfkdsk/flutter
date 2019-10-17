@@ -43,6 +43,9 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,)
+      ..addFlag('lite',
+        help: 'Flutter lite edition to reduce package size',
+        negatable: false,)
       // END
       ..addMultiOption('ios-arch',
         splitCommas: true,
@@ -99,9 +102,11 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         buildMode: buildMode,
         mainPath: mainPath,
         packagesPath: PackageMap.globalPackagesPath,
-        // BD MOD
+        // BD MOD: START
         //trackWidgetCreation: false,
         trackWidgetCreation: argResults['track-widget-creation'],
+        lite: argResults['lite'],
+        // END
         outputPath: outputPath,
         extraFrontEndOptions: argResults[FlutterOptions.kExtraFrontEndOptions],
       );

@@ -101,6 +101,12 @@ BuildApp() {
       compress_size_flag="--compress-size"
   fi
 
+  # ios lite 版本标记
+  local lite_flag=""
+  if [[  -n "$LITE" ]] && [[ "$build_mode" != "debug" ]]; then
+      lite_flag="--lite"
+  fi
+
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
 
   AssertExists "${framework_path}"
@@ -191,7 +197,8 @@ BuildApp() {
       ${flutter_engine_flag}                                                \
       ${local_engine_flag}                                                  \
       ${track_widget_creation_flag}                                         \
-      ${compress_size_flag}
+      ${compress_size_flag}                                                 \
+      ${lite_flag}
 
     if [[ $? -ne 0 ]]; then
       EchoError "Failed to build ${project_path}."

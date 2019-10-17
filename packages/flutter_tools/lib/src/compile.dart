@@ -224,6 +224,8 @@ class KernelCompiler {
     String fileSystemScheme,
     bool targetProductVm = false,
     String initializeFromDill,
+    // BD ADD:
+    bool lite = false,
   }) async {
     final String frontendServer = artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
@@ -273,6 +275,11 @@ class KernelCompiler {
       '--strong',
       '--target=$targetModel',
     ];
+    // BD ADD: START
+    if (lite) {
+      command.add('--lite');
+    }
+    // END
     if (trackWidgetCreation)
       command.add('--track-widget-creation');
     if (!linkPlatformKernelIn)

@@ -345,6 +345,8 @@ class AOTSnapshotter {
     @required String outputPath,
     @required bool trackWidgetCreation,
     List<String> extraFrontEndOptions = const <String>[],
+    // BD ADD: 
+    bool lite = false,
   }) async {
     final FlutterProject flutterProject = await FlutterProject.current();
     final Directory outputDir = fs.directory(outputPath);
@@ -371,6 +373,8 @@ class AOTSnapshotter {
       aot: true,
       trackWidgetCreation: trackWidgetCreation,
       targetProductVm: buildMode == BuildMode.release,
+      // BD ADD:
+      lite: lite,
     ));
 
     // Write path to frontend_server, since things need to be re-generated when that changes.

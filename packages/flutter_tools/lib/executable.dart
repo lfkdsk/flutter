@@ -43,7 +43,8 @@ import 'src/commands/update_packages.dart';
 import 'src/commands/upgrade.dart';
 import 'src/commands/version.dart';
 import 'src/runner/flutter_command.dart';
-
+// BD ADD:
+import 'src/artifacts.dart';
 /// Main entry point for commands.
 ///
 /// This function is intended to be used from the `flutter` command line tool.
@@ -56,6 +57,15 @@ Future<void> main(List<String> args) async {
       (args.isNotEmpty && args.first == 'help') || (args.length == 1 && verbose);
   final bool muteCommandLogging = help || doctor;
   final bool verboseHelp = help && verbose;
+  // BD ADD: START
+  final bool lite = args.contains('--lite');
+  EngineMode engineMode = EngineMode.normal;
+  if (lite) {
+    engineMode = EngineMode.lite;
+    print('Currently in lite mode !!!\n');
+  }
+  setEngineMode(engineMode);
+  // END
 
   await runner.run(args, <FlutterCommand>[
     AnalyzeCommand(verboseHelp: verboseHelp),

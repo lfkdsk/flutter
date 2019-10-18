@@ -248,6 +248,12 @@ abstract class FlutterCommand extends Command<void> {
       hide: !verboseHelp,
       negatable: false,
       help: 'Enable dynamic code. Only allowed with --release or --profile.');
+    // BD ADD: START
+    argParser.addFlag('lite',
+      negatable: false,
+      defaultsTo: false,
+      help: 'Flutter lite edition to reduce package size');
+    // END
   }
 
   void addDynamicModeFlags({ bool verboseHelp = false }) {
@@ -445,6 +451,11 @@ abstract class FlutterCommand extends Command<void> {
       buildName: argParser.options.containsKey('build-name')
           ? argResults['build-name']
           : null,
+      // BD ADD: START
+      lite: argParser.options.containsKey('lite') 
+          ? argResults['lite'] 
+          : false,
+      // END
     );
   }
 

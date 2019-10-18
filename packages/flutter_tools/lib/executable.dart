@@ -62,7 +62,7 @@ Future<void> main(List<String> args) async {
   EngineMode engineMode = EngineMode.normal;
   if (lite) {
     engineMode = EngineMode.lite;
-    print('Currently in lite mode !!!\n');
+    print('Currently in lite mode...');
   }
   setEngineMode(engineMode);
   // END

@@ -413,6 +413,11 @@ Future<void> _buildGradleProjectV2(
   } else {
     command.add('-q');
   }
+  // BD ADD: START
+  if (buildInfo.lite) {
+    command.add('-Plite=true');
+  }
+  // END
   if (artifacts is LocalEngineArtifacts) {
     final LocalEngineArtifacts localEngineArtifacts = artifacts;
     printTrace('Using local engine: ${localEngineArtifacts.engineOutPath}');

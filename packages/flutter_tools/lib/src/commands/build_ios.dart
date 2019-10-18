@@ -40,9 +40,18 @@ class BuildIOSCommand extends BuildSubCommand {
         defaultsTo: true,
         help: 'Codesign the application bundle (only available on device builds).',
       )
+      // BD ADD: START
       ..addFlag('compress-size',
-      help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
-      negatable: false,);
+        help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
+        negatable: false,
+      ) 
+      ..addFlag('lite',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size',
+      );
+      // END
+
   }
 
   @override

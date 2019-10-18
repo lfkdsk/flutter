@@ -43,9 +43,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,)
-      ..addFlag('lite',
-        help: 'Flutter lite edition to reduce package size',
-        negatable: false,)
       // END
       ..addMultiOption('ios-arch',
         splitCommas: true,
@@ -76,6 +73,11 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     if (platform == null)
       throwToolExit('Unknown platform: $targetPlatform');
 
+    // BD ADD: START
+    if (argResults['lite']) {
+      print('Build with lite edition...');
+    }
+    // END
     final BuildMode buildMode = getBuildMode();
 
     Status status;

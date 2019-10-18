@@ -327,6 +327,12 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('track-widget-creation')) {
             trackWidgetCreationValue = project.property('track-widget-creation').toBoolean()
         }
+        // BD ADD: START
+        Boolean liteValue = false
+        if (project.hasProperty('lite')) {
+            liteValue = project.property('lite').toBoolean()
+        }
+        // END
         String compilationTraceFilePathValue = null
         if (project.hasProperty('compilation-trace-file')) {
             compilationTraceFilePathValue = project.property('compilation-trace-file')
@@ -394,6 +400,8 @@ class FlutterPlugin implements Plugin<Project> {
                 intermediateDir project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}")
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
+                // BD ADD:
+                useLite liteValue
             }
 
             // We know that the flutter app is a subproject in another Android app when these tasks exist.
@@ -469,6 +477,10 @@ abstract class BaseFlutterTask extends DefaultTask {
     String fileSystemScheme
     @Input
     Boolean trackWidgetCreation
+    // BD ADD: START
+    @Optional @Input
+    Boolean useLite
+    // END
     @Optional @Input
     String compilationTraceFilePath
     @Optional @Input
@@ -528,6 +540,11 @@ abstract class BaseFlutterTask extends DefaultTask {
                 if (trackWidgetCreation) {
                     args "--track-widget-creation"
                 }
+                // BD ADD: START
+                if (useLite) {
+                    args "--lite"
+                }
+                // END
                 if (extraFrontEndOptions != null) {
                     args "--extra-front-end-options", "${extraFrontEndOptions}"
                 }

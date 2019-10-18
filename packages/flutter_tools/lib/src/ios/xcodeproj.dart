@@ -93,10 +93,15 @@ Future<void> updateGeneratedXcodeProperties({
   if (buildInfo.trackWidgetCreation) {
     localsBuffer.writeln('TRACK_WIDGET_CREATION=true');
   }
+  // BD ADD: START
   if (compressSize) {
     localsBuffer.writeln('COMPRESS_SIZE=true');
   }
 
+  if (buildInfo.lite) {
+    localsBuffer.writeln('LITE=true');
+  }
+  // END
   final File generatedXcodePropertiesFile = project.ios.generatedXcodePropertiesFile;
   generatedXcodePropertiesFile.createSync(recursive: true);
   generatedXcodePropertiesFile.writeAsStringSync(localsBuffer.toString());

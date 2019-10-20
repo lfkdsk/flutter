@@ -59,15 +59,30 @@ BuildApp() {
     assets_path="${FLTAssetsPath}"
   fi
 
+  # BD ADD:
+  # ios lite 版本标记
+  local lite_flag=""
+  local lite_suffix=""
+  if [[  -n "$LITE" ]]; then
+      lite_flag="--lite"
+      lite_suffix="-lite"
+  fi
+  # END
+
   # Use FLUTTER_BUILD_MODE if it's set, otherwise use the Xcode build configuration name
   # This means that if someone wants to use an Xcode build config other than Debug/Profile/Release,
   # they _must_ set FLUTTER_BUILD_MODE so we know what type of artifact to build.
   local build_mode="$(echo "${FLUTTER_BUILD_MODE:-${CONFIGURATION}}" | tr "[:upper:]" "[:lower:]")"
   local artifact_variant="unknown"
   case "$build_mode" in
-    *release*) build_mode="release"; artifact_variant="ios-release";;
-    *profile*) build_mode="profile"; artifact_variant="ios-profile";;
-    *debug*) build_mode="debug"; artifact_variant="ios";;
+    # BD MOD: START
+    # *release*) build_mode="release"; artifact_variant="ios-release";;
+    # *profile*) build_mode="profile"; artifact_variant="ios-profile";;
+    # *debug*) build_mode="debug"; artifact_variant="ios";;
+    *release*) build_mode="release"; artifact_variant="ios-release"${lite_suffix};;
+    *profile*) build_mode="profile"; artifact_variant="ios-profile"${lite_suffix};;
+    *debug*) build_mode="debug"; artifact_variant="ios"${lite_suffix};;
+    # END
     *)
       EchoError "========================================================================"
       EchoError "ERROR: Unknown FLUTTER_BUILD_MODE: ${build_mode}."
@@ -99,12 +114,6 @@ BuildApp() {
   local compress_size_flag=""
   if [[  -n "$COMPRESS_SIZE" ]] && [[ "$build_mode" == "release" ]]; then
       compress_size_flag="--compress-size"
-  fi
-
-  # ios lite 版本标记
-  local lite_flag=""
-  if [[  -n "$LITE" ]] && [[ "$build_mode" != "debug" ]]; then
-      lite_flag="--lite"
   fi
 
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"

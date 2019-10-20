@@ -107,7 +107,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         // BD MOD: START
         //trackWidgetCreation: false,
         trackWidgetCreation: argResults['track-widget-creation'],
-        lite: argResults['lite'],
+        lite: argResults['lite'] && buildMode == BuildMode.release,
         // END
         outputPath: outputPath,
         extraFrontEndOptions: argResults[FlutterOptions.kExtraFrontEndOptions],

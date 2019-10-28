@@ -9,10 +9,18 @@ UserMessages get userMessages => context[UserMessages];
 /// Class containing message strings that can be produced by Flutter tools.
 class UserMessages {
   // Messages used in FlutterValidator
-  String flutterStatusInfo(String channel, String version, String os, String locale) =>
-      'Channel $channel, v$version, on $os, locale $locale';
-  String flutterVersion(String version, String flutterRoot) =>
-      'Flutter version $version at $flutterRoot';
+  // BD MOD: START
+  //  String flutterStatusInfo(String channel, String version, String os, String locale) =>
+  //      'Channel $channel, v$version, on $os, locale $locale';
+  //  String flutterVersion(String version, String flutterRoot) =>
+  //      'Flutter version $version at $flutterRoot';
+  String flutterStatusInfo(String channel, String version, String bdVersion,
+          String changeLog, String os, String locale) =>
+      'Channel $channel, v$version, bd$bdVersion, changelog $changeLog, on $os, locale $locale';
+  String flutterVersion(String version, String bdVersion, String flutterRoot) =>
+      'Flutter version $version bd$bdVersion at $flutterRoot';
+  String flutterChangelog(String changeLog) => 'Changelog $changeLog';
+  // END
   String flutterRevision(String revision, String age, String date) =>
       'Framework revision $revision ($age), $date';
   String engineRevision(String revision) => 'Engine revision $revision';

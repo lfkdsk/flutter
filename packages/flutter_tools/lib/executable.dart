@@ -19,6 +19,8 @@ import 'src/commands/clean.dart';
 import 'src/commands/config.dart';
 import 'src/commands/create.dart';
 import 'src/commands/daemon.dart';
+// BD ADD:
+import 'src/commands/develop.dart';
 import 'src/commands/devices.dart';
 import 'src/commands/doctor.dart';
 import 'src/commands/drive.dart';
@@ -75,6 +77,8 @@ Future<void> main(List<String> args) async {
     CleanCommand(),
     ConfigCommand(verboseHelp: verboseHelp),
     CreateCommand(),
+    // BD ADD:
+    DevelopCommand(),
     DaemonCommand(hidden: !verboseHelp),
     DevicesCommand(),
     DoctorCommand(verbose: verbose),

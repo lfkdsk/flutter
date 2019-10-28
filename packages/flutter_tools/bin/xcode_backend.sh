@@ -206,9 +206,10 @@ BuildApp() {
       ${flutter_engine_flag}                                                \
       ${local_engine_flag}                                                  \
       ${track_widget_creation_flag}                                         \
+      # BD ADD: START
       ${compress_size_flag}                                                 \
       ${lite_flag}
-
+      # END
     if [[ $? -ne 0 ]]; then
       EchoError "Failed to build ${project_path}."
       exit -1

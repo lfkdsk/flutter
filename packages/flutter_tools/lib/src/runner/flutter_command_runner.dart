@@ -158,7 +158,6 @@ class FlutterCommandRunner extends CommandRunner<void> {
         hide: !verboseHelp,
         help: 'List the special \'flutter-tester\' device in device listings. '
               'This headless device is used to\ntest Flutter tooling.');
-  
   }
 
   @override

@@ -13,11 +13,12 @@ import 'build_info.dart';
 import 'dart/sdk.dart';
 import 'globals.dart';
 
+// BD ADD: START
 enum EngineMode {
   normal,
   lite
 }
-
+// END
 enum Artifact {
   genSnapshot,
   flutterTester,

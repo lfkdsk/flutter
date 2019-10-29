@@ -998,4 +998,12 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
     }
     return WidgetsBinding.instance;
   }
+
+  // BD ADD: START
+  @override
+  void handleMemoryPressure() {
+    super.handleMemoryPressure();
+    PaintingBinding.instance.imageCache.clear();
+  }
+  // END
 }

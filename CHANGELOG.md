@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4-2](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-1...bd1.5.4-2) (2019-11-12)
+
+
+### Features
+
+* 压缩模式新增接口 ([d7173f3](https://code.byted.org/tech_client/flutter/commit/d7173f3))
+
 ### 1.5.4-1 (2019-11-06)
 
 

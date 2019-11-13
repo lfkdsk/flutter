@@ -4,11 +4,14 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import 'framework.dart';
 import 'notification_listener.dart';
 import 'scroll_metrics.dart';
 
+bool _hasScrollUpdate = false;
 /// Mixin for [Notification]s that track how many [RenderAbstractViewport] they
 /// have bubbled through.
 ///
@@ -126,6 +129,15 @@ class ScrollStartNotification extends ScrollNotification {
     if (dragDetails != null)
       description.add('$dragDetails');
   }
+
+  @override
+  void dispatch(BuildContext target) {
+    super.dispatch(target);
+    _hasScrollUpdate = false;
+    final String key = 'Scroll(${simplifyFileLocationKey(
+        getCreationLocationForError(target))})';
+    FpsUtils.instance.startRecord(key);
+  }
 }
 
 /// A notification that a [Scrollable] widget has changed its scroll position.
@@ -161,6 +173,12 @@ class ScrollUpdateNotification extends ScrollNotification {
     description.add('scrollDelta: $scrollDelta');
     if (dragDetails != null)
       description.add('$dragDetails');
+  }
+
+  @override
+  void dispatch(BuildContext target) {
+    _hasScrollUpdate = true;
+    super.dispatch(target);
   }
 }
 
@@ -250,6 +268,14 @@ class ScrollEndNotification extends ScrollNotification {
     super.debugFillDescription(description);
     if (dragDetails != null)
       description.add('$dragDetails');
+  }
+
+  @override
+  void dispatch(BuildContext target) {
+    super.dispatch(target);
+    final String key = 'Scroll(${simplifyFileLocationKey(
+        getCreationLocationForError(target))})';
+    FpsUtils.instance.getFps(key, true, recordInFramework: _hasScrollUpdate);
   }
 }
 

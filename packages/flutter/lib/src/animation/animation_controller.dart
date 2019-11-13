@@ -236,6 +236,7 @@ class AnimationController extends Animation<double>
     this.upperBound = 1.0,
     this.animationBehavior = AnimationBehavior.normal,
     @required TickerProvider vsync,
+    this.fpsKey,
   }) : assert(lowerBound != null),
        assert(upperBound != null),
        assert(upperBound >= lowerBound),
@@ -243,6 +244,7 @@ class AnimationController extends Animation<double>
        _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value ?? lowerBound);
+    _checkRecordFps();
   }
 
   /// Creates an animation controller with no upper or lower bound for its value.
@@ -267,6 +269,7 @@ class AnimationController extends Animation<double>
     this.debugLabel,
     @required TickerProvider vsync,
     this.animationBehavior = AnimationBehavior.preserve,
+    this.fpsKey,
   }) : assert(value != null),
        assert(vsync != null),
        lowerBound = double.negativeInfinity,
@@ -274,6 +277,7 @@ class AnimationController extends Animation<double>
        _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value);
+    _checkRecordFps();
   }
 
   /// The value at which this animation is deemed to be dismissed.
@@ -303,6 +307,9 @@ class AnimationController extends Animation<double>
   Duration duration;
 
   Ticker _ticker;
+
+  final String fpsKey;
+  bool _isInAnim = false;
 
   /// Recreates the [Ticker] with the new [TickerProvider].
   void resync(TickerProvider vsync) {
@@ -390,6 +397,39 @@ class AnimationController extends Animation<double>
       _status = (_direction == _AnimationDirection.forward) ?
         AnimationStatus.forward :
         AnimationStatus.reverse;
+    }
+  }
+
+  void _checkRecordFps() {
+    if (fpsKey == null) {
+      return;
+    }
+    addStatusListener((AnimationStatus status) {
+      switch (status) {
+        case AnimationStatus.forward:
+        case AnimationStatus.reverse:
+          _changeRecordStatus(true);
+          break;
+        case AnimationStatus.dismissed:
+        case AnimationStatus.completed:
+          _changeRecordStatus(false);
+          break;
+      }
+    });
+  }
+
+  void _changeRecordStatus(bool isStart) {
+    if (isStart) {
+      if (!_isInAnim) {
+        FpsUtils.instance.startRecord('Animation($fpsKey)');
+        _isInAnim = true;
+      }
+    } else {
+      if (_isInAnim) {
+        FpsUtils.instance.getFps(
+            'Animation($fpsKey)', true, recordInFramework: true);
+        _isInAnim = false;
+      }
     }
   }
 

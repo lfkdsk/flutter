@@ -240,6 +240,8 @@ class AnimationController extends Animation<double>
     this.upperBound = 1.0,
     this.animationBehavior = AnimationBehavior.normal,
     required TickerProvider vsync,
+    // BD ADD:
+    this.fpsKey = '',
   }) : assert(lowerBound != null),
        assert(upperBound != null),
        assert(upperBound >= lowerBound),
@@ -247,6 +249,8 @@ class AnimationController extends Animation<double>
        _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value ?? lowerBound);
+    // BD ADD:
+    _checkRecordFps();
   }
 
   /// Creates an animation controller with no upper or lower bound for its
@@ -273,6 +277,8 @@ class AnimationController extends Animation<double>
     this.debugLabel,
     required TickerProvider vsync,
     this.animationBehavior = AnimationBehavior.preserve,
+    // BD ADD:
+    this.fpsKey = '',
   }) : assert(value != null),
        assert(vsync != null),
        lowerBound = double.negativeInfinity,
@@ -280,6 +286,8 @@ class AnimationController extends Animation<double>
        _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value);
+    // BD ADD:
+    _checkRecordFps();
   }
 
   /// The value at which this animation is deemed to be dismissed.
@@ -318,6 +326,12 @@ class AnimationController extends Animation<double>
   Duration? reverseDuration;
 
   Ticker? _ticker;
+
+  // BD ADD: START
+  /// FrameWork will auto record Fps when given a fpsKey
+  final String fpsKey;
+  bool _isInAnim = false;
+  // END
 
   /// Recreates the [Ticker] with the new [TickerProvider].
   void resync(TickerProvider vsync) {
@@ -408,6 +422,43 @@ class AnimationController extends Animation<double>
         AnimationStatus.reverse;
     }
   }
+
+  // BD ADD: START
+  void _checkRecordFps() {
+    if (fpsKey == null  || !FpsUtils.instance.enableAutoRecord) {
+      return;
+    }
+    addStatusListener((AnimationStatus status) {
+      switch (status) {
+        case AnimationStatus.forward:
+        case AnimationStatus.reverse:
+          _changeRecordStatus(true);
+          break;
+        case AnimationStatus.dismissed:
+        case AnimationStatus.completed:
+          _changeRecordStatus(false);
+          break;
+      }
+    });
+  }
+
+  void _changeRecordStatus(bool isStart) {
+    if (isStart) {
+      if (!_isInAnim) {
+        FpsUtils.instance.startRecord(
+            'Animation($fpsKey)', isFromFramework: true);
+        _isInAnim = true;
+      }
+    } else {
+      if (_isInAnim) {
+        FpsUtils.instance.getFps(
+            'Animation($fpsKey)', true, recordInFramework: true,
+            isFromFramework: true);
+        _isInAnim = false;
+      }
+    }
+  }
+  // END
 
   /// The amount of time that has passed between the time the animation started
   /// and the most recent tick of the animation.

@@ -2870,6 +2870,37 @@ String _describeCreationLocation(Object object) {
   return location?.toString();
 }
 
+/// BD ADD:
+/// Element向上遍历，寻找第一个由业务创建的Widget，返回创建地址
+String getCreationLocationForError(Element element) {
+  // if (element == null) {
+  //   return 'none';
+  // }
+  // String location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(element);
+  // if (location != null) {
+  //   return location;
+  // }
+  // element?.visitAncestorElements((ancestor) {
+  //   location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(ancestor);
+  //   return location == null;
+  // });
+  // return location ?? 'none';
+  return 'none';
+}
+
+
+/// BD ADD:
+/// simplify location string
+String simplifyFileLocationKey(String key) {
+  if (key?.startsWith('file:') ?? false) {
+    final int index = key.lastIndexOf('/');
+    if (index > 0) {
+      key = key.substring(index);
+    }
+  }
+  return key;
+}
+
 /// Returns the creation location of an object if one is available.
 ///
 /// {@macro widgets.inspector.trackCreation}

@@ -51,6 +51,7 @@ abstract class BindingBase {
   /// observatory service extensions, if any.
   BindingBase() {
     developer.Timeline.startSync('Framework initialization');
+    frameworkInitializationdTimeMicros = developer.Timeline.now;
 
     assert(!_debugInitialized);
     initInstances();
@@ -67,6 +68,8 @@ abstract class BindingBase {
 
   static bool _debugInitialized = false;
   static bool _debugServiceExtensionsRegistered = false;
+  // BD ADD:
+  static int frameworkInitializationdTimeMicros = 0;
 
   /// The window to which this binding is bound.
   ///

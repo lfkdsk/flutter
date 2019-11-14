@@ -7,6 +7,8 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback;
+// BD ADD:
+import 'dart:ui' as ui show window, performance;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -924,6 +926,22 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
         developer.Timeline.instantSync('Widgets built first useful frame');
       }
     }
+    // BD ADD: START
+    if (_needToReportFirstFrame) {
+      int engineEnterTime = ui.performance.getEngineMainEnterMicros();
+      if (engineEnterTime != null && engineEnterTime > 0) {
+        int timeToFirstFrameMicros = developer.Timeline.now - engineEnterTime;
+        int timeToFrameworkInitMicros =
+            BindingBase.frameworkInitializationdTimeMicros - engineEnterTime;
+        ui.performance.timeToFirstFrameMicros = timeToFirstFrameMicros;
+        ui.performance.timeToFrameworkInitMicros = timeToFrameworkInitMicros;
+        if (ui.performance.onTimeToFirstFrameMicros != null) {
+          ui.performance.onTimeToFirstFrameMicros(
+              timeToFrameworkInitMicros, timeToFirstFrameMicros);
+        }
+      }
+    }
+    // END
     _needToReportFirstFrame = false;
     if (firstFrameCallback != null && !sendFramesToEngine) {
       // This frame is deferred and not the first frame sent to the engine that

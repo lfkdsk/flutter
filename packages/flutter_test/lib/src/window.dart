@@ -374,6 +374,35 @@ class TestWindow implements Window {
   set exitApp(VoidCallback callback) {
     _window.exitApp = callback;
   }
+
+  @override
+  int getEngineMainEnterMicros() {
+    return _window.getEngineMainEnterMicros();
+  }
+
+  @override
+  TimeToFirstFrameMicrosCallback get onTimeToFirstFrameMicros => _window.onTimeToFirstFrameMicros;
+
+  @override
+  set onTimeToFirstFrameMicros(TimeToFirstFrameMicrosCallback callback) {
+    _window.onTimeToFirstFrameMicros = callback;
+  }
+
+  @override
+  int get timeToFrameworkInitMicros => _window.timeToFrameworkInitMicros;
+
+  @override
+  set timeToFrameworkInitMicros(int time) {
+    _window.timeToFrameworkInitMicros = time;
+  }
+
+  @override
+  int get timeToFirstFrameMicros => _window.timeToFirstFrameMicros;
+
+  @override
+  set timeToFirstFrameMicros(int time) {
+    _window.timeToFirstFrameMicros = time;
+  }
   // END
 
 }

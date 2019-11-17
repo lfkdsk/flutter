@@ -51,6 +51,7 @@ abstract class BindingBase {
   /// observatory service extensions, if any.
   BindingBase() {
     developer.Timeline.startSync('Framework initialization');
+    // BD ADD:
     frameworkInitializationdTimeMicros = developer.Timeline.now;
 
     assert(!_debugInitialized);

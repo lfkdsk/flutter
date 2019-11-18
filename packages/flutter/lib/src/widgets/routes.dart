@@ -150,6 +150,7 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
 
   T _result;
 
+  // BD ADD:
   bool _isPushing = false;
 
   void _handleStatusChanged(AnimationStatus status) {
@@ -157,12 +158,14 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
       case AnimationStatus.completed:
         if (overlayEntries.isNotEmpty)
           overlayEntries.first.opaque = opaque;
+        // BD ADD: START
         if (_isPushing) {
           FpsUtils.instance.getFps(
               'Route(${simplifyFileLocationKey(settings.name)})', true,
               recordInFramework: true);
           _isPushing = false;
         }
+        // END
         break;
       case AnimationStatus.forward:
       case AnimationStatus.reverse:
@@ -178,11 +181,13 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
           navigator.finalizeRoute(this);
           assert(overlayEntries.isEmpty);
         }
+        // BD ADD: START
         if (_isPushing) {
           FpsUtils.instance.getFps(
               'Route(${simplifyFileLocationKey(settings.name)})', true);
           _isPushing = false;
         }
+        // END
         break;
     }
     changedInternalState();
@@ -210,21 +215,21 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     _animation.addStatusListener(_handleStatusChanged);
     // BD ADD: START
     final String key = 'Route(${simplifyFileLocationKey(settings.name)})';
+    void startRecord() {
+      if (!_isPushing) {
+        FpsUtils.instance.startRecord(key, timeOut: const Duration(seconds: 2));
+        _isPushing = true;
+      }
+    }
     if (ignoreFirstFrameTimeCost()) {
       ui.window.addNextFrameCallback(() {
-        if (key != 'Route(/)') {
-          FpsUtils.instance.startRecord(key);
-          _isPushing = true;
-        }
+        startRecord();
         _controller.forward();
 
       });
       return null;
     }
-    if (key != 'Route(/)') {
-      FpsUtils.instance.startRecord(key);
-      _isPushing = true;
-    }
+    startRecord();
     // END
     return _controller.forward();
   }

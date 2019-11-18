@@ -1,3 +1,7 @@
+/**
+ * BD ADD:
+ */
+import 'dart:async';
 import 'dart:ui' as ui;
 
 /// Utils For record fps
@@ -17,21 +21,31 @@ class FpsUtils {
     return _instance;
   }
 
-  void startRecord(String key) {
+  /// Start record the fps, clear Data of this key when timeOut
+  void startRecord(String key, {Duration timeOut}) {
     ui.window.startRecordFps(key);
+    if (timeOut != null) {
+      Timer(timeOut, () {
+        getFps(key, true);
+      });
+    }
   }
 
+  /// Get the fps for this key
+  /// stopRecord，true:clear data of this key after return fps
+  ///             false: continue record data after return
   FpsData getFps(String key, bool stopRecord,
       {bool recordInFramework = false}) {
     final List<dynamic> fpsDataList = ui.window.obtainFps(key, stopRecord);
     final FpsData fpsData = FpsData.fromList(key, fpsDataList);
-    if (recordInFramework) {
+    if (recordInFramework && _recordedData.length < 300) {
       _recordedData.add(fpsData);
       print(fpsData.toString());
     }
     return fpsData;
   }
 
+  /// Auto recorded data for Scroll,Animation,Route
   List<FpsData> getFpsDataRecordInFramework(bool erase) {
     final List<FpsData> temp = List<FpsData>.from(_recordedData);
     if (erase) {
@@ -41,19 +55,85 @@ class FpsUtils {
   }
 }
 
+/// Structure of Fps data
 class FpsData {
+  /// directly construct FpsData
+  FpsData.factory(this.key, this.fps, this.uiAvgTime, this.gpuAvgTime);
+
+  /// construct FpsData
+  FpsData.fromList(this.key, List<dynamic> fpsData)
+      : fps = (fpsData[0] * 100.0).round() / 100,
+        uiAvgTime = (fpsData[1] * 100.0).round() / 100,
+        gpuAvgTime = (fpsData[2] * 100.0).round() / 100;
+
+  /// Copy the data
+  FpsData.copyWith(FpsData data)
+      : _count = data._count,
+        key = data.key,
+        fps = data.fps,
+        uiAvgTime = data.fps,
+        gpuAvgTime = data.gpuAvgTime;
+
+  /// count for accumulation the FpsData
+  int _count = 1;
+
+  /// Key of Fps
   String key;
+
+  /// Fps value
   double fps;
+
+  ///Average time spent on UI thread
   double uiAvgTime;
+
+  ///Average time spent on GPU thread
   double gpuAvgTime;
 
-  FpsData.fromList(this.key, List<dynamic> fpsData) {
-    final double fps = fpsData[0];
-    this.fps = (fps * 100.0).round() / 100;
-    final double uiAvgTime = fpsData[1];
-    this.uiAvgTime = (uiAvgTime * 100.0).round() / 100;
-    final double gpuAvgTime = fpsData[2];
-    this.gpuAvgTime = (gpuAvgTime * 100.0).round() / 100;
+  /// fps data is valid
+  bool isValid() {
+    return fps >= 0;
+  }
+
+  /// accumulation the FpsData and get the average value
+  static List<FpsData> averageFpsDataList(List<FpsData> dataList) {
+    if (dataList?.isEmpty ?? true) {
+      return dataList;
+    }
+    final Map<String, FpsData> totalData = <String, FpsData>{};
+    for (FpsData data in dataList) {
+      if (!data.isValid()) {
+        continue;
+      }
+      final FpsData dataInMap = totalData[data.key];
+      if (dataInMap == null) {
+        totalData[data.key] = FpsData.copyWith(data);
+      } else {
+        dataInMap._accumulationData(data);
+      }
+    }
+    final List<FpsData> result = <FpsData>[];
+    for (FpsData data in totalData.values) {
+      data._averageData();
+      result.add(data);
+    }
+    return result;
+  }
+
+  void _accumulationData(FpsData newData) {
+    _count += newData._count;
+    fps += newData.fps;
+    uiAvgTime += newData.uiAvgTime;
+    gpuAvgTime += newData.gpuAvgTime;
+  }
+
+  void _averageData() {
+    if (_count == 1) {
+      return;
+    }
+    fps /= _count;
+    uiAvgTime /= _count;
+    gpuAvgTime /= _count;
+    _count = 1;
   }
 
   @override

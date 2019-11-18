@@ -2842,6 +2842,7 @@ String getCreationLocationForError(Element element) {
   return location ?? 'none';
 }
 
+/// simplify location string
 String simplifyFileLocationKey(String key) {
   if (key?.startsWith('file:') ?? false) {
     final int index = key.lastIndexOf('/');

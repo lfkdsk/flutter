@@ -236,6 +236,7 @@ class AnimationController extends Animation<double>
     this.upperBound = 1.0,
     this.animationBehavior = AnimationBehavior.normal,
     @required TickerProvider vsync,
+    // BD ADD:
     this.fpsKey,
   }) : assert(lowerBound != null),
        assert(upperBound != null),
@@ -244,6 +245,7 @@ class AnimationController extends Animation<double>
        _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value ?? lowerBound);
+    // BD ADD:
     _checkRecordFps();
   }
 
@@ -269,6 +271,7 @@ class AnimationController extends Animation<double>
     this.debugLabel,
     @required TickerProvider vsync,
     this.animationBehavior = AnimationBehavior.preserve,
+    // BD ADD:
     this.fpsKey,
   }) : assert(value != null),
        assert(vsync != null),
@@ -277,6 +280,7 @@ class AnimationController extends Animation<double>
        _direction = _AnimationDirection.forward {
     _ticker = vsync.createTicker(_tick);
     _internalSetValue(value);
+    // BD ADD:
     _checkRecordFps();
   }
 
@@ -308,8 +312,11 @@ class AnimationController extends Animation<double>
 
   Ticker _ticker;
 
+  // BD ADD: START
+  /// FrameWork will auto record Fps when given a fpsKey
   final String fpsKey;
   bool _isInAnim = false;
+  // END
 
   /// Recreates the [Ticker] with the new [TickerProvider].
   void resync(TickerProvider vsync) {
@@ -400,6 +407,7 @@ class AnimationController extends Animation<double>
     }
   }
 
+  // BD ADD: START
   void _checkRecordFps() {
     if (fpsKey == null) {
       return;
@@ -432,6 +440,7 @@ class AnimationController extends Animation<double>
       }
     }
   }
+  // END
 
   /// The amount of time that has passed between the time the animation started
   /// and the most recent tick of the animation.

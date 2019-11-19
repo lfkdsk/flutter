@@ -14,7 +14,7 @@ class FpsUtils {
 
   /// for framework to record fps, do not use in business
   static const String _frameWorkPrefix = 'Framework_';
-  static const int _recordListLength = 300;
+  static const int _recordListLength = 500;
 
   ///getInstance
   static FpsUtils get instance => _getInstance();
@@ -26,6 +26,20 @@ class FpsUtils {
   static FpsUtils _getInstance() {
     _instance ??= FpsUtils._internal();
     return _instance;
+  }
+
+  bool _isEnable = false;
+
+  /// open the auto record fps in framework
+  set enableAutoRecord(bool value) {
+    _isEnable = value;
+  }
+
+  /// is auto record enable
+  /// if recordData is full, indicates that there is no consumer,
+  /// then no longer continue to automatically record data
+  bool get enableAutoRecord {
+    return _isEnable && _recordedData.length < _recordListLength;
   }
 
   /// Start record the fps, if still not call getFps,data will be clear
@@ -57,7 +71,7 @@ class FpsUtils {
     _timers.remove(key)?.cancel();
     final List<dynamic> fpsDataList = ui.window.obtainFps(key, stopRecord);
     final FpsData fpsData = FpsData.fromList(key, fpsDataList);
-    if (recordInFramework && _recordedData.length < _recordListLength) {
+    if (recordInFramework) {
       _recordedData.add(fpsData);
       if (!kReleaseMode) {
         debugPrint(fpsData.toString());

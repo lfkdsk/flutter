@@ -217,7 +217,7 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     // BD ADD: START
     final String key = 'Route(${simplifyFileLocationKey(settings.name)})';
     void startRecord() {
-      if (!_isPushing) {
+      if (!_isPushing && FpsUtils.instance.enableAutoRecord) {
         FpsUtils.instance.startRecord(
             key, timeOut: const Duration(seconds: 2), isFromFramework: true);
         _isPushing = true;

@@ -137,10 +137,12 @@ class ScrollStartNotification extends ScrollNotification {
   @override
   void dispatch(BuildContext target) {
     super.dispatch(target);
-    _hasScrollUpdate = false;
-    final String key = 'Scroll(${simplifyFileLocationKey(
-        getCreationLocationForError(target))})';
-    FpsUtils.instance.startRecord(key, isFromFramework: true);
+    if (FpsUtils.instance.enableAutoRecord) {
+      _hasScrollUpdate = false;
+      final String key = 'Scroll(${simplifyFileLocationKey(
+          getCreationLocationForError(target))})';
+      FpsUtils.instance.startRecord(key, isFromFramework: true);
+    }
   }
   // END
 }
@@ -281,10 +283,13 @@ class ScrollEndNotification extends ScrollNotification {
   @override
   void dispatch(BuildContext target) {
     super.dispatch(target);
-    final String key = 'Scroll(${simplifyFileLocationKey(
-        getCreationLocationForError(target))})';
-    FpsUtils.instance.getFps(
-        key, true, recordInFramework: _hasScrollUpdate, isFromFramework: true);
+    if (FpsUtils.instance.enableAutoRecord) {
+      final String key = 'Scroll(${simplifyFileLocationKey(
+          getCreationLocationForError(target))})';
+      FpsUtils.instance.getFps(
+          key, true, recordInFramework: _hasScrollUpdate,
+          isFromFramework: true);
+    }
   }
   // END
 }

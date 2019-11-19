@@ -409,7 +409,7 @@ class AnimationController extends Animation<double>
 
   // BD ADD: START
   void _checkRecordFps() {
-    if (fpsKey == null) {
+    if (fpsKey == null || !FpsUtils.instance.enableAutoRecord) {
       return;
     }
     addStatusListener((AnimationStatus status) {

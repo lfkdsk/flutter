@@ -1008,6 +1008,12 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
 //  <String>['android-arm-dynamic-release/darwin-x64', 'android-arm-dynamic-release/darwin-x64.zip'],
 //  <String>['android-arm64-dynamic-profile/darwin-x64', 'android-arm64-dynamic-profile/darwin-x64.zip'],
 //  <String>['android-arm64-dynamic-release/darwin-x64', 'android-arm64-dynamic-release/darwin-x64.zip'],
+
+  // BD ADD:
+  <String>['android-arm-profile-lite/darwin-x64', 'android-arm-profile-lite/darwin-x64.zip'],
+  <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
+  <String>['android-arm64-profile-lite/darwin-x64', 'android-arm64-profile-lite/darwin-x64.zip'],
+  <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
 ];
 
 const List<List<String>> _linuxBinaryDirs = <List<String>>[
@@ -1045,12 +1051,28 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
 //  <String>['android-arm-dynamic-release', 'android-arm-dynamic-release/artifacts.zip'],
 //  <String>['android-arm64-dynamic-profile', 'android-arm64-dynamic-profile/artifacts.zip'],
 //  <String>['android-arm64-dynamic-release', 'android-arm64-dynamic-release/artifacts.zip'],
+
+  // BD ADD: START
+  <String>['android-x86-lite', 'android-x86-lite/artifacts.zip'],
+  <String>['android-x64-lite', 'android-x64-lite/artifacts.zip'],
+  <String>['android-arm-lite', 'android-arm-lite/artifacts.zip'],
+  <String>['android-arm-profile-lite', 'android-arm-profile-lite/artifacts.zip'],
+  <String>['android-arm-release-lite', 'android-arm-release-lite/artifacts.zip'],
+  <String>['android-arm64-lite', 'android-arm64-lite/artifacts.zip'],
+  <String>['android-arm64-profile-lite', 'android-arm64-profile-lite/artifacts.zip'],
+  <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
+  // END
 ];
 
 const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios', 'ios/artifacts.zip'],
   <String>['ios-profile', 'ios-profile/artifacts.zip'],
   <String>['ios-release', 'ios-release/artifacts.zip'],
+  // BD ADD: START
+  <String>['ios-lite', 'ios-lite/artifacts.zip'],
+  <String>['ios-profile-lite', 'ios-profile-lite/artifacts.zip'],
+  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
+  // END
 ];
 
 const List<List<String>> _dartSdks = <List<String>> [

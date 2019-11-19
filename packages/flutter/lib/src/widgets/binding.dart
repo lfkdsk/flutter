@@ -710,13 +710,32 @@ mixin WidgetsBinding on BindingBase, SchedulerBinding, GestureBinding, RendererB
         return true;
       }());
     }
-    if (!kReleaseMode) {
-      if (_needToReportFirstFrame && _reportFirstFrame) {
+    // BD MOD: START
+    //  if (!kReleaseMode) {
+    //    if (_needToReportFirstFrame && _reportFirstFrame) {
+    //      developer.Timeline.instantSync('Widgets completed first useful frame');
+    //      developer.postEvent('Flutter.FirstFrame', <String, dynamic>{});
+    //      _needToReportFirstFrame = false;
+    //    }
+    //  }
+    if (_needToReportFirstFrame && _reportFirstFrame) {
+      int engineEnterTime = ui.window.getEngineMainEnterMicros();
+      int timeToFirstFrameMicros = developer.Timeline.now - engineEnterTime;
+      int timeToFrameworkInitMicros =
+          BindingBase.frameworkInitializationdTimeMicros - engineEnterTime;
+      ui.window.timeToFirstFrameMicros = timeToFirstFrameMicros;
+      ui.window.timeToFrameworkInitMicros = timeToFrameworkInitMicros;
+      if (ui.window.onTimeToFirstFrameMicros != null) {
+        ui.window.onTimeToFirstFrameMicros(
+            timeToFrameworkInitMicros, timeToFirstFrameMicros);
+      }
+      if (!kReleaseMode) {
         developer.Timeline.instantSync('Widgets completed first useful frame');
         developer.postEvent('Flutter.FirstFrame', <String, dynamic>{});
-        _needToReportFirstFrame = false;
       }
+      _needToReportFirstFrame = false;
     }
+    // END
   }
 
   /// The [Element] that is at the root of the hierarchy (and which wraps the
@@ -998,4 +1017,12 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
     }
     return WidgetsBinding.instance;
   }
+
+  // BD ADD: START
+  @override
+  void handleMemoryPressure() {
+    super.handleMemoryPressure();
+    PaintingBinding.instance.imageCache.clear();
+  }
+  // END
 }

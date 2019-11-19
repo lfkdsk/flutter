@@ -38,8 +38,12 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         defaultsTo: false,
         help: 'Report timing information about build steps in machine readable form,',
       )
-      // BD ADD
+      // BD ADD: START
       ..addFlag('track-widget-creation', defaultsTo: false, hide: true,)
+      ..addFlag('compress-size',
+        help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
+        negatable: false,)
+      // END
       ..addMultiOption('ios-arch',
         splitCommas: true,
         defaultsTo: defaultIOSArchs.map<String>(getNameForIOSArch),
@@ -69,6 +73,11 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     if (platform == null)
       throwToolExit('Unknown platform: $targetPlatform');
 
+    // BD ADD: START
+    if (argResults['lite']) {
+      print('Build with lite edition...');
+    }
+    // END
     final BuildMode buildMode = getBuildMode();
 
     Status status;
@@ -83,6 +92,10 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     final bool reportTimings = argResults['report-timings'];
     try {
       String mainPath = findMainDartFile(targetFile);
+      final bool compressSize = buildMode == BuildMode.release &&
+          platform == TargetPlatform.ios
+          ? argResults['compress-size']
+          : false;
       final AOTSnapshotter snapshotter = AOTSnapshotter(reportTimings: reportTimings);
 
       // Compile to kernel.
@@ -91,9 +104,11 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         buildMode: buildMode,
         mainPath: mainPath,
         packagesPath: PackageMap.globalPackagesPath,
-        // BD MOD
+        // BD MOD: START
         //trackWidgetCreation: false,
         trackWidgetCreation: argResults['track-widget-creation'],
+        lite: argResults['lite'] && buildMode == BuildMode.release,
+        // END
         outputPath: outputPath,
         extraFrontEndOptions: argResults[FlutterOptions.kExtraFrontEndOptions],
       );
@@ -122,6 +137,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
             outputPath: outputPath,
             buildSharedLibrary: false,
             extraGenSnapshotOptions: argResults[FlutterOptions.kExtraGenSnapshotOptions],
+            compressSize: compressSize
           ).then<int>((int buildExitCode) {
             return buildExitCode;
           });

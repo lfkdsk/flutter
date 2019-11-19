@@ -109,7 +109,7 @@ class FpsData {
 
   /// fps data is valid
   bool isValid() {
-    return fps >= 0;
+    return fps > 0;
   }
 
   /// accumulation the FpsData and get the average value

@@ -1010,7 +1010,11 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
     if (WidgetsBinding.instance == null) {
       WidgetsFlutterBinding();
       // BD ADD: START
+      final VoidCallback preCallback = ui.window.exitApp;
       ui.window.exitApp = () {
+        if (preCallback != null) {
+          preCallback();
+        }
         runApp(Container());
       };
       // END

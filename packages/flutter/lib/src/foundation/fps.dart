@@ -3,30 +3,42 @@
  */
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'package:flutter/widgets.dart';
 
 /// Utils For record fps
 class FpsUtils {
   FpsUtils._internal() {
     _recordedData = <FpsData>[];
+    _timers = <String, Timer>{};
   }
+
+  /// for framework to record fps, do not use in business
+  static const String _frameWorkPrefix = 'Framework_';
 
   ///getInstance
   static FpsUtils get instance => _getInstance();
   static FpsUtils _instance;
 
   List<FpsData> _recordedData;
+  Map<String, Timer> _timers;
 
   static FpsUtils _getInstance() {
     _instance ??= FpsUtils._internal();
     return _instance;
   }
 
-  /// Start record the fps, clear Data of this key when timeOut
-  void startRecord(String key, {Duration timeOut}) {
+  /// Start record the fps, if still not call getFps,data will be clear
+  ///
+  /// Attention:startRecord and getFps must be paired
+  void startRecord(String key,
+      {Duration timeOut, bool isFromFramework = false}) {
+    if (isFromFramework) {
+      key = _frameWorkPrefix + key;
+    }
     ui.window.startRecordFps(key);
     if (timeOut != null) {
-      Timer(timeOut, () {
-        getFps(key, true);
+      _timers[key] = Timer(timeOut, () {
+        getFps(key, true, isFromFramework: isFromFramework);
       });
     }
   }
@@ -34,13 +46,19 @@ class FpsUtils {
   /// Get the fps for this key
   /// stopRecord，true:clear data of this key after return fps
   ///             false: continue record data after return
+  ///
+  /// Attention:startRecord and getFps must be paired
   FpsData getFps(String key, bool stopRecord,
-      {bool recordInFramework = false}) {
+      {bool recordInFramework = false, bool isFromFramework = false}) {
+    if (isFromFramework) {
+      key = _frameWorkPrefix + key;
+    }
+    _timers.remove(key)?.cancel();
     final List<dynamic> fpsDataList = ui.window.obtainFps(key, stopRecord);
     final FpsData fpsData = FpsData.fromList(key, fpsDataList);
     if (recordInFramework && _recordedData.length < 300) {
       _recordedData.add(fpsData);
-      print(fpsData.toString());
+      debugPrint(fpsData.toString());
     }
     return fpsData;
   }

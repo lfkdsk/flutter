@@ -162,7 +162,7 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
         if (_isPushing) {
           FpsUtils.instance.getFps(
               'Route(${simplifyFileLocationKey(settings.name)})', true,
-              recordInFramework: true);
+              recordInFramework: true, isFromFramework: true);
           _isPushing = false;
         }
         // END
@@ -184,7 +184,8 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
         // BD ADD: START
         if (_isPushing) {
           FpsUtils.instance.getFps(
-              'Route(${simplifyFileLocationKey(settings.name)})', true);
+              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              isFromFramework: true);
           _isPushing = false;
         }
         // END
@@ -217,7 +218,8 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     final String key = 'Route(${simplifyFileLocationKey(settings.name)})';
     void startRecord() {
       if (!_isPushing) {
-        FpsUtils.instance.startRecord(key, timeOut: const Duration(seconds: 2));
+        FpsUtils.instance.startRecord(
+            key, timeOut: const Duration(seconds: 2), isFromFramework: true);
         _isPushing = true;
       }
     }
@@ -225,7 +227,6 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
       ui.window.addNextFrameCallback(() {
         startRecord();
         _controller.forward();
-
       });
       return null;
     }

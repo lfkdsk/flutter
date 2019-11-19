@@ -429,13 +429,15 @@ class AnimationController extends Animation<double>
   void _changeRecordStatus(bool isStart) {
     if (isStart) {
       if (!_isInAnim) {
-        FpsUtils.instance.startRecord('Animation($fpsKey)');
+        FpsUtils.instance.startRecord(
+            'Animation($fpsKey)', isFromFramework: true);
         _isInAnim = true;
       }
     } else {
       if (_isInAnim) {
         FpsUtils.instance.getFps(
-            'Animation($fpsKey)', true, recordInFramework: true);
+            'Animation($fpsKey)', true, recordInFramework: true,
+            isFromFramework: true);
         _isInAnim = false;
       }
     }

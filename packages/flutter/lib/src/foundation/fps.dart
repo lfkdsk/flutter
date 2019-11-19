@@ -3,7 +3,7 @@
  */
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 
 /// Utils For record fps
 class FpsUtils {
@@ -14,6 +14,7 @@ class FpsUtils {
 
   /// for framework to record fps, do not use in business
   static const String _frameWorkPrefix = 'Framework_';
+  static const int _recordListLength = 300;
 
   ///getInstance
   static FpsUtils get instance => _getInstance();
@@ -56,9 +57,11 @@ class FpsUtils {
     _timers.remove(key)?.cancel();
     final List<dynamic> fpsDataList = ui.window.obtainFps(key, stopRecord);
     final FpsData fpsData = FpsData.fromList(key, fpsDataList);
-    if (recordInFramework && _recordedData.length < 300) {
+    if (recordInFramework && _recordedData.length < _recordListLength) {
       _recordedData.add(fpsData);
-      debugPrint(fpsData.toString());
+      if (!kReleaseMode) {
+        debugPrint(fpsData.toString());
+      }
     }
     return fpsData;
   }

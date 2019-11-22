@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4-3](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-2...bd1.5.4-3) (2019-11-22)
+
+
+### Features
+
+* 内置压缩策略优化，新增内存解压兜底，统一解压相关error domain和error code ([cb0a562](https://code.byted.org/tech_client/flutter/commit/cb0a562)), closes [#FLUTTER-305](https://jira.bytedance.com/browse/FLUTTER-305)
+
 ### [1.5.4-2](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-1...bd1.5.4-2) (2019-11-12)
 
 

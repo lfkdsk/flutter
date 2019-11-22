@@ -288,7 +288,8 @@ BuildApp() {
     ${flutter_engine_flag}                                                  \
     ${local_engine_flag}                                                    \
     ${track_widget_creation_flag}
-
+  
+  # BD ADD:START
   if [[ "$compress_size_flag" != "" ]]; then
     RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${app_framework_dir}/icudtl.dat"
     if [[ -e "${project_path}/.ios" ]]; then
@@ -298,7 +299,8 @@ BuildApp() {
     fi
     local current_path=`pwd`
     RunCommand cd ${app_framework_dir}/
-    zip -q -r flutter_compress_assets.zip icudtl.dat ${assets_path}
+    zip -q -r flutter_compress_icudtl.zip icudtl.dat
+    zip -q -r flutter_compress_assets.zip ${assets_path}
     RunCommand rm -f icudtl.dat
     local dirPath=`dirname ${assets_path}`
     if [ "${dirPath}" == "." ];then
@@ -308,6 +310,7 @@ BuildApp() {
     fi
     RunCommand cd ${current_path}
   fi
+  # END
 
   if [[ $? -ne 0 ]]; then
     EchoError "Failed to package ${project_path}."

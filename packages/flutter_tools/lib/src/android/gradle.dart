@@ -26,6 +26,8 @@ import '../globals.dart';
 import '../project.dart';
 import 'android_sdk.dart';
 import 'android_studio.dart';
+// BD ADD:
+import 'package:flutter_tools/src/calculate_build_info.dart';
 
 const String gradleVersion = '4.10.2';
 final RegExp _assembleTaskPattern = RegExp(r'assemble(\S+)');
@@ -501,6 +503,10 @@ Future<void> _buildGradleProjectV2(
       appSize = ' (${getSizeAsMB(apkFile.lengthSync())})';
     }
     printStatus('Built ${fs.path.relative(apkFile.path)}$appSize.');
+    // BD ADD: START
+    FlutterBuildInfo.instance.extractApkPkgNameAndVersion(apkFile.path);
+    FlutterBuildInfo.instance.reportInfo();
+    // END
 
     if (buildInfo.createBaseline) {
       // Save baseline apk for generating dynamic patches in later builds.
@@ -621,6 +627,8 @@ Future<void> _buildGradleProjectV2(
       appSize = ' (${getSizeAsMB(bundleFile.lengthSync())})';
     }
     printStatus('Built ${fs.path.relative(bundleFile.path)}$appSize.');
+    // BD ADD:
+    FlutterBuildInfo.instance.reportInfo();
   }
 }
 

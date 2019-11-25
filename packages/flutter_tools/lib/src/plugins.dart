@@ -12,6 +12,8 @@ import 'dart/package_map.dart';
 import 'globals.dart';
 import 'ios/cocoapods.dart';
 import 'project.dart';
+// BD ADD:
+import 'calculate_build_info.dart';
 
 void _renderTemplateToFile(String template, dynamic context, String filePath) {
   final String renderedTemplate =
@@ -286,6 +288,8 @@ Future<void> _writeIOSPluginRegistrant(FlutterProject project, List<Plugin> plug
 void refreshPluginsList(FlutterProject project) {
   final List<Plugin> plugins = findPlugins(project);
   final bool changed = _writeFlutterPluginsList(project, plugins);
+  // BD ADD:
+  FlutterBuildInfo.instance.depList.addAll(plugins);
   if (changed)
     cocoaPods.invalidatePodInstallOutput(project.ios);
 }

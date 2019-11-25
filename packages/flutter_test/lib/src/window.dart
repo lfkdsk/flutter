@@ -368,6 +368,16 @@ class TestWindow implements Window {
   }
 
   @override
+  void startRecordFps(String key) {
+    _window.startRecordFps(key);
+  }
+
+  @override
+  List obtainFps(String key, bool stopRecord) {
+    return _window.obtainFps(key, stopRecord);
+  }
+
+  @override
   VoidCallback get exitApp => _window.exitApp;
 
   @override

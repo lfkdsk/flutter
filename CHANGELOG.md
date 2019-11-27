@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4-4](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-3...bd1.5.4-4) (2019-11-27)
+
+
+### Bug Fixes
+
+* 修复iOS后台渲染图片调用OpenGL导致的崩溃 ([c259490](https://code.byted.org/tech_client/flutter/commit/c259490)), closes [#FLUTTER-247](https://jira.bytedance.com/browse/FLUTTER-247)
+
+
+### Features
+
+* support report build info ([b7d2d13](https://code.byted.org/tech_client/flutter/commit/b7d2d13))
+
 ### [1.5.4-3](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-2...bd1.5.4-3) (2019-11-22)
 
 

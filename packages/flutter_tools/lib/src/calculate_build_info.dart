@@ -166,7 +166,10 @@ class FlutterBuildInfo {
     final String result = buildReportJson();
     final String newReportTime =
         reportTime.replaceAll(':', '_').replaceAll('-', '_');
-    final String newIp = ip.replaceAll('\.', '_');
+    String newIp = 'unkonwn_ip';
+    if (ip != null && ip.isNotEmpty) {
+      newIp = ip.replaceAll('\.', '_');
+    }
     final String newFrameworkVersion =
         frameworkVersion.replaceAll('\.', '_').replaceAll('-', '_');
     findIndexAndUploadResult(

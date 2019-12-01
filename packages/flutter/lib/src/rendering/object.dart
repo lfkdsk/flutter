@@ -8,12 +8,15 @@ import 'dart:developer';
 import 'dart:ui' as ui show PictureRecorder;
 
 import 'package:flutter/animation.dart';
+// BD ADD:
+import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/semantics.dart';
 import 'package:vector_math/vector_math_64.dart';
-
+// BD ADD:
+import '../../widgets.dart';
 import 'binding.dart';
 import 'debug.dart';
 import 'layer.dart';
@@ -1446,6 +1449,11 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
   }
   bool _needsLayout = true;
 
+  /// BD ADD: START
+  bool get needsLayout {
+      return _needsLayout;
+  }
+  /// END
   RenderObject _relayoutBoundary;
   bool _doingThisLayoutWithCallback = false;
 
@@ -1611,6 +1619,8 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
       return true;
     }());
     owner._nodesNeedingLayout.add(this);
+    // BD ADD:
+    Boost.ensureNotifyIdle();
   }
 
   void _layoutWithoutResize() {
@@ -1644,6 +1654,20 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
     markNeedsPaint();
   }
 
+  /// BD ADD: START
+  /// 触发重新绘制
+  void layoutNextFrame(Duration duration) {
+    try {
+      if (WidgetsBinding.instance.buildOwner.dirtyElementsIsNotEmpty()) {
+        return;
+      }
+      markNeedsLayout();
+      WidgetsBinding.instance.pipelineOwner.flushLayout();
+    } catch(e, stack) {
+      _debugReportException('layoutNextFrame', e, stack);
+    }
+  }
+  /// END
   /// Compute the layout for this render object.
   ///
   /// This method is the main entry point for parents to ask their children to

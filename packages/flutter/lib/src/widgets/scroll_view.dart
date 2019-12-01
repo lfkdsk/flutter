@@ -6,6 +6,10 @@
 
 import 'dart:math' as math;
 
+// BD ADD: START
+import 'package:flutter/boost.dart';
+import 'package:flutter/material.dart';
+// END
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
 
@@ -1029,6 +1033,10 @@ class ListView extends BoxScrollView {
     double cacheExtent,
     List<Widget> children = const <Widget>[],
     int semanticChildCount,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
   }) : childrenDelegate = SliverChildListDelegate(
@@ -1100,6 +1108,10 @@ class ListView extends BoxScrollView {
     bool addSemanticIndexes = true,
     double cacheExtent,
     int semanticChildCount,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
   }) : assert(itemCount == null || itemCount >= 0),
@@ -1191,6 +1203,10 @@ class ListView extends BoxScrollView {
     double cacheExtent,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
   }) : assert(itemBuilder != null),
        assert(separatorBuilder != null),
        assert(itemCount != null && itemCount >= 0),
@@ -1332,6 +1348,10 @@ class ListView extends BoxScrollView {
     int semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
   }) : assert(childrenDelegate != null),
        super(
          key: key,
@@ -1365,6 +1385,23 @@ class ListView extends BoxScrollView {
   /// respectively.
   final SliverChildDelegate childrenDelegate;
 
+  /// BD ADD: START
+  /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
+  final double scrollingExtent;
+
+  /// extent for preload item when scroll end
+  final double scrollEndExtent;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget result = super.build(context);
+    return (scrollingExtent != null && scrollingExtent > 0.0) ||
+            (scrollEndExtent != null && scrollEndExtent > 0.0)
+        ? _ScrollOptWrapper(result)
+        : result;
+  }
+  /// END
+
   @override
   Widget buildChildLayout(BuildContext context) {
     if (itemExtent != null) {
@@ -1373,7 +1410,13 @@ class ListView extends BoxScrollView {
         itemExtent: itemExtent,
       );
     }
-    return SliverList(delegate: childrenDelegate);
+    // BD MOD:
+    // return SliverList(delegate: childrenDelegate);
+    return SliverList(
+        delegate: childrenDelegate,
+        scrollEndExtent: scrollEndExtent,
+        scrollingExtent: scrollingExtent);
+    // END
   }
 
   @override
@@ -1387,7 +1430,30 @@ class ListView extends BoxScrollView {
     return math.max(0, itemCount * 2 - 1);
   }
 }
+/// BD ADD: START
+class _ScrollOptWrapper extends StatefulWidget {
+  const _ScrollOptWrapper(this.child);
 
+  final Widget child;
+
+  @override
+  __ScrollOptWrapperState createState() => __ScrollOptWrapperState();
+}
+
+class __ScrollOptWrapperState extends State<_ScrollOptWrapper> {
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      child: widget.child,
+      onNotification: (Notification notification) {
+        if (notification is ScrollStartNotification) {
+          Boost.startFromNow(Duration(seconds: 20), notifyIdle: true);
+        }
+      },
+    );
+  }
+}
+/// END
 /// A scrollable, 2D array of widgets.
 ///
 /// The main axis direction of a grid is the direction in which it scrolls (the

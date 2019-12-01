@@ -2791,6 +2791,11 @@ class BuildOwner {
     assert(_debugStateLockLevel >= 0);
   }
 
+  /// BD ADD: START
+  bool dirtyElementsIsNotEmpty() {
+    return _dirtyElements.isNotEmpty;
+  }
+  /// END
   Map<Element, Set<GlobalKey>> _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans;
 
   void _debugTrackElementThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans(Element node, GlobalKey key) {

@@ -816,12 +816,33 @@ class SliverList extends SliverMultiBoxAdaptorWidget {
   const SliverList({
     Key key,
     @required SliverChildDelegate delegate,
-  }) : super(key: key, delegate: delegate);
+  /// BD MOD: START
+  /// }) : super(key: key, delegate: delegate);
+    double scrollingExtent,
+    double scrollEndExtent,
+  })  : scrollingExtent = scrollingExtent ?? 0.0,
+        scrollEndExtent = scrollEndExtent ?? 0.0,
+        super(key: key, delegate: delegate);
+
+  /// 预 Build/Layout 下一帧，注意过大容易导致提前绘制多个Item
+  final double scrollingExtent;
+
+  /// extent for preload item when scroll end
+  final double scrollEndExtent;
+  /// END
 
   @override
   RenderSliverList createRenderObject(BuildContext context) {
     final SliverMultiBoxAdaptorElement element = context as SliverMultiBoxAdaptorElement;
-    return RenderSliverList(childManager: element);
+    // BD MOD: START
+    // return RenderSliverList(childManager: element);
+    return scrollingExtent > 0.0 || scrollEndExtent > 0.0
+        ? RenderSliverListExtent(
+            childManager: element,
+            scrollEndExtent: scrollEndExtent,
+            scrollingExtent: scrollingExtent)
+        : RenderSliverList(childManager: element);
+    // END
   }
 }
 

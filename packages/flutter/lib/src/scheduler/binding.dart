@@ -8,6 +8,8 @@ import 'dart:developer' show Flow, Timeline;
 import 'dart:ui' show AppLifecycleState, FramePhase, FrameTiming, TimingsCallback;
 
 import 'package:collection/collection.dart' show PriorityQueue, HeapPriorityQueue;
+// BD ADD:
+import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
 
 import 'debug.dart';
@@ -782,6 +784,11 @@ mixin SchedulerBinding on BindingBase {
   ///  * [scheduleWarmUpFrame], which ignores the "Vsync" signal entirely and
   ///    triggers a frame immediately.
   void scheduleFrame() {
+    // BD ADD: START
+    if (Boost.localIsIdleCallbacksHandling) {
+      return;
+    }
+    // END
     if (_hasScheduledFrame || !framesEnabled)
       return;
     assert(() {

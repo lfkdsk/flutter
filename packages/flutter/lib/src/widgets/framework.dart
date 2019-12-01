@@ -2760,6 +2760,7 @@ abstract class Element extends DiagnosticableTree implements BuildContext {
         }());
         return child;
       }
+//      print('----------sunkun:updateChild');
       deactivateChild(child);
       assert(child._parent == null);
     }
@@ -4512,6 +4513,7 @@ abstract class RenderObjectElement extends Element {
 
   @override
   void mount(Element parent, dynamic newSlot) {
+//    print('------sunkun:mount}');
     super.mount(parent, newSlot);
     _renderObject = widget.createRenderObject(this);
     //BD MOD
@@ -4524,6 +4526,7 @@ abstract class RenderObjectElement extends Element {
 
   @override
   void update(covariant RenderObjectWidget newWidget) {
+//    print('------sunkun:update}');
     super.update(newWidget);
     assert(widget == newWidget);
     assert(() { _debugUpdateRenderObjectOwner(); return true; }());
@@ -4730,6 +4733,7 @@ abstract class RenderObjectElement extends Element {
 
   @override
   void unmount() {
+//    print('------sunkun:unmount}');
     super.unmount();
     assert(!renderObject.attached,
       'A RenderObject was still attached when attempting to unmount its '

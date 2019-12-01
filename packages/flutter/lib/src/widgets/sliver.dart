@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:collection' show SplayTreeMap, HashMap;
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -678,12 +679,17 @@ class SliverList extends SliverMultiBoxAdaptorWidget {
   const SliverList({
     Key key,
     @required SliverChildDelegate delegate,
+    this.preLoadExtent,
   }) : super(key: key, delegate: delegate);
+
+  /// extent for preload item when scroll end
+  final double preLoadExtent;
 
   @override
   RenderSliverList createRenderObject(BuildContext context) {
     final SliverMultiBoxAdaptorElement element = context;
-    return RenderSliverList(childManager: element);
+    return RenderSliverList(
+        childManager: element, preloadExtent: preLoadExtent);
   }
 }
 
@@ -971,6 +977,7 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
   final Map<int, Widget> _childWidgets = HashMap<int, Widget>();
   final SplayTreeMap<int, Element> _childElements = SplayTreeMap<int, Element>();
   RenderBox _currentBeforeChild;
+  final List<Element> _caches = <Element>[];
 
   @override
   void performRebuild() {
@@ -981,14 +988,25 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
     try {
       void processElement(int index) {
         _currentlyUpdatingChildIndex = index;
+        ///
         final Element newChild = updateChild(_childElements[index], _build(index), index);
+        ///
+//        final Element oldElement = _caches.isNotEmpty?_caches.removeLast():_childElements[index];
+//        oldElement?.attachRenderObject(index);
+//        final Element newChild = updateChild(oldElement, _build(index), index);
         if (newChild != null) {
           _childElements[index] = newChild;
           final SliverMultiBoxAdaptorParentData parentData = newChild.renderObject.parentData;
           if (!parentData.keptAlive)
             _currentBeforeChild = newChild.renderObject;
         } else {
+          ///
           _childElements.remove(index);
+          ///
+//          final Element element = _childElements.remove(index);
+//          if (element != null) {
+//            _caches.add(element);
+//          }
         }
       }
       // processElement may modify the Map - need to do a .toList() here.
@@ -1009,6 +1027,7 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
   @override
   void createChild(int index, { @required RenderBox after }) {
     assert(_currentlyUpdatingChildIndex == null);
+    Timeline.startSync('createChild');
     owner.buildScope(this, () {
       final bool insertFirst = after == null;
       assert(insertFirst || _childElements[index-1] != null);
@@ -1016,16 +1035,28 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
       Element newChild;
       try {
         _currentlyUpdatingChildIndex = index;
+        ///
         newChild = updateChild(_childElements[index], _build(index), index);
+        ///
+//        final Element oldElement = _caches.isNotEmpty?_caches.removeLast():_childElements[index];
+//        oldElement?.attachRenderObject(index);
+//        newChild = updateChild(oldElement, _build(index), index);
       } finally {
         _currentlyUpdatingChildIndex = null;
       }
       if (newChild != null) {
         _childElements[index] = newChild;
       } else {
+        ///
         _childElements.remove(index);
+        ///
+//        final Element element = _childElements.remove(index);
+//        if (element != null) {
+//          _caches.add(element);
+//        }
       }
     });
+    Timeline.finishSync();
   }
 
   @override
@@ -1042,12 +1073,20 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
     return newChild;
   }
 
+//  @override
+//  void deactivateChild(Element child) {
+//    child.detachRenderObject();
+//  }
+
   @override
   void forgetChild(Element child) {
     assert(child != null);
     assert(child.slot != null);
     assert(_childElements.containsKey(child.slot));
+    ///
     _childElements.remove(child.slot);
+    ///
+//    _caches.add(_childElements.remove(child.slot));
   }
 
   @override
@@ -1055,6 +1094,7 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
     final int index = renderObject.indexOf(child);
     assert(_currentlyUpdatingChildIndex == null);
     assert(index >= 0);
+    Timeline.startSync("removeChild");
     owner.buildScope(this, () {
       assert(_childElements.containsKey(index));
       try {
@@ -1064,9 +1104,13 @@ class SliverMultiBoxAdaptorElement extends RenderObjectElement implements Render
       } finally {
         _currentlyUpdatingChildIndex = null;
       }
+      ///
       _childElements.remove(index);
+      ///
+//      _caches.add(_childElements.remove(index));
       assert(!_childElements.containsKey(index));
     });
+    Timeline.finishSync();
   }
 
   static double _extrapolateMaxScrollOffset(

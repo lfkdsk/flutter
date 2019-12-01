@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:developer';
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
 
@@ -870,6 +872,7 @@ class ListView extends BoxScrollView {
     double cacheExtent,
     List<Widget> children = const <Widget>[],
     int semanticChildCount,
+    this.preloadExtent,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : childrenDelegate = SliverChildListDelegate(
          children,
@@ -934,6 +937,7 @@ class ListView extends BoxScrollView {
     bool addSemanticIndexes = true,
     double cacheExtent,
     int semanticChildCount,
+    this.preloadExtent,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : childrenDelegate = SliverChildBuilderDelegate(
          itemBuilder,
@@ -1019,6 +1023,7 @@ class ListView extends BoxScrollView {
     bool addRepaintBoundaries = true,
     bool addSemanticIndexes = true,
     double cacheExtent,
+    this.preloadExtent,
   }) : assert(itemBuilder != null),
        assert(separatorBuilder != null),
        assert(itemCount != null && itemCount >= 0),
@@ -1078,6 +1083,7 @@ class ListView extends BoxScrollView {
     @required this.childrenDelegate,
     double cacheExtent,
     int semanticChildCount,
+    this.preloadExtent,
   }) : assert(childrenDelegate != null),
        super(
          key: key,
@@ -1109,6 +1115,15 @@ class ListView extends BoxScrollView {
   /// respectively.
   final SliverChildDelegate childrenDelegate;
 
+  /// extent for preload item when scroll end
+  final double preloadExtent;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget result = super.build(context);
+    return (preloadExtent == null) ? result : _ScrollOptWrapper(result);
+  }
+
   @override
   Widget buildChildLayout(BuildContext context) {
     if (itemExtent != null) {
@@ -1117,7 +1132,8 @@ class ListView extends BoxScrollView {
         itemExtent: itemExtent,
       );
     }
-    return SliverList(delegate: childrenDelegate);
+    return SliverList(
+      delegate: childrenDelegate, preLoadExtent: preloadExtent,);
   }
 
   @override
@@ -1129,6 +1145,42 @@ class ListView extends BoxScrollView {
   // Helper method to compute the semantic child count for the separated constructor.
   static int _computeSemanticChildCount(int itemCount) {
     return math.max(0, itemCount * 2 - 1);
+  }
+}
+
+bool _canPreloadItem = false;
+
+/// set value after use
+set canPreloadItem(bool canPreLoad) {
+  _canPreloadItem = canPreLoad;
+}
+/// list scroll end && preloadExtent != null
+bool get canPreloadItem => _canPreloadItem;
+
+class _ScrollOptWrapper extends StatefulWidget {
+  const _ScrollOptWrapper(this.child);
+
+  final Widget child;
+
+  @override
+  __ScrollOptWrapperState createState() => __ScrollOptWrapperState();
+}
+
+class __ScrollOptWrapperState extends State<_ScrollOptWrapper> {
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      child: widget.child, onNotification: (Notification notification) {
+      if (notification is ScrollStartNotification) {
+        Timeline.startSync('ListScroll');
+      }
+      if (notification is ScrollEndNotification) {
+        Timeline.finishSync();
+        setState(() {
+          canPreloadItem = true;
+        });
+      }
+    },);
   }
 }
 

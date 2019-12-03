@@ -4,7 +4,9 @@
 
 import 'dart:math';
 
+import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'box.dart';
@@ -52,25 +54,48 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
 
   @override
   void performLayout() {
-    final bool canPreload = canPreloadItem && preloadExtent > 0;
-    canPreloadItem = false;
-    childManager.didStartLayout();
-    childManager.setDidUnderflow(false);
+    final bool canPreload = Boost.gCanPreloadItem && preloadExtent > 0;
+    Boost.gCanPreloadItem = false;
+    // 这几个参数是为了处理滚动过程中预 Build 逻辑
+    Boost.localNotifyIdleCallbackScrolling = Boost.gCanPreBuildInIdle ? notifyPreBuildNextFrame : null;
+    final bool supportIdlePreBuild = Boost.gCanPreBuildInIdle;
+    final bool isIdlePreBuild = Boost.localIsIdleCallbacksHandling;
+    final bool isScrollDown = constraints.userScrollDirection == ScrollDirection.reverse;
+    final bool isScrollUp = constraints.userScrollDirection == ScrollDirection.forward;
+    final double idleBuildOffset = Boost.gIdlePreBuildOffsetScrolling;
+
+    if (!isIdlePreBuild) {
+      childManager.didStartLayout();
+      childManager.setDidUnderflow(false);
+    }
 
     final double oldScrollOffset = constraints.scrollOffset + constraints.cacheOrigin;
-    final double scrollOffset = max(0, oldScrollOffset - (canPreload ? preloadExtent : 0));
-    final double garbageScrollOffset = max(0, oldScrollOffset - preloadExtent);
+    double scrollOffset = max(0, oldScrollOffset - (canPreload ? preloadExtent : 0));
+    double garbageScrollOffset = max(0, oldScrollOffset - preloadExtent);
     assert(scrollOffset >= 0.0);
     final double remainingExtent = constraints.remainingCacheExtent;
     assert(remainingExtent >= 0.0);
-    final double targetEndScrollOffset = oldScrollOffset + remainingExtent +
+    double targetEndScrollOffset = oldScrollOffset + remainingExtent +
         (canPreload ? preloadExtent : 0);
-    final double garbageTargetEndScrollOffset = oldScrollOffset + remainingExtent + preloadExtent;
+    double garbageTargetEndScrollOffset = oldScrollOffset + remainingExtent + preloadExtent;
     final BoxConstraints childConstraints = constraints.asBoxConstraints();
     int leadingGarbage = 0;
     int trailingGarbage = 0;
     bool reachedEnd = false;
 
+    // 如果支持空闲 build， 扩大 garbageScrollOffset 和 garbageTargetEndScrollOffset
+    if (supportIdlePreBuild) {
+      garbageScrollOffset = max(0, garbageScrollOffset - idleBuildOffset);
+      garbageTargetEndScrollOffset += idleBuildOffset;
+    }
+    if (isIdlePreBuild) {
+      // 扩大 scrollOffset 和 targetEndScrollOffset
+      if (isScrollUp) {
+        scrollOffset = max(0, scrollOffset - idleBuildOffset);
+      } else if(isScrollDown) {
+        targetEndScrollOffset += idleBuildOffset;
+      }
+    }
     // This algorithm in principle is straight-forward: find the first child
     // that overlaps the given scrollOffset, creating more children at the top
     // of the list if necessary, then walk down the list updating and laying out
@@ -187,6 +212,13 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
     // that some children beyond that one have also been laid out.
 
     bool inLayoutRange = true;
+
+    // 如果是利用空闲时间预 build，将第一个 Child 直接指向 lastChild
+    if (supportIdlePreBuild && isIdlePreBuild && isScrollDown) {
+      earliestUsefulChild = lastChild;
+      trailingChildWithLayout = earliestUsefulChild;
+    }
+
     RenderBox child = earliestUsefulChild;
     int index = indexOf(child);
     double endScrollOffset = childScrollOffset(child) + paintExtentOf(child);
@@ -205,6 +237,7 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
           child = insertAndLayoutChild(childConstraints,
             after: trailingChildWithLayout,
             parentUsesSize: true,
+            needLayout: true,
           );
           if (child == null) {
             // We have run out of children.
@@ -212,7 +245,9 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
           }
         } else {
           // Lay out the child.
-          child.layout(childConstraints, parentUsesSize: true);
+          if (!isIdlePreBuild) {
+            child.layout(childConstraints, parentUsesSize: true);
+          }
         }
         trailingChildWithLayout = child;
       }
@@ -225,12 +260,12 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
     }
 
     // Find the first child that ends after the scroll offset.
-    while (endScrollOffset < scrollOffset) {
+    while (endScrollOffset < scrollOffset && !isIdlePreBuild) {
       if (endScrollOffset < garbageScrollOffset) {
         leadingGarbage += 1;
       }
       if (!advance()) {
-//        assert(leadingGarbage == childCount);
+        assert(leadingGarbage == childCount);
         assert(child == null);
         // we want to make sure we keep the last child around so we know the end scroll offset
         collectGarbage(leadingGarbage - 1, 0);
@@ -252,7 +287,11 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
         break;
       }
     }
-
+    // 如果是空闲预 build，后面逻辑就不用走了
+    if (isIdlePreBuild) {
+      return;
+    }
+    // Finally count up all the remaining children and label them as garbage.
     double tempEndScrollOffset = endScrollOffset;
     while (tempEndScrollOffset < garbageTargetEndScrollOffset) {
       if (child == null) {
@@ -261,15 +300,6 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
       child = childAfter(child);
       if (child?.hasSize ?? false) {
         tempEndScrollOffset += paintExtentOf(child);
-      }
-    }
-
-    // Finally count up all the remaining children and label them as garbage.
-    if (child != null) {
-      child = childAfter(child);
-      while (child != null) {
-        trailingGarbage += 1;
-        child = childAfter(child);
       }
     }
 
@@ -290,7 +320,8 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
         leadingScrollOffset: childScrollOffset(firstChild),
         trailingScrollOffset: endScrollOffset,
       );
-      assert(estimatedMaxScrollOffset >= endScrollOffset - childScrollOffset(firstChild));
+      assert(estimatedMaxScrollOffset >=
+          endScrollOffset - childScrollOffset(firstChild));
     }
     final double paintExtent = calculatePaintOffset(
       constraints,
@@ -302,14 +333,16 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
       from: childScrollOffset(firstChild),
       to: endScrollOffset,
     );
-    final double targetEndScrollOffsetForPaint = constraints.scrollOffset + constraints.remainingPaintExtent;
+    final double targetEndScrollOffsetForPaint = constraints.scrollOffset +
+        constraints.remainingPaintExtent;
     geometry = SliverGeometry(
       scrollExtent: estimatedMaxScrollOffset,
       paintExtent: paintExtent,
       cacheExtent: cacheExtent,
       maxPaintExtent: estimatedMaxScrollOffset,
       // Conservative to avoid flickering away the clip during scroll.
-      hasVisualOverflow: endScrollOffset > targetEndScrollOffsetForPaint || constraints.scrollOffset > 0.0,
+      hasVisualOverflow: endScrollOffset > targetEndScrollOffsetForPaint ||
+          constraints.scrollOffset > 0.0,
     );
 
     // We may have started the layout while scrolled to the end, which would not

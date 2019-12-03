@@ -5,6 +5,7 @@
 import 'dart:developer';
 import 'dart:math' as math;
 
+import 'package:flutter/boost.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
@@ -1148,15 +1149,6 @@ class ListView extends BoxScrollView {
   }
 }
 
-bool _canPreloadItem = false;
-
-/// set value after use
-set canPreloadItem(bool canPreLoad) {
-  _canPreloadItem = canPreLoad;
-}
-/// list scroll end && preloadExtent != null
-bool get canPreloadItem => _canPreloadItem;
-
 class _ScrollOptWrapper extends StatefulWidget {
   const _ScrollOptWrapper(this.child);
 
@@ -1177,7 +1169,7 @@ class __ScrollOptWrapperState extends State<_ScrollOptWrapper> {
       if (notification is ScrollEndNotification) {
         Timeline.finishSync();
         setState(() {
-          canPreloadItem = true;
+          Boost.gCanPreloadItem = true;
         });
       }
     },);

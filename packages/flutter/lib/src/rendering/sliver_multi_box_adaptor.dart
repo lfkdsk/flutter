@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -261,6 +263,7 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
   }
 
   void _createOrObtainChild(int index, { RenderBox after }) {
+    Timeline.startSync('createOrObtainChild', arguments: {'index': index});
     invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) {
       assert(constraints == this.constraints);
       if (_keepAliveBucket.containsKey(index)) {
@@ -275,10 +278,12 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
         _childManager.createChild(index, after: after);
       }
     });
+    Timeline.finishSync();
   }
 
   void _destroyOrCacheChild(RenderBox child) {
     final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
+    Timeline.startSync('destroyOrCacheChild', arguments: {'index': childParentData.index});
     if (childParentData.keepAlive) {
       assert(!childParentData._keptAlive);
       remove(child);
@@ -291,6 +296,7 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
       _childManager.removeChild(child);
       assert(child.parent == null);
     }
+    Timeline.finishSync();
   }
 
   @override

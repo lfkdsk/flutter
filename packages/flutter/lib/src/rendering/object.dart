@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'dart:ui' as ui show PictureRecorder;
 
 import 'package:flutter/animation.dart';
+import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/painting.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+import '../../widgets.dart';
 import 'binding.dart';
 import 'debug.dart';
 import 'layer.dart';
@@ -1498,6 +1500,7 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
       return true;
     }());
     owner._nodesNeedingLayout.add(this);
+    Boost.ensureNotifyIdle();
   }
 
   void _layoutWithoutResize() {
@@ -1529,6 +1532,19 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
     }());
     _needsLayout = false;
     markNeedsPaint();
+  }
+
+  /// 通知提前绘制刷新下一帧
+  /// 如果是正数，表示可用时间，限制在 17 ms以内, 可用时间越长，表示当前帧越快
+  /// 如果是负数，有几种情况：
+  /// 1、UI线程耗时太长导致丢帧，时间已经超过 frame_end_time；
+  /// 2、垃圾回收太长，导致下一帧已经开始
+  void notifyPreBuildNextFrame(Duration duration) {
+    if (duration.inMilliseconds > 16 || duration.inMilliseconds < 4) {
+      return;
+    }
+    markNeedsLayout();
+    WidgetsBinding.instance.pipelineOwner.flushLayout();
   }
 
   /// Compute the layout for this render object.

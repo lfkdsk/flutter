@@ -1910,7 +1910,7 @@ abstract class RenderBox extends RenderObject {
       }
       return true;
     }());
-    if (_size.contains(position)) {
+    if (_size != null && _size.contains(position)) {
       if (hitTestChildren(result, position: position) || hitTestSelf(position)) {
         result.add(BoxHitTestEntry(this, position));
         return true;

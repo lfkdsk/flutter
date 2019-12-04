@@ -166,17 +166,9 @@ class Boost {
     engine.preloadFontFamilies(fontFamilies, locale?.toString());
   }
 
-  /// 是否可以在滚动过程中利用空闲时间提前 build
-  /// 外部可配置
-  static bool gCanPreBuildInIdle = true;
-
   /// list scroll end && preloadExtent != null
   /// 外部可配置
   static bool gCanPreloadItem = false;
-
-  /// 绘制下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多帧
-  /// 外部可配置
-  static double gIdlePreBuildOffsetScrolling = 250;
 
   /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
   /// 外部可配置

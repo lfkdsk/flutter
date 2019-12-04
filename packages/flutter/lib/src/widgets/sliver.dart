@@ -679,16 +679,20 @@ class SliverList extends SliverMultiBoxAdaptorWidget {
     Key key,
     @required SliverChildDelegate delegate,
     this.preLoadExtent,
+    this.idlePreBuildExtent,
   }) : super(key: key, delegate: delegate);
 
   /// extent for preload item when scroll end
   final double preLoadExtent;
+  /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
+  final double idlePreBuildExtent;
 
   @override
   RenderSliverList createRenderObject(BuildContext context) {
     final SliverMultiBoxAdaptorElement element = context;
     return RenderSliverList(
-        childManager: element, preloadExtent: preLoadExtent);
+        childManager: element, preloadExtent: preLoadExtent,
+        idlePreBuildExtent: idlePreBuildExtent);
   }
 }
 

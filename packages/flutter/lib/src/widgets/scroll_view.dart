@@ -874,6 +874,7 @@ class ListView extends BoxScrollView {
     List<Widget> children = const <Widget>[],
     int semanticChildCount,
     this.preloadExtent,
+    this.idlePreBuildExtent,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : childrenDelegate = SliverChildListDelegate(
          children,
@@ -939,6 +940,7 @@ class ListView extends BoxScrollView {
     double cacheExtent,
     int semanticChildCount,
     this.preloadExtent,
+    this.idlePreBuildExtent,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : childrenDelegate = SliverChildBuilderDelegate(
          itemBuilder,
@@ -1025,6 +1027,7 @@ class ListView extends BoxScrollView {
     bool addSemanticIndexes = true,
     double cacheExtent,
     this.preloadExtent,
+    this.idlePreBuildExtent,
   }) : assert(itemBuilder != null),
        assert(separatorBuilder != null),
        assert(itemCount != null && itemCount >= 0),
@@ -1085,6 +1088,7 @@ class ListView extends BoxScrollView {
     double cacheExtent,
     int semanticChildCount,
     this.preloadExtent,
+    this.idlePreBuildExtent,
   }) : assert(childrenDelegate != null),
        super(
          key: key,
@@ -1118,11 +1122,15 @@ class ListView extends BoxScrollView {
 
   /// extent for preload item when scroll end
   final double preloadExtent;
+  /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
+  final double idlePreBuildExtent;
 
   @override
   Widget build(BuildContext context) {
     final Widget result = super.build(context);
-    return (preloadExtent == null) ? result : _ScrollOptWrapper(result);
+    return (preloadExtent == null && idlePreBuildExtent == null)
+        ? result
+        : _ScrollOptWrapper(result, preloadExtent);
   }
 
   @override
@@ -1134,7 +1142,8 @@ class ListView extends BoxScrollView {
       );
     }
     return SliverList(
-      delegate: childrenDelegate, preLoadExtent: preloadExtent,);
+        delegate: childrenDelegate, preLoadExtent: preloadExtent,
+        idlePreBuildExtent: idlePreBuildExtent);
   }
 
   @override
@@ -1150,9 +1159,11 @@ class ListView extends BoxScrollView {
 }
 
 class _ScrollOptWrapper extends StatefulWidget {
-  const _ScrollOptWrapper(this.child);
+  const _ScrollOptWrapper(this.child, this.preLoadExtent);
 
   final Widget child;
+
+  final double preLoadExtent;
 
   @override
   __ScrollOptWrapperState createState() => __ScrollOptWrapperState();
@@ -1165,12 +1176,17 @@ class __ScrollOptWrapperState extends State<_ScrollOptWrapper> {
       child: widget.child, onNotification: (Notification notification) {
       if (notification is ScrollStartNotification) {
         Timeline.startSync('ListScroll');
-      }
-      if (notification is ScrollEndNotification) {
+        Boost.startFromNow(Duration(days: 1), notifyIdle: true);
+        Boost.gNotifyIdleCallbackScrollEnd = (Duration duration) {
+          Boost.finishRightNow(false, notifyIdle: true);
+          if ((widget.preLoadExtent ?? 0) > 0) {
+            setState(() {
+              Boost.gCanPreloadItem = true;
+            });
+          }
+        };
+      } else if (notification is ScrollEndNotification) {
         Timeline.finishSync();
-        setState(() {
-          Boost.gCanPreloadItem = true;
-        });
       }
     },);
   }

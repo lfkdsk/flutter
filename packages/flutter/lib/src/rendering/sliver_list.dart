@@ -46,23 +46,27 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
   RenderSliverList({
     @required RenderSliverBoxChildManager childManager,
     double preloadExtent,
+    double idlePreBuildExtent,
   }): preloadExtent = preloadExtent ?? 0,
+        idlePreBuildExtent = idlePreBuildExtent ?? 0,
         super(childManager: childManager);
 
   /// extent for preload item when scroll end,will preload at leading and trailing
   final double preloadExtent;
+  /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
+  final double idlePreBuildExtent;
 
   @override
   void performLayout() {
+    //本次layout是否为预加载Item
     final bool canPreload = Boost.gCanPreloadItem && preloadExtent > 0;
     Boost.gCanPreloadItem = false;
     // 这几个参数是为了处理滚动过程中预 Build 逻辑
-    Boost.localNotifyIdleCallbackScrolling = Boost.gCanPreBuildInIdle ? notifyPreBuildNextFrame : null;
-    final bool supportIdlePreBuild = Boost.gCanPreBuildInIdle;
+    final bool supportIdlePreBuild = idlePreBuildExtent > 0;
+    Boost.localNotifyIdleCallbackScrolling = supportIdlePreBuild ? notifyPreBuildNextFrame : null;
     final bool isIdlePreBuild = Boost.localIsIdleCallbacksHandling;
     final bool isScrollDown = constraints.userScrollDirection == ScrollDirection.reverse;
     final bool isScrollUp = constraints.userScrollDirection == ScrollDirection.forward;
-    final double idleBuildOffset = Boost.gIdlePreBuildOffsetScrolling;
 
     if (!isIdlePreBuild) {
       childManager.didStartLayout();
@@ -70,32 +74,36 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
     }
 
     final double oldScrollOffset = constraints.scrollOffset + constraints.cacheOrigin;
-    double scrollOffset = max(0, oldScrollOffset - (canPreload ? preloadExtent : 0));
-    double garbageScrollOffset = max(0, oldScrollOffset - preloadExtent);
+    ///idlePreBuild&&scrollUp的时候需要向上偏移
+    ///预加载Item的时候需要向上编译
+    ///取最大值作为scrollOffset的向上偏移量
+    final double maxDecrease = max(
+        (isIdlePreBuild && isScrollUp) ? idlePreBuildExtent : 0,
+        canPreload ? preloadExtent : 0);
+    final double scrollOffset = max(0, oldScrollOffset - maxDecrease);
+    // 向上偏移garbageOffset防止preBuild或者预加载的item被回收
+    final double garbageScrollOffset = max(
+        0, oldScrollOffset - max(preloadExtent, idlePreBuildExtent));
     assert(scrollOffset >= 0.0);
+
     final double remainingExtent = constraints.remainingCacheExtent;
     assert(remainingExtent >= 0.0);
-    double targetEndScrollOffset = oldScrollOffset + remainingExtent +
-        (canPreload ? preloadExtent : 0);
-    double garbageTargetEndScrollOffset = oldScrollOffset + remainingExtent + preloadExtent;
+    ///idlePreBuild&&scrollDown的时候需要向下偏移
+    ///预加载Item的时候需要向下编译
+    ///取最大值作为targetEndScrollOffset的向下偏移量
+    final double maxIncrease = max(
+        (isIdlePreBuild && isScrollDown) ? idlePreBuildExtent : 0,
+        canPreload ? preloadExtent : 0);
+    final double targetEndScrollOffset = oldScrollOffset + remainingExtent +
+        maxIncrease;
+    // 向上偏移garbageEndOffset防止preBuild或者预加载的item被回收
+    final double garbageTargetEndScrollOffset = oldScrollOffset + remainingExtent +
+        max(preloadExtent, idlePreBuildExtent);
     final BoxConstraints childConstraints = constraints.asBoxConstraints();
     int leadingGarbage = 0;
     int trailingGarbage = 0;
     bool reachedEnd = false;
 
-    // 如果支持空闲 build， 扩大 garbageScrollOffset 和 garbageTargetEndScrollOffset
-    if (supportIdlePreBuild) {
-      garbageScrollOffset = max(0, garbageScrollOffset - idleBuildOffset);
-      garbageTargetEndScrollOffset += idleBuildOffset;
-    }
-    if (isIdlePreBuild) {
-      // 扩大 scrollOffset 和 targetEndScrollOffset
-      if (isScrollUp) {
-        scrollOffset = max(0, scrollOffset - idleBuildOffset);
-      } else if(isScrollDown) {
-        targetEndScrollOffset += idleBuildOffset;
-      }
-    }
     // This algorithm in principle is straight-forward: find the first child
     // that overlaps the given scrollOffset, creating more children at the top
     // of the list if necessary, then walk down the list updating and laying out
@@ -290,7 +298,7 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
     if (isIdlePreBuild) {
       return;
     }
-    // Finally count up all the remaining children and label them as garbage.
+
     double tempEndScrollOffset = endScrollOffset;
     while (tempEndScrollOffset < garbageTargetEndScrollOffset) {
       if (child == null) {
@@ -299,6 +307,15 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
       child = childAfter(child);
       if (child?.hasSize ?? false) {
         tempEndScrollOffset += paintExtentOf(child);
+      }
+    }
+
+    // Finally count up all the remaining children and label them as garbage.
+    if (child != null) {
+      child = childAfter(child);
+      while (child != null) {
+        trailingGarbage += 1;
+        child = childAfter(child);
       }
     }
 
@@ -319,8 +336,7 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
         leadingScrollOffset: childScrollOffset(firstChild),
         trailingScrollOffset: endScrollOffset,
       );
-      assert(estimatedMaxScrollOffset >=
-          endScrollOffset - childScrollOffset(firstChild));
+      assert(estimatedMaxScrollOffset >= endScrollOffset - childScrollOffset(firstChild));
     }
     final double paintExtent = calculatePaintOffset(
       constraints,
@@ -332,16 +348,14 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
       from: childScrollOffset(firstChild),
       to: endScrollOffset,
     );
-    final double targetEndScrollOffsetForPaint = constraints.scrollOffset +
-        constraints.remainingPaintExtent;
+    final double targetEndScrollOffsetForPaint = constraints.scrollOffset + constraints.remainingPaintExtent;
     geometry = SliverGeometry(
       scrollExtent: estimatedMaxScrollOffset,
       paintExtent: paintExtent,
       cacheExtent: cacheExtent,
       maxPaintExtent: estimatedMaxScrollOffset,
       // Conservative to avoid flickering away the clip during scroll.
-      hasVisualOverflow: endScrollOffset > targetEndScrollOffsetForPaint ||
-          constraints.scrollOffset > 0.0,
+      hasVisualOverflow: endScrollOffset > targetEndScrollOffsetForPaint || constraints.scrollOffset > 0.0,
     );
 
     // We may have started the layout while scrolled to the end, which would not

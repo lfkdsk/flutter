@@ -306,7 +306,7 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
       }
       child = childAfter(child);
       if (child?.hasSize ?? false) {
-        tempEndScrollOffset += paintExtentOf(child);
+        tempEndScrollOffset = childScrollOffset(child) + paintExtentOf(child);
       }
     }
 

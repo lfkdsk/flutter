@@ -263,7 +263,9 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
   }
 
   void _createOrObtainChild(int index, { RenderBox after }) {
-    Timeline.startSync('createOrObtainChild', arguments: {'index': index});
+    // ignore: always_specify_types
+    final Map<String, String> arguments = {'index': '$index'};
+    Timeline.startSync('createOrObtainChild', arguments: arguments);
     invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) {
       assert(constraints == this.constraints);
       if (_keepAliveBucket.containsKey(index)) {
@@ -283,7 +285,9 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
 
   void _destroyOrCacheChild(RenderBox child) {
     final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
-    Timeline.startSync('destroyOrCacheChild', arguments: {'index': childParentData.index});
+    // ignore: always_specify_types, prefer_single_quotes
+    final Map<String, String> arguments = {'index': "${childParentData?.index}"};
+    Timeline.startSync('destroyOrCacheChild', arguments: arguments);
     if (childParentData.keepAlive) {
       assert(!childParentData._keptAlive);
       remove(child);

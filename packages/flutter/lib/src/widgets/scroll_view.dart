@@ -873,8 +873,10 @@ class ListView extends BoxScrollView {
     double cacheExtent,
     List<Widget> children = const <Widget>[],
     int semanticChildCount,
-    this.preloadExtent,
-    this.idlePreBuildExtent,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : childrenDelegate = SliverChildListDelegate(
          children,
@@ -939,8 +941,10 @@ class ListView extends BoxScrollView {
     bool addSemanticIndexes = true,
     double cacheExtent,
     int semanticChildCount,
-    this.preloadExtent,
-    this.idlePreBuildExtent,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
   }) : childrenDelegate = SliverChildBuilderDelegate(
          itemBuilder,
@@ -1026,8 +1030,10 @@ class ListView extends BoxScrollView {
     bool addRepaintBoundaries = true,
     bool addSemanticIndexes = true,
     double cacheExtent,
-    this.preloadExtent,
-    this.idlePreBuildExtent,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
   }) : assert(itemBuilder != null),
        assert(separatorBuilder != null),
        assert(itemCount != null && itemCount >= 0),
@@ -1087,8 +1093,10 @@ class ListView extends BoxScrollView {
     @required this.childrenDelegate,
     double cacheExtent,
     int semanticChildCount,
-    this.preloadExtent,
-    this.idlePreBuildExtent,
+    // BD ADD: START
+    this.scrollingExtent,
+    this.scrollEndExtent,
+    // END
   }) : assert(childrenDelegate != null),
        super(
          key: key,
@@ -1119,18 +1127,22 @@ class ListView extends BoxScrollView {
   /// [childrenDelegate] that wraps the given [List] and [IndexedWidgetBuilder],
   /// respectively.
   final SliverChildDelegate childrenDelegate;
+  /// BD ADD: START
+  /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
+  final double scrollingExtent;
 
   /// extent for preload item when scroll end
-  final double preloadExtent;
-  /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
-  final double idlePreBuildExtent;
-
+  final double scrollEndExtent;
+  /// END
   @override
   Widget build(BuildContext context) {
     final Widget result = super.build(context);
-    return (preloadExtent == null && idlePreBuildExtent == null)
+    // BD MOD:
+    // return result;
+    return (scrollEndExtent == null && scrollingExtent == null)
         ? result
-        : _ScrollOptWrapper(result, preloadExtent);
+        : _ScrollOptWrapper(result, scrollEndExtent);
+    // END
   }
 
   @override
@@ -1142,8 +1154,12 @@ class ListView extends BoxScrollView {
       );
     }
     return SliverList(
-        delegate: childrenDelegate, preLoadExtent: preloadExtent,
-        idlePreBuildExtent: idlePreBuildExtent);
+        delegate: childrenDelegate,
+        // BD MOD: START
+        // );
+        scrollEndExtent: scrollEndExtent,
+        scrollingExtent: scrollingExtent);
+        // END
   }
 
   @override
@@ -1157,13 +1173,13 @@ class ListView extends BoxScrollView {
     return math.max(0, itemCount * 2 - 1);
   }
 }
-
+/// BD ADD: START
 class _ScrollOptWrapper extends StatefulWidget {
-  const _ScrollOptWrapper(this.child, this.preLoadExtent);
+  const _ScrollOptWrapper(this.child, this.scrollEndExtent);
 
   final Widget child;
 
-  final double preLoadExtent;
+  final double scrollEndExtent;
 
   @override
   __ScrollOptWrapperState createState() => __ScrollOptWrapperState();
@@ -1173,25 +1189,16 @@ class __ScrollOptWrapperState extends State<_ScrollOptWrapper> {
   @override
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
-      child: widget.child, onNotification: (Notification notification) {
-      if (notification is ScrollStartNotification) {
-        Timeline.startSync('ListScroll');
-        Boost.startFromNow(Duration(days: 1), notifyIdle: true);
-        Boost.gNotifyIdleCallbackScrollEnd = (Duration duration) {
-          Boost.finishRightNow(false, notifyIdle: true);
-          if ((widget.preLoadExtent ?? 0) > 0) {
-            setState(() {
-              Boost.gCanPreloadItem = true;
-            });
-          }
-        };
-      } else if (notification is ScrollEndNotification) {
-        Timeline.finishSync();
-      }
-    },);
+      child: widget.child,
+      onNotification: (Notification notification) {
+        if (notification is ScrollStartNotification) {
+          Boost.startFromNow(Duration(seconds: 20), notifyIdle: true);
+        }
+      },
+    );
   }
 }
-
+/// END
 /// A scrollable, 2D array of widgets.
 ///
 /// The main axis direction of a grid is the direction in which it scrolls (the

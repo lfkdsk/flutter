@@ -5,8 +5,8 @@
 /// wangying.666@bytedance.com
 ///
 
-import 'dart:ui' as engine;
 import 'dart:developer';
+import 'dart:ui' as engine;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
@@ -166,18 +166,13 @@ class Boost {
     engine.preloadFontFamilies(fontFamilies, locale?.toString());
   }
 
-  /// list scroll end && preloadExtent != null
-  /// 外部可配置
-  static bool gCanPreloadItem = false;
-
-  /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
-  /// 外部可配置
-  static engine.NotifyIdleCallback gNotifyIdleCallbackScrollEnd;
-
-
   /// 滚动中回调，每次需要重新赋值，避免无法销毁情况
   /// 内部使用，外部不可配置
   static engine.NotifyIdleCallback localNotifyIdleCallbackScrolling;
+
+  /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
+  /// 外部可配置
+  static engine.NotifyIdleCallback localNotifyIdleCallbackScrollEnd;
 
   /// 是否正在处理 idleCallback
   /// 内部使用，外部不可配置
@@ -186,22 +181,25 @@ class Boost {
   /// 内部调用，外部不可设置
   static void ensureNotifyIdle() {
     engine.window.onNotifyIdle = (Duration duration) {
-      if (gNotifyIdleCallbackScrollEnd == null && localNotifyIdleCallbackScrolling == null) {
+      if (localNotifyIdleCallbackScrollEnd == null && localNotifyIdleCallbackScrolling == null) {
         return;
       }
-      Timeline.startSync('Boost::NotifyIdle', arguments:  {'duration': '${duration.inMilliseconds}'});
+      // ignore: always_specify_types
+      final Map<String, String> args = {'duration': '${duration.inMilliseconds}'};
+      Timeline.startSync('Boost::NotifyIdle', arguments: args);
       localIsIdleCallbacksHandling = true;
       try {
-        /// 如果 duration < 17ms，说明是页面滚动过程中，否则认为是页面静止状态
+        // 如果 duration < 17ms，说明是页面滚动过程中，否则认为是页面静止状态
+        // 用完后即将 callback 设置为 null，避免存在多个列表的问题
         if (duration.inMilliseconds < 17) {
           if (localNotifyIdleCallbackScrolling != null) {
             final engine.NotifyIdleCallback _localCallback = localNotifyIdleCallbackScrolling;
             localNotifyIdleCallbackScrolling = null;
             _localCallback(duration);
           }
-        } else if (gNotifyIdleCallbackScrollEnd != null) {
-          final engine.NotifyIdleCallback _localCallback = gNotifyIdleCallbackScrollEnd;
-          gNotifyIdleCallbackScrollEnd = null;
+        } else if (localNotifyIdleCallbackScrollEnd != null) {
+          final engine.NotifyIdleCallback _localCallback = localNotifyIdleCallbackScrollEnd;
+          localNotifyIdleCallbackScrollEnd = null;
           _localCallback(duration);
         }
       } catch(e, stacktrace) {

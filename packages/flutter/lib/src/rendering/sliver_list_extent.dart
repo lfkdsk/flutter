@@ -61,41 +61,48 @@ class RenderSliverListExtent extends RenderSliverList {
   bool _needScrollEndPreload = false;
 
   /// 通知结束后预加载
-  void notifyPreloadEndNextFrame(Duration duration) {
+  @override
+  void notifyPreloadNextFrame(Duration duration) {
+    if (duration.inMilliseconds < 100) {
+      return;
+    }
     Boost.finishRightNow(true);
     _needScrollEndPreload = true;
-    notifyPreloadNextFrame(duration);
+    super.notifyPreloadNextFrame(duration);
   }
 
   @override
   void performLayout() {
-    // 定义处理滚动结束加载参数
-    final bool canScrollEndPreload =
-        _needScrollEndPreload && scrollEndExtent > 0.0;
-
-    // 定义处理滚动过程中加载参数
+    // 本次是否是滚动中预加载
     final bool canScrollingPreload = scrollingExtent > 0.0 &&
         Boost.localIsIdleCallbacksHandling &&
         !_needScrollEndPreload;
+    // 本次是否是滚动结束预加载
+    final bool canScrollEndPreload =
+        _needScrollEndPreload && scrollEndExtent > 0.0;
+    _needScrollEndPreload = false;
+    // 确定滚动方向
     final bool isScrollDown =
         constraints.userScrollDirection == ScrollDirection.reverse;
     final bool isScrollUp =
         constraints.userScrollDirection == ScrollDirection.forward;
 
-    // 确定空闲时回调
-    Boost.localNotifyIdleCallbackScrollEnd ??=
-    scrollEndExtent > 0.0 ? notifyPreloadEndNextFrame : null;
-
+    // 确定滚动过程中空闲时回调，滚动结束和滚动中回调相同，最后一次滚动结束执行预加载后滚动设置为 null
     Boost.localNotifyIdleCallbackScrolling ??=
-    scrollingExtent > 0.0 && !canScrollEndPreload
-        ? notifyPreloadNextFrame
-        : null;
+        (scrollingExtent > 0.0 || scrollEndExtent > 0.0) && !canScrollEndPreload
+            ? notifyPreloadNextFrame
+            : null;
+    Boost.gNotifyIdleCallbackScrollEnd ??=
+        scrollEndExtent > 0.0 && !canScrollEndPreload
+            ? notifyPreloadNextFrame
+            : null;
 
-    _needScrollEndPreload = false;
-    if (!canScrollingPreload && !_needScrollEndPreload) {
+    if (!canScrollingPreload && !canScrollEndPreload) {
       childManager.didStartLayout();
       childManager.setDidUnderflow(false);
     }
+    print(
+        "RenderSliverListExtent performLayout  canScrollingPreload: $canScrollingPreload canScrollEndPreload: $canScrollEndPreload");
 
     final double oldScrollOffset =
         constraints.scrollOffset + constraints.cacheOrigin;

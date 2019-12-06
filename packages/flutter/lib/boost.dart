@@ -172,7 +172,7 @@ class Boost {
 
   /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
   /// 外部可配置
-  static engine.NotifyIdleCallback localNotifyIdleCallbackScrollEnd;
+  static engine.NotifyIdleCallback gNotifyIdleCallbackScrollEnd;
 
   /// 是否正在处理 idleCallback
   /// 内部使用，外部不可配置
@@ -181,9 +181,10 @@ class Boost {
   /// 内部调用，外部不可设置
   static void ensureNotifyIdle() {
     engine.window.onNotifyIdle = (Duration duration) {
-      if (localNotifyIdleCallbackScrollEnd == null && localNotifyIdleCallbackScrolling == null) {
+      if (gNotifyIdleCallbackScrollEnd == null && localNotifyIdleCallbackScrolling == null) {
         return;
       }
+      print("onNotifyIdle: duration ${duration.inMilliseconds}");
       // ignore: always_specify_types
       final Map<String, String> args = {'duration': '${duration.inMilliseconds}'};
       Timeline.startSync('Boost::NotifyIdle', arguments: args);
@@ -195,11 +196,13 @@ class Boost {
           if (localNotifyIdleCallbackScrolling != null) {
             final engine.NotifyIdleCallback _localCallback = localNotifyIdleCallbackScrolling;
             localNotifyIdleCallbackScrolling = null;
+            print("执行 localNotifyIdleCallbackScrolling>>>");
             _localCallback(duration);
           }
-        } else if (localNotifyIdleCallbackScrollEnd != null) {
-          final engine.NotifyIdleCallback _localCallback = localNotifyIdleCallbackScrollEnd;
-          localNotifyIdleCallbackScrollEnd = null;
+        } else if (gNotifyIdleCallbackScrollEnd != null) {
+          final engine.NotifyIdleCallback _localCallback = gNotifyIdleCallbackScrollEnd;
+          gNotifyIdleCallbackScrollEnd = null;
+          print("执行 gNotifyIdleCallbackScrollEnd>>>");
           _localCallback(duration);
         }
       } catch(e, stacktrace) {

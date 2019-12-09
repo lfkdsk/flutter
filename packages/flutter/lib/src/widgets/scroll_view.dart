@@ -1178,11 +1178,9 @@ class ListView extends BoxScrollView {
 }
 /// BD ADD: START
 class _ScrollOptWrapper extends StatefulWidget {
-  const _ScrollOptWrapper(this.child, this.scrollEndExtent);
+  const _ScrollOptWrapper(this.child);
 
   final Widget child;
-
-  final double scrollEndExtent;
 
   @override
   __ScrollOptWrapperState createState() => __ScrollOptWrapperState();

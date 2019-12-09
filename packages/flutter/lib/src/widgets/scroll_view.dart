@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:developer';
 import 'dart:math' as math;
-
+// BD ADD: START
 import 'package:flutter/boost.dart';
 import 'package:flutter/material.dart';
+// END
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
 
@@ -1135,18 +1135,15 @@ class ListView extends BoxScrollView {
   /// extent for preload item when scroll end
   final double scrollEndExtent;
 
-  /// END
   @override
   Widget build(BuildContext context) {
     final Widget result = super.build(context);
-    // BD MOD:
-    // return result;
     return (scrollingExtent != null && scrollingExtent > 0.0) ||
             (scrollEndExtent != null && scrollEndExtent > 0.0)
         ? _ScrollOptWrapper(result)
         : result;
-    // END
   }
+  /// END
 
   @override
   Widget buildChildLayout(BuildContext context) {
@@ -1156,13 +1153,13 @@ class ListView extends BoxScrollView {
         itemExtent: itemExtent,
       );
     }
+    // BD MOD:
+    // return SliverList(delegate: childrenDelegate);
     return SliverList(
         delegate: childrenDelegate,
-        // BD MOD: START
-        // );
         scrollEndExtent: scrollEndExtent,
         scrollingExtent: scrollingExtent);
-        // END
+    // END
   }
 
   @override

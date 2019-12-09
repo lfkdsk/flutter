@@ -679,21 +679,18 @@ class SliverList extends SliverMultiBoxAdaptorWidget {
     Key key,
     @required SliverChildDelegate delegate,
     // BD MOD: START
-    // })
+    // }) : super(key: key, delegate: delegate);
     double scrollingExtent,
     double scrollEndExtent,
   })  : scrollingExtent = scrollingExtent ?? 0.0,
         scrollEndExtent = scrollEndExtent ?? 0.0,
-    // END
         super(key: key, delegate: delegate);
 
-  /// BD ADD: START
   /// 预 Build/Layout 下一帧，注意过大容易导致提前绘制多个Item
   final double scrollingExtent;
 
   /// extent for preload item when scroll end
   final double scrollEndExtent;
-
   /// END
 
   @override

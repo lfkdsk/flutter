@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'dart:ui' as ui show PictureRecorder;
 
 import 'package:flutter/animation.dart';
+// BD ADD:
 import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -13,7 +14,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:vector_math/vector_math_64.dart';
-
+// BD ADD:
 import '../../widgets.dart';
 import 'binding.dart';
 import 'debug.dart';
@@ -1538,8 +1539,12 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
   /// BD ADD: START
   /// 触发重新绘制
   void layoutNextFrame(Duration duration) {
-    markNeedsLayout();
-    WidgetsBinding.instance.pipelineOwner.flushLayout();
+    try {
+      markNeedsLayout();
+      WidgetsBinding.instance.pipelineOwner.flushLayout();
+    } catch(e, stack) {
+      _debugReportException('layoutNextFrame', e, stack);
+    }
   }
   /// END
   /// Compute the layout for this render object.

@@ -678,8 +678,8 @@ class SliverList extends SliverMultiBoxAdaptorWidget {
   const SliverList({
     Key key,
     @required SliverChildDelegate delegate,
-    // BD MOD: START
-    // }) : super(key: key, delegate: delegate);
+  /// BD MOD: START
+  /// }) : super(key: key, delegate: delegate);
     double scrollingExtent,
     double scrollEndExtent,
   })  : scrollingExtent = scrollingExtent ?? 0.0,

@@ -1127,21 +1127,24 @@ class ListView extends BoxScrollView {
   /// [childrenDelegate] that wraps the given [List] and [IndexedWidgetBuilder],
   /// respectively.
   final SliverChildDelegate childrenDelegate;
+
   /// BD ADD: START
   /// 预Build下一帧的偏移量，数值越大越可能提前绘制，注意过大容易导致提前绘制多个Item
   final double scrollingExtent;
 
   /// extent for preload item when scroll end
   final double scrollEndExtent;
+
   /// END
   @override
   Widget build(BuildContext context) {
     final Widget result = super.build(context);
     // BD MOD:
     // return result;
-    return (scrollEndExtent == null && scrollingExtent == null)
-        ? result
-        : _ScrollOptWrapper(result, scrollEndExtent);
+    return (scrollingExtent != null && scrollingExtent > 0.0) ||
+            (scrollEndExtent != null && scrollEndExtent > 0.0)
+        ? _ScrollOptWrapper(result)
+        : result;
     // END
   }
 

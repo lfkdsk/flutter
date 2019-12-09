@@ -1536,15 +1536,8 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
   }
 
   /// BD ADD: START
-  /// 通知提前绘制刷新下一帧
-  /// 如果是正数，表示可用时间，限制在 17 ms以内, 可用时间越长，表示当前帧越快
-  /// 如果是负数，有几种情况：
-  /// 1、UI线程耗时太长导致丢帧，时间已经超过 frame_end_time；
-  /// 2、垃圾回收太长，导致下一帧已经开始
-  void notifyPreloadNextFrame(Duration duration) {
-    if (duration.inMilliseconds < 4) {
-      return;
-    }
+  /// 触发重新绘制
+  void layoutNextFrame(Duration duration) {
     markNeedsLayout();
     WidgetsBinding.instance.pipelineOwner.flushLayout();
   }

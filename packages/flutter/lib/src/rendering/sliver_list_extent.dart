@@ -60,15 +60,25 @@ class RenderSliverListExtent extends RenderSliverList {
   /// 是否可以开始预加载下一帧
   bool _needScrollEndPreload = false;
 
-  /// 通知结束后预加载
+  /// 触发重新绘制
+  ///
+  /// 如果是正数，表示可利用的空闲时间
+  /// 1.如果小于 16 ms，表示是滚动过程中
+  /// 2.如果大于 100 ms，表示是滚动结束
+  ///
+  /// 如果是负数，表示已经超过frame_end_time，下一帧已经开始，此时不应再做预布局。两种情况会出现这个问题：
+  /// 1.UI线程耗时太长，时间已经超过当前帧的 frame_end_time
+  /// 2.垃圾回收耗时太长，时间已经超过当前帧的 frame_end_time
   @override
-  void notifyPreloadNextFrame(Duration duration) {
-    if (duration.inMilliseconds < 100) {
+  void layoutNextFrame(Duration duration) {
+    if (duration.inMicroseconds < 3000) {
       return;
     }
-    Boost.finishRightNow(true);
-    _needScrollEndPreload = true;
-    super.notifyPreloadNextFrame(duration);
+    if (duration.inMicroseconds > 100000) {
+      _needScrollEndPreload = true;
+      Boost.finishRightNow(false, notifyIdle: true);
+    }
+    super.layoutNextFrame(duration);
   }
 
   @override
@@ -81,38 +91,39 @@ class RenderSliverListExtent extends RenderSliverList {
     final bool canScrollEndPreload =
         _needScrollEndPreload && scrollEndExtent > 0.0;
     _needScrollEndPreload = false;
+    final bool isPreload = canScrollingPreload || canScrollEndPreload;
+    assert(canScrollingPreload != true || canScrollEndPreload != true);
+
     // 确定滚动方向
     final bool isScrollDown =
         constraints.userScrollDirection == ScrollDirection.reverse;
     final bool isScrollUp =
         constraints.userScrollDirection == ScrollDirection.forward;
 
-    // 确定滚动过程中空闲时回调，滚动结束和滚动中回调相同，最后一次滚动结束执行预加载后滚动设置为 null
+    // 确定滚动过程中空闲时回调
     Boost.localNotifyIdleCallbackScrolling ??=
-        (scrollingExtent > 0.0 || scrollEndExtent > 0.0) && !canScrollEndPreload
-            ? notifyPreloadNextFrame
+        scrollingExtent > 0.0 && !isPreload
+            ? layoutNextFrame
             : null;
-    Boost.gNotifyIdleCallbackScrollEnd ??=
-        scrollEndExtent > 0.0 && !canScrollEndPreload
-            ? notifyPreloadNextFrame
+    Boost.localNotifyIdleCallbackScrollEnd ??=
+        scrollEndExtent > 0.0 && !isPreload
+            ? layoutNextFrame
             : null;
 
-    if (!canScrollingPreload && !canScrollEndPreload) {
+    if (!isPreload) {
       childManager.didStartLayout();
       childManager.setDidUnderflow(false);
     }
-    print(
-        "RenderSliverListExtent performLayout  canScrollingPreload: $canScrollingPreload canScrollEndPreload: $canScrollEndPreload");
 
     final double oldScrollOffset =
         constraints.scrollOffset + constraints.cacheOrigin;
-
     // idlePreBuild&&scrollUp的时候需要向上偏移
     // 预加载Item的时候需要向上编译
     // 取最大值作为scrollOffset的向上偏移量
     final double maxDecrease = max(
         (canScrollingPreload && isScrollUp) ? scrollingExtent : 0.0,
         canScrollEndPreload ? scrollEndExtent : 0.0);
+    // 这里计算有问题
     final double scrollOffset = max(0.0, oldScrollOffset - maxDecrease);
     // 向上偏移garbageOffset防止preBuild或者预加载的item被回收
     final double garbageScrollOffset =
@@ -276,9 +287,11 @@ class RenderSliverListExtent extends RenderSliverList {
       // returns true if we advanced, false if we have no more children
       // This function is used in two different places below, to avoid code duplication.
       assert(child != null);
-      if (child == trailingChildWithLayout) inLayoutRange = false;
+      if (child == trailingChildWithLayout)
+        inLayoutRange = false;
       child = childAfter(child);
-      if (child == null) inLayoutRange = false;
+      if (child == null)
+        inLayoutRange = false;
       index += 1;
       if (!inLayoutRange) {
         if (child == null || indexOf(child) != index) {
@@ -339,7 +352,7 @@ class RenderSliverListExtent extends RenderSliverList {
     }
 
     // 如果是预加载，后面的逻辑就不用走了
-    if (canScrollingPreload || canScrollEndPreload) {
+    if (isPreload) {
       return;
     }
 

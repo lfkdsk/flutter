@@ -5,7 +5,6 @@
 /// wangying.666@bytedance.com
 ///
 
-import 'dart:developer';
 import 'dart:ui' as engine;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -58,10 +57,14 @@ class Boost {
   static bool _ignoreTransitionsFirstFrameTimeCost = false;
 
   /// If true, will ignore first frame time cost when drive the transitions.
-  static bool get ignoreTransitionsFirstFrameTimeCost => _ignoreTransitionsFirstFrameTimeCost;
+  static bool get ignoreTransitionsFirstFrameTimeCost =>
+      _ignoreTransitionsFirstFrameTimeCost;
 
   /// enable or disable semantics, reuseWidget and so on.
-  static void enable({bool disableSemantics = true, bool reuseWidget = true, bool ignoreTransitionsFirstFrameTimeCost = false}) {
+  static void enable(
+      {bool disableSemantics = true,
+      bool reuseWidget = true,
+      bool ignoreTransitionsFirstFrameTimeCost = false}) {
     _disabledSemantics = disableSemantics;
     RendererBinding?.instance?.setSemanticsEnabled(!disableSemantics);
     _reuseTransitionsWidget = reuseWidget;
@@ -172,45 +175,46 @@ class Boost {
 
   /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
   /// 外部可配置
-  static engine.NotifyIdleCallback gNotifyIdleCallbackScrollEnd;
+  static engine.NotifyIdleCallback localNotifyIdleCallbackScrollEnd;
 
   /// 是否正在处理 idleCallback
   /// 内部使用，外部不可配置
   static bool localIsIdleCallbacksHandling = false;
 
-  /// 内部调用，外部不可设置
+  /// 内部调用
   static void ensureNotifyIdle() {
     engine.window.onNotifyIdle = (Duration duration) {
-      if (gNotifyIdleCallbackScrollEnd == null && localNotifyIdleCallbackScrolling == null) {
+      if (localNotifyIdleCallbackScrollEnd == null &&
+          localNotifyIdleCallbackScrolling == null) {
         return;
       }
-      print("onNotifyIdle: duration ${duration.inMilliseconds}");
-      // ignore: always_specify_types
-      final Map<String, String> args = {'duration': '${duration.inMilliseconds}'};
-      Timeline.startSync('Boost::NotifyIdle', arguments: args);
       localIsIdleCallbacksHandling = true;
       try {
         // 如果 duration < 17ms，说明是页面滚动过程中，否则认为是页面静止状态
-        // 用完后即将 callback 设置为 null，避免存在多个列表的问题
-        if (duration.inMilliseconds < 17) {
+        // 用完后即将 callback 设置为 null，避免存在多个列表泄漏的问题
+        if (duration.inMicroseconds < 16667) {
           if (localNotifyIdleCallbackScrolling != null) {
-            final engine.NotifyIdleCallback _localCallback = localNotifyIdleCallbackScrolling;
+            final engine.NotifyIdleCallback _localCallback =
+                localNotifyIdleCallbackScrolling;
             localNotifyIdleCallbackScrolling = null;
-            print("执行 localNotifyIdleCallbackScrolling>>>");
             _localCallback(duration);
           }
-        } else if (gNotifyIdleCallbackScrollEnd != null) {
-          final engine.NotifyIdleCallback _localCallback = gNotifyIdleCallbackScrollEnd;
-          gNotifyIdleCallbackScrollEnd = null;
-          print("执行 gNotifyIdleCallbackScrollEnd>>>");
+        } else if (localNotifyIdleCallbackScrollEnd != null) {
+          final engine.NotifyIdleCallback _localCallback =
+              localNotifyIdleCallbackScrollEnd;
+          localNotifyIdleCallbackScrollEnd = null;
           _localCallback(duration);
         }
-      } catch(e, stacktrace) {
+      } catch (e, stacktrace) {
         debugPrint(stacktrace.toString());
       }
       localIsIdleCallbacksHandling = false;
-      Timeline.finishSync();
     };
   }
-}
 
+  /// 重置 callback，避免可能的泄漏问题
+  static void resetIdleCallbacks() {
+    localNotifyIdleCallbackScrolling = null;
+    localNotifyIdleCallbackScrollEnd = null;
+  }
+}

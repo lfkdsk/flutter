@@ -45,8 +45,10 @@ import 'src/commands/update_packages.dart';
 import 'src/commands/upgrade.dart';
 import 'src/commands/version.dart';
 import 'src/runner/flutter_command.dart';
-// BD ADD:
+// BD ADD: START
 import 'src/artifacts.dart';
+import 'src/calculate_build_info.dart';
+// END
 /// Main entry point for commands.
 ///
 /// This function is intended to be used from the `flutter` command line tool.
@@ -67,6 +69,28 @@ Future<void> main(List<String> args) async {
     print('Currently in lite mode...');
   }
   setEngineMode(engineMode);
+
+  // BD ADD: START
+  final bool notAotByUser = args.contains('--target')
+      && args.contains('--release')
+      && args.contains('--output-dir')
+      && args.contains('--target-platform');
+  if (!notAotByUser) {
+    if (args.first == 'build') {
+      FlutterBuildInfo.instance.needReport =
+          !args.contains('--debug') && !args.contains('--profile');
+      FlutterBuildInfo.instance.isAot =
+          (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
+      if (FlutterBuildInfo.instance.isAot &&
+          (args.length >= 2 && args[1] == 'ios' || args.contains('ios'))) {
+        FlutterBuildInfo.instance.platform = 'ios';
+      }
+      if (args.contains('--compress-size')) {
+        FlutterBuildInfo.instance.useCompressSize = true;
+      }
+      FlutterBuildInfo.instance.isLite = lite;
+    }
+  }
   // END
 
   await runner.run(args, <FlutterCommand>[

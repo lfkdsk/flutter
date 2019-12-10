@@ -1,0 +1,270 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter_tools/src/android/android_sdk.dart';
+import 'package:flutter_tools/src/base/process.dart';
+import 'package:flutter_tools/src/plugins.dart';
+import 'package:intl/intl.dart';
+import 'cache.dart';
+import 'version.dart';
+
+// ignore: avoid_classes_with_only_static_members
+class FlutterBuildInfo {
+  FlutterBuildInfo._internal();
+
+  static const String _kAccess = 'MGT9E8E1FCFBPGO1CVYO';
+  static const String _kHost = '10.10.24.103:8789';
+  static const String _kBucket = 'flutter';
+  static const String _kTosPre = 'who_use_engine';
+  static const String _kContentType = 'application/json';
+  static const String _indexUrl =
+      'http://tosv.byted.org/obj/flutter/who_use_engine/index';
+
+  static FlutterBuildInfo get instance => _getInstance();
+  static FlutterBuildInfo _instance;
+
+  static FlutterBuildInfo _getInstance() {
+    _instance ??= FlutterBuildInfo._internal();
+    return _instance;
+  }
+
+  String pkgName = '';
+  String versionCode = '';
+  String appName = '';
+  String projectDir = ''; // project dir
+  String projectGitUrl = ''; // project url
+  String projectCid = ''; // project cid
+  String ip = ''; // machine ip
+  String userName = '';
+  String userEmail = '';
+  String engineCid = '';
+  String frameworkVersion = '';
+  String frameworkCid = '';
+  String platform = 'android';
+  bool needReport = false;
+  bool isAot = false;
+  bool isLite = false;
+  bool useCompressSize = false;
+  List<Plugin> depList = List<Plugin>();
+  String reportTime = '';
+
+  void extractBuildInfo() {
+    // get ip
+    String result;
+    result = runSafeCmd(<String>['ip', 'addr', 'show', 'eth0']);
+    if (result != null && result.isNotEmpty) {
+      ip = extractIpFromString(result);
+    }
+
+    if (ip == null || ip.isEmpty || ip == '') {
+      result = runSafeCmd(<String>['ifconfig', 'en0']);
+      if (result != null && result.isNotEmpty) {
+        ip = extractIpFromString(result);
+      }
+    }
+
+    // get dirs
+    projectDir = runSafeCmd(<String>['pwd']);
+
+    // get projectGitUrl
+    projectGitUrl =
+        runSafeCmd(<String>['git', 'config', '--get', 'remote.origin.url']);
+    if (projectGitUrl != null && projectGitUrl.contains('git@')) {
+      projectGitUrl = projectGitUrl.split('git@')[1];
+    }
+
+    // get projectCid
+    projectCid = runSafeCmd(<String>['git', 'rev-parse', 'HEAD']);
+
+    // get user name and email
+    userName = runSafeCmd(<String>['git', 'config', 'user.name']);
+    userEmail = runSafeCmd(<String>['git', 'config', 'user.email']);
+
+    frameworkCid = _runGit('git log -n 1 --pretty=format:%H');
+    if (frameworkCid != null) {
+      frameworkVersion =
+          BDGitTagVersion.determine().frameworkVersionFor(frameworkCid);
+    }
+    engineCid = runSafeCmd(
+        <String>['cat', '${Cache.flutterRoot}/bin/internal/ttengine.version']);
+  }
+
+  String extractIpFromString(String result) {
+    final RegExp reg = RegExp(
+        '((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}');
+    final Iterable<Match> matches = reg.allMatches(result);
+    for (Match match in matches) {
+      if (!match.group(0).endsWith('.255')) {
+        return match.group(0);
+      }
+    }
+    return null;
+  }
+
+  static String runSafeCmd(List<String> cmd) {
+    try {
+      return runSync(cmd);
+    } on Error {
+      return null;
+    }
+  }
+
+  static String _runGit(String command) {
+    try {
+      return runSync(command.split(' '), workingDirectory: Cache.flutterRoot);
+    } on Error {
+      return null;
+    }
+  }
+
+  void extractApkPkgNameAndVersion(String apkPath) {
+    if (!needReport) {
+      return;
+    }
+    String text;
+    final String aaptPath = getAaptPath();
+    if (aaptPath != null) {
+      text = runSafeCmd(<String>[aaptPath, 'dump', 'badging', apkPath]);
+    }
+    final List<String> manifestList = text.split('\n');
+    for (String line in manifestList) {
+      line = line.trim();
+      if (line.startsWith('package: name=')) {
+        // 包名提取
+        final RegExp reg =
+            RegExp("package: name='(.+?)' versionCode='(.+?)' .+");
+        final Iterable<Match> matches = reg.allMatches(line);
+        for (Match m in matches) {
+          pkgName = m.group(1);
+          versionCode = m.group(2);
+        }
+      }
+
+      if (line.startsWith('application: label=')) {
+        // 包名提取
+        final RegExp reg = RegExp("application: label='(.+?)' .+");
+        final Iterable<Match> matches = reg.allMatches(line);
+        for (Match m in matches) {
+          appName = m.group(1);
+        }
+        if (appName != null) {
+          break;
+        }
+      }
+    }
+  }
+
+  void reportInfo() {
+    if (!needReport) {
+      return;
+    }
+    initializeDateFormatting();
+    final DateTime now = DateTime.now();
+    final DateFormat inputFormat = DateFormat('yyyy-MM-dd-HH:mm:ss');
+    reportTime = inputFormat.format(now);
+    extractBuildInfo();
+    final String result = buildReportJson();
+    final String newReportTime =
+        reportTime.replaceAll(':', '_').replaceAll('-', '_');
+    String newIp = 'unkonwn_ip';
+    if (ip != null && ip.isNotEmpty) {
+      newIp = ip.replaceAll('\.', '_');
+    }
+    final String newFrameworkVersion =
+        frameworkVersion.replaceAll('\.', '_').replaceAll('-', '_');
+    findIndexAndUploadResult(
+        result, 'v_${newFrameworkVersion}_ip_${newIp}_t_$newReportTime.json');
+  }
+
+  void reportInfoWhenAot() {
+    if (needReport && isAot) {
+      reportInfo();
+    }
+  }
+
+  String buildReportJson() {
+    List<Map<String, String>> list = new List();
+    for (Plugin plugin in depList) {
+      final Map<String, String> map = new Map<String, String>();
+      map['name'] = plugin.name;
+      map['path'] = plugin.path;
+      map['androidPackage'] = plugin.androidPackage;
+      map['iosPrefix'] = plugin.iosPrefix;
+      map['pluginClass'] = plugin.pluginClass;
+      list.add(map);
+    }
+
+    final Map<String, dynamic> map = Map<String, dynamic>();
+    map['pkgName'] = pkgName;
+    map['versionCode'] = versionCode;
+    map['appName'] = appName;
+    map['projectDir'] = projectDir;
+    map['projectGitUrl'] = projectGitUrl;
+    map['projectCid'] = projectCid;
+    map['ip'] = ip;
+    map['userName'] = userName;
+    map['userEmail'] = userEmail;
+    map['engineCid'] = engineCid;
+    map['frameworkVersion'] = frameworkVersion;
+    map['frameworkCid'] = frameworkCid;
+    map['platform'] = platform;
+    map['depList'] = list;
+    map['isAot'] = isAot;
+    map['isLite'] = isLite;
+    map['useCompressSize'] = useCompressSize;
+    map['reportTime'] = reportTime;
+    return json.encode(map).toString();
+  }
+
+  void findIndexAndUploadResult(String jsonResult, String fileName) {
+    http.get(_indexUrl).then((value) {
+      if (value != null && value.body != null && value.body.isNotEmpty) {
+        String indexStr = value.body;
+        indexStr += '$fileName\n';
+        uploadResult(indexStr, 'index', contextType: 'application/text');
+        uploadResult(jsonResult, fileName);
+      }
+    });
+  }
+
+  void uploadResult(String jsonResult, String fileName,
+      {String contextType = 'application/json'}) {
+    String findTosUrl =
+        'http://10.224.28.10:2280/v1/lookup/name?name=toutiao.tos.tosapi';
+    http.get(findTosUrl).timeout(Duration(seconds: 20), onTimeout: () {
+      _uploadJson(_kHost, jsonResult, fileName, contextType);
+    }).then((value) {
+      if (value != null && value.body != null && value.body.isNotEmpty) {
+        final List list = json.decode(value.body);
+        if (list != null && list.length > 0) {
+          Map<String, dynamic> map = list[0];
+          if (map != null &&
+              map.containsKey('Host') &&
+              map.containsKey('Port')) {
+            _uploadJson('${map['Host']}:${map['Port']}', jsonResult, fileName,
+                contextType);
+            return;
+          }
+        }
+      }
+      _uploadJson(_kHost, jsonResult, fileName, contextType);
+    }, onError: (Object error) {
+      _uploadJson(_kHost, jsonResult, fileName, contextType);
+      return null;
+    });
+  }
+
+  void _uploadJson(
+      String host, String jsonResult, String fileName, String contextType) {
+    final Map<String, String> headers = Map();
+    headers['x-tos-access'] = _kAccess;
+    headers['content-type'] = contextType;
+    final String url = 'http://$host/$_kBucket/$_kTosPre/$fileName';
+    http
+        .put(url, headers: headers, body: jsonResult)
+        .timeout(Duration(seconds: 60))
+        .catchError((Object error) {
+      return null;
+    });
+  }
+}

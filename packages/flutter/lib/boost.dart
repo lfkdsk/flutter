@@ -170,18 +170,18 @@ class Boost {
   }
 
   /// 滚动中回调，每次需要重新赋值，避免无法销毁情况
-  /// 内部使用，外部不可配置
   static engine.NotifyIdleCallback localNotifyIdleCallbackScrolling;
 
   /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
-  /// 外部可配置
   static engine.NotifyIdleCallback localNotifyIdleCallbackScrollEnd;
 
   /// 是否正在处理 idleCallback
-  /// 内部使用，外部不可配置
   static bool localIsIdleCallbacksHandling = false;
 
-  /// 内部调用
+  /// 一帧时间
+  static const int oneFrameMicros = 16667;
+
+  /// 内部调用，回调赋值
   static void ensureNotifyIdle() {
     engine.window.onNotifyIdle = (Duration duration) {
       if (localNotifyIdleCallbackScrollEnd == null &&
@@ -192,7 +192,7 @@ class Boost {
       try {
         // 如果 duration < 17ms，说明是页面滚动过程中，否则认为是页面静止状态
         // 用完后即将 callback 设置为 null，避免存在多个列表泄漏的问题
-        if (duration.inMicroseconds < 16667) {
+        if (duration.inMicroseconds < oneFrameMicros) {
           if (localNotifyIdleCallbackScrolling != null) {
             final engine.NotifyIdleCallback _localCallback =
                 localNotifyIdleCallbackScrolling;

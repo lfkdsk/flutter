@@ -1340,6 +1340,11 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
   }
   bool _needsLayout = true;
 
+  /// BD ADD: START
+  bool get needsLayout {
+      return _needsLayout;
+  }
+  /// END
   RenderObject _relayoutBoundary;
   bool _doingThisLayoutWithCallback = false;
 
@@ -1540,6 +1545,9 @@ abstract class RenderObject extends AbstractNode with DiagnosticableTreeMixin im
   /// 触发重新绘制
   void layoutNextFrame(Duration duration) {
     try {
+      if (WidgetsBinding.instance.buildOwner.dirtyElementsIsNotEmpty()) {
+        return;
+      }
       markNeedsLayout();
       WidgetsBinding.instance.pipelineOwner.flushLayout();
     } catch(e, stack) {

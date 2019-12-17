@@ -323,7 +323,7 @@ class RenderSliverListExtent extends RenderSliverList {
 
     // Find the first child that ends after the scroll offset.
     while (endScrollOffset < scrollOffset && !canScrollingPreload) {
-      if (endScrollOffset < garbageScrollOffset) {
+      if (endScrollOffset <= garbageScrollOffset) {
         leadingGarbage += 1;
       }
       if (!advance()) {
@@ -351,17 +351,16 @@ class RenderSliverListExtent extends RenderSliverList {
       }
     }
 
-    // 如果是预加载，后面的逻辑就不用走了
-    if (isPreload) {
-      return;
-    }
 
     double tempEndScrollOffset = endScrollOffset;
-    while (tempEndScrollOffset < garbageTargetEndScrollOffset) {
+    while (tempEndScrollOffset <= garbageTargetEndScrollOffset) {
       if (child == null) {
         break;
       }
       child = childAfter(child);
+      if (child != null && child.needsLayout) {
+        child.layout(childConstraints, parentUsesSize: true);
+      }
       if (child?.hasSize ?? false) {
         // 校正 child 位移，避免出现覆盖问题
         final SliverMultiBoxAdaptorParentData childParentData =
@@ -383,7 +382,10 @@ class RenderSliverListExtent extends RenderSliverList {
     // the garbage and report the geometry.
 
     collectGarbage(leadingGarbage, trailingGarbage);
-
+    // 如果是预加载，后面的逻辑就不用走了
+    if (isPreload) {
+      return;
+    }
     assert(debugAssertChildListIsNonEmptyAndContiguous());
     double estimatedMaxScrollOffset;
     if (reachedEnd) {

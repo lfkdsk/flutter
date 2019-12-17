@@ -322,7 +322,7 @@ class RenderSliverListExtent extends RenderSliverList {
     }
 
     // Find the first child that ends after the scroll offset.
-    while (endScrollOffset < scrollOffset && !canScrollingPreload) {
+    while (endScrollOffset < scrollOffset) {
       if (endScrollOffset <= garbageScrollOffset) {
         leadingGarbage += 1;
       }

@@ -98,3 +98,5 @@ coverage/
 # BD ADD:
 # npm related
 node_modules
+
+dev/bd_scrips/*

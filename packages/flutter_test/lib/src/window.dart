@@ -386,6 +386,14 @@ class TestWindow implements Window {
   }
 
   @override
+  NotifyIdleCallback get onNotifyIdle => _window.onNotifyIdle;
+
+  @override
+  set onNotifyIdle(NotifyIdleCallback callback) {
+    _window.onNotifyIdle = callback;
+  }
+
+  @override
   int getEngineMainEnterMicros() {
     return _window.getEngineMainEnterMicros();
   }

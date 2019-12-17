@@ -266,8 +266,10 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
   void _createOrObtainChild(int index, { RenderBox after }) {
     // BD ADD: START
     // ignore: always_specify_types
-    final Map<String, String> arguments = {'index': '$index'};
-    Timeline.startSync('createOrObtainChild', arguments: arguments);
+    if (!kReleaseMode) {
+      final Map<String, String> arguments = {'index': '$index'};
+      Timeline.startSync('createOrObtainChild', arguments: arguments);
+    }
     // END
     invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) {
       assert(constraints == this.constraints);
@@ -283,16 +285,23 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
         _childManager.createChild(index, after: after);
       }
     });
-    // BD ADD:
-    Timeline.finishSync();
+    // BD ADD: START
+    if (!kReleaseMode) {
+      Timeline.finishSync();
+    }
+    // END
   }
 
   void _destroyOrCacheChild(RenderBox child) {
     final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
     // BD ADD: START
     // ignore: always_specify_types, prefer_single_quotes
-    final Map<String, String> arguments = {'index': "${childParentData?.index}"};
-    Timeline.startSync('destroyOrCacheChild', arguments: arguments);
+    if (!kReleaseMode) {
+      final Map<String, String> arguments = {
+        'index': "${childParentData?.index}"
+      };
+      Timeline.startSync('destroyOrCacheChild', arguments: arguments);
+    }
     // END
     if (childParentData.keepAlive) {
       assert(!childParentData._keptAlive);
@@ -306,8 +315,11 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
       _childManager.removeChild(child);
       assert(child.parent == null);
     }
-    // BD ADD:
-    Timeline.finishSync();
+    // BD ADD: START
+    if (!kReleaseMode) {
+      Timeline.finishSync();
+    }
+    // END
   }
 
   @override

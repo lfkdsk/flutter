@@ -367,6 +367,8 @@ Future<void> _buildGradleProjectV1(FlutterProject project, String gradle) async 
   if (exitCode != 0)
     throwToolExit('Gradle build failed: $exitCode', exitCode: exitCode);
 
+  // BD ADD:
+  FlutterBuildInfo.instance.reportInfo();
   printStatus('Built ${fs.path.relative(project.android.gradleAppOutV1File.path)}.');
 }
 

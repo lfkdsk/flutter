@@ -71,25 +71,19 @@ Future<void> main(List<String> args) async {
   setEngineMode(engineMode);
 
   // BD ADD: START
-  final bool notAotByUser = args.contains('--target')
-      && args.contains('--release')
-      && args.contains('--output-dir')
-      && args.contains('--target-platform');
-  if (!notAotByUser) {
-    if (args.first == 'build') {
-      FlutterBuildInfo.instance.needReport =
-          !args.contains('--debug') && !args.contains('--profile');
-      FlutterBuildInfo.instance.isAot =
-          (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
-      if (FlutterBuildInfo.instance.isAot &&
-          (args.length >= 2 && args[1] == 'ios' || args.contains('ios'))) {
-        FlutterBuildInfo.instance.platform = 'ios';
-      }
-      if (args.contains('--compress-size')) {
-        FlutterBuildInfo.instance.useCompressSize = true;
-      }
-      FlutterBuildInfo.instance.isLite = lite;
+  if (args.first == 'build') {
+    FlutterBuildInfo.instance.needReport =
+        !args.contains('--debug') && !args.contains('--profile');
+    FlutterBuildInfo.instance.isAot =
+        (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
+    if (FlutterBuildInfo.instance.isAot &&
+        (args.length >= 2 && args[1] == 'ios' || args.contains('ios'))) {
+      FlutterBuildInfo.instance.platform = 'ios';
     }
+    if (args.contains('--compress-size')) {
+      FlutterBuildInfo.instance.useCompressSize = true;
+    }
+    FlutterBuildInfo.instance.isLite = lite;
   }
   // END
 

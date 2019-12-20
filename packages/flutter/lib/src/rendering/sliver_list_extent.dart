@@ -327,7 +327,6 @@ class RenderSliverListExtent extends RenderSliverList {
         leadingGarbage += 1;
       }
       if (!advance()) {
-        assert(leadingGarbage == childCount);
         assert(child == null);
         // we want to make sure we keep the last child around so we know the end scroll offset
         collectGarbage(leadingGarbage - 1, 0);

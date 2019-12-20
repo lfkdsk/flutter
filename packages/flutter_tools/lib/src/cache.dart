@@ -241,6 +241,11 @@ class Cache {
   }
 
   String getVersionFor(String artifactName) {
+    // BD ADD: START
+    if (artifactName != null && artifactName == 'engine') {
+      artifactName = 'ttengine';
+    }
+    // END
     final File versionFile = fs.file(fs.path.join(_rootOverride?.path ?? flutterRoot, 'bin', 'internal', '$artifactName.version'));
     return versionFile.existsSync() ? versionFile.readAsStringSync().trim() : null;
   }

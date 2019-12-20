@@ -154,11 +154,11 @@ class FlutterBuildInfo {
     }
   }
 
-  void reportInfo() {
+  Future<void> reportInfo() async {
     if (!needReport) {
       return;
     }
-    initializeDateFormatting();
+    await initializeDateFormatting();
     final DateTime now = DateTime.now();
     final DateFormat inputFormat = DateFormat('yyyy-MM-dd-HH:mm:ss');
     reportTime = inputFormat.format(now);
@@ -172,13 +172,13 @@ class FlutterBuildInfo {
     }
     final String newFrameworkVersion =
         frameworkVersion.replaceAll('\.', '_').replaceAll('-', '_');
-    findIndexAndUploadResult(
+    await findIndexAndUploadResult(
         result, 'v_${newFrameworkVersion}_ip_${newIp}_t_$newReportTime.json');
   }
 
-  void reportInfoWhenAot() {
+  Future<void> reportInfoWhenAot() async {
     if (needReport && isAot) {
-      reportInfo();
+      await reportInfo();
     }
   }
 
@@ -216,51 +216,54 @@ class FlutterBuildInfo {
     return json.encode(map).toString();
   }
 
-  void findIndexAndUploadResult(String jsonResult, String fileName) {
-    http.get(_indexUrl).then((value) {
-      if (value != null && value.body != null && value.body.isNotEmpty) {
-        String indexStr = value.body;
-        indexStr += '$fileName\n';
-        uploadResult(indexStr, 'index', contextType: 'application/text');
-        uploadResult(jsonResult, fileName);
-      }
-    });
-  }
-
-  void uploadResult(String jsonResult, String fileName,
-      {String contextType = 'application/json'}) {
-    String findTosUrl =
-        'http://10.224.28.10:2280/v1/lookup/name?name=toutiao.tos.tosapi';
-    http.get(findTosUrl).timeout(Duration(seconds: 20), onTimeout: () {
-      _uploadJson(_kHost, jsonResult, fileName, contextType);
-    }).then((value) {
-      if (value != null && value.body != null && value.body.isNotEmpty) {
-        final List list = json.decode(value.body);
-        if (list != null && list.length > 0) {
-          Map<String, dynamic> map = list[0];
-          if (map != null &&
-              map.containsKey('Host') &&
-              map.containsKey('Port')) {
-            _uploadJson('${map['Host']}:${map['Port']}', jsonResult, fileName,
-                contextType);
-            return;
-          }
-        }
-      }
-      _uploadJson(_kHost, jsonResult, fileName, contextType);
-    }, onError: (Object error) {
-      _uploadJson(_kHost, jsonResult, fileName, contextType);
+  Future<void> findIndexAndUploadResult(String jsonResult,
+      String fileName) async {
+    // get index file
+    final http.Response responseSearchTOS = await http.get(_indexUrl)
+        .catchError((Object error) {
       return null;
     });
+    if (responseSearchTOS?.body?.isNotEmpty == true) {
+      String indexStr = responseSearchTOS.body;
+      indexStr += '$fileName\n';
+
+      // search tos upload ip
+      const String findTosUrl =
+          'http://10.224.28.10:2280/v1/lookup/name?name=toutiao.tos.tosapi';
+      String tosHost = _kHost;
+      final http.Response findTosResp = await http.get(findTosUrl).timeout(
+          Duration(seconds: 30)).catchError((Object error) {
+        return null;
+      });
+      try {
+        if (findTosResp?.body?.isNotEmpty == true) {
+          final List list = json.decode(findTosResp.body);
+          if (list?.isNotEmpty == true) {
+            final Map<String, dynamic> map = list[0];
+            if (map != null && map.containsKey('Host') &&
+                map.containsKey('Port')) {
+              tosHost = '${map['Host']}:${map['Port']}';
+            }
+          }
+        }
+      } on Exception catch (_) {
+        // ignore
+      }
+
+      // upload index
+      await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      // upload result json
+      await _uploadJson(tosHost, jsonResult, fileName, 'application/json');
+    }
   }
 
-  void _uploadJson(
-      String host, String jsonResult, String fileName, String contextType) {
+  Future<http.Response> _uploadJson(String host, String jsonResult,
+      String fileName, String contextType) {
     final Map<String, String> headers = Map();
     headers['x-tos-access'] = _kAccess;
     headers['content-type'] = contextType;
     final String url = 'http://$host/$_kBucket/$_kTosPre/$fileName';
-    http
+    return http
         .put(url, headers: headers, body: jsonResult)
         .timeout(Duration(seconds: 60))
         .catchError((Object error) {

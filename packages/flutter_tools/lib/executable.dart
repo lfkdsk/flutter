@@ -71,13 +71,14 @@ Future<void> main(List<String> args) async {
   setEngineMode(engineMode);
 
   // BD ADD: START
-  if (args.first == 'build') {
+  if (args.contains('build')) {
     FlutterBuildInfo.instance.needReport =
         !args.contains('--debug') && !args.contains('--profile');
     FlutterBuildInfo.instance.isAot =
         (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
     if (FlutterBuildInfo.instance.isAot &&
-        (args.length >= 2 && args[1] == 'ios' || args.contains('ios'))) {
+        (args.length >= 2 && args[1] == 'ios' || args.contains('ios')
+            || args.contains('--target-platform=ios'))) {
       FlutterBuildInfo.instance.platform = 'ios';
     }
     if (args.contains('--compress-size')) {

@@ -194,7 +194,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       printStatus(builtMessage);
     }
     // BD ADD:
-    FlutterBuildInfo.instance.reportInfoWhenAot();
+    await FlutterBuildInfo.instance.reportInfoWhenAot();
     return null;
   }
 }

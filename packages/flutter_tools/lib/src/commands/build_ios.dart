@@ -100,7 +100,7 @@ class BuildIOSCommand extends BuildSubCommand {
     if (app != null) {
       FlutterBuildInfo.instance.pkgName = app.toString();
     }
-    FlutterBuildInfo.instance.reportInfo();
+    await FlutterBuildInfo.instance.reportInfo();
     // END
     final bool compressSize = buildInfo.mode == BuildMode.release
         ? argResults['compress-size']

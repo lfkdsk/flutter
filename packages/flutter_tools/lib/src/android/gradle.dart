@@ -368,7 +368,7 @@ Future<void> _buildGradleProjectV1(FlutterProject project, String gradle) async 
     throwToolExit('Gradle build failed: $exitCode', exitCode: exitCode);
 
   // BD ADD:
-  FlutterBuildInfo.instance.reportInfo();
+  await FlutterBuildInfo.instance.reportInfo();
   printStatus('Built ${fs.path.relative(project.android.gradleAppOutV1File.path)}.');
 }
 
@@ -507,7 +507,7 @@ Future<void> _buildGradleProjectV2(
     printStatus('Built ${fs.path.relative(apkFile.path)}$appSize.');
     // BD ADD: START
     FlutterBuildInfo.instance.extractApkPkgNameAndVersion(apkFile.path);
-    FlutterBuildInfo.instance.reportInfo();
+    await FlutterBuildInfo.instance.reportInfo();
     // END
 
     if (buildInfo.createBaseline) {
@@ -630,7 +630,7 @@ Future<void> _buildGradleProjectV2(
     }
     printStatus('Built ${fs.path.relative(bundleFile.path)}$appSize.');
     // BD ADD:
-    FlutterBuildInfo.instance.reportInfo();
+    await FlutterBuildInfo.instance.reportInfo();
   }
 }
 

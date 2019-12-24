@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4-5](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-4...bd1.5.4-5) (2019-12-24)
+
+
+### Bug Fixes
+
+* 低内存时偶现空指针 ([d1ec83f](https://code.byted.org/tech_client/flutter/commit/d1ec83f))
+* 在 TestWindow 添加 onNotifyIdle 接口 ([08264c3](https://code.byted.org/tech_client/flutter/commit/08264c3))
+* fix replace string exception ([ae2b560](https://code.byted.org/tech_client/flutter/commit/ae2b560))
+* fix report bug ([1f185c4](https://code.byted.org/tech_client/flutter/commit/1f185c4))
+* fix report bug ([3197478](https://code.byted.org/tech_client/flutter/commit/3197478))
+* flutter drive failed. ([ec41e74](https://code.byted.org/tech_client/flutter/commit/ec41e74))
+* flutter sdk version and engine product version are inconsistent ([36ecda5](https://code.byted.org/tech_client/flutter/commit/36ecda5))
+
+
+### Features
+
+* add benchmark scrips ([f4e39ae](https://code.byted.org/tech_client/flutter/commit/f4e39ae))
+* Make it easier to pass local engine flags when running devicelab tests ([1c2c325](https://code.byted.org/tech_client/flutter/commit/1c2c325))
+
 ### [1.5.4-4](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-3...bd1.5.4-4) (2019-11-27)
 
 

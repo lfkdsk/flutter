@@ -152,7 +152,9 @@ class TimelineSummary {
   }
 
   List<Duration> _extractDurations(String name) {
-    return _extractNamedEvents(name).map<Duration>((TimelineEvent event) => event.duration).toList();
+    // BD MOD:
+    // return _extractNamedEvents(name).map<Duration>((TimelineEvent event) => event.duration).toList();
+    return _extractBeginEndEvents(name).map<Duration>((TimedEvent event) => event.duration).toList();
   }
 
   /// Extracts timed events that are reported as a pair of begin/end events.

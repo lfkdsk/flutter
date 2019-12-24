@@ -66,6 +66,8 @@ List<String> _allDemos = <String>[];
 Future<void> saveDurationsHistogram(List<Map<String, dynamic>> events, String outputPath) async {
   final Map<String, List<int>> durations = <String, List<int>>{};
   Map<String, dynamic> startEvent;
+  // BD ADD:
+  Map<String, dynamic> lastFrameEvent;
 
   // Save the duration of the first frame after each 'Start Transition' event.
   for (Map<String, dynamic> event in events) {
@@ -73,12 +75,26 @@ Future<void> saveDurationsHistogram(List<Map<String, dynamic>> events, String ou
     if (eventName == 'Start Transition') {
       assert(startEvent == null);
       startEvent = event;
-    } else if (startEvent != null && eventName == 'Frame') {
-      final String routeName = startEvent['args']['to'];
-      durations[routeName] ??= <int>[];
-      durations[routeName].add(event['dur']);
+    // BD MOD: START
+    // } else if (startEvent != null && eventName == 'Frame') {
+    //  final String routeName = startEvent['args']['to'];
+    //  durations[routeName] ??= <int>[];
+    //  durations[routeName].add(event['dur']);
+    //  startEvent = null;
+    // }
+      lastFrameEvent = null;
+    } else if (startEvent != null && eventName == 'Frame' && event['ph'] == 'B') {
+      lastFrameEvent = event;
+    } else if (startEvent != null && eventName == 'Frame' && event['ph'] == 'E') {
+      if (lastFrameEvent != null) {
+        final String routeName = startEvent['args']['to'];
+        durations[routeName] ??= <int>[];
+        durations[routeName].add(event['ts'] - lastFrameEvent['ts']);
+        lastFrameEvent = null;
+      }
       startEvent = null;
     }
+    // END
   }
 
   // Verify that the durations data is valid.

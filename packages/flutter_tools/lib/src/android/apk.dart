@@ -12,6 +12,8 @@ import '../project.dart';
 
 import 'android_sdk.dart';
 import 'gradle.dart';
+// BD ADD:
+import '../calculate_build_info.dart';
 
 Future<void> buildApk({
   @required FlutterProject project,
@@ -31,6 +33,8 @@ Future<void> buildApk({
   if (androidSdk == null)
     throwToolExit('No Android SDK found. Try setting the ANDROID_SDK_ROOT environment variable.');
 
+  // BD ADD:
+  FlutterBuildInfo.instance.pkgName = project.manifest.appName;
   await buildGradleProject(
     project: project,
     androidBuildInfo: androidBuildInfo,

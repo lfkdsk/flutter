@@ -20,6 +20,8 @@ import '../macos/xcode.dart';
 import '../resident_runner.dart';
 import '../runner/flutter_command.dart';
 import 'build.dart';
+// BD ADD:
+import '../calculate_build_info.dart';
 
 class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmentArtifacts {
   BuildAotCommand({bool verboseHelp = false}) {
@@ -202,6 +204,8 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     } else {
       printStatus(builtMessage);
     }
+    // BD ADD:
+    await FlutterBuildInfo.instance.reportInfoWhenAot();
     return null;
   }
 }

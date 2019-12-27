@@ -27,6 +27,8 @@ import '../project.dart';
 import '../reporting/reporting.dart';
 import 'android_sdk.dart';
 import 'android_studio.dart';
+// BD ADD:
+import 'package:flutter_tools/src/calculate_build_info.dart';
 
 final RegExp _assembleTaskPattern = RegExp(r'assemble(\S+)');
 
@@ -582,6 +584,8 @@ Future<void> buildGradleAar({
     throwToolExit('Gradle task $aarTask failed to produce $repoDirectory', exitCode: exitCode);
   }
   printStatus('Built ${fs.path.relative(repoDirectory.path)}.', color: TerminalColor.green);
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 Future<void> _buildGradleProjectV1(FlutterProject project, String gradle) async {
@@ -605,6 +609,8 @@ Future<void> _buildGradleProjectV1(FlutterProject project, String gradle) async 
     throwToolExit('Gradle build failed: $exitCode', exitCode: exitCode);
 
   printStatus('Built ${fs.path.relative(project.android.gradleAppOutV1File.path)}.');
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 String _hex(List<int> bytes) {
@@ -773,6 +779,8 @@ Future<void> _buildGradleProjectV2(
       }
       printStatus('Built ${fs.path.relative(apkFile.path)}$appSize.',
           color: TerminalColor.green);
+      // BD ADD:
+      FlutterBuildInfo.instance.extractApkPkgNameAndVersion(apkFile.path);
     }
   } else {
     final File bundleFile = findBundleFile(project, buildInfo);
@@ -788,6 +796,8 @@ Future<void> _buildGradleProjectV2(
     printStatus('Built ${fs.path.relative(bundleFile.path)}$appSize.',
         color: TerminalColor.green);
   }
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 @visibleForTesting

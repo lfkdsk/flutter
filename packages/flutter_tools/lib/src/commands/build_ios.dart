@@ -12,6 +12,8 @@ import '../globals.dart';
 import '../ios/mac.dart';
 import '../runner/flutter_command.dart' show DevelopmentArtifact, FlutterCommandResult;
 import 'build.dart';
+// BD ADD:
+import '../calculate_build_info.dart';
 
 class BuildIOSCommand extends BuildSubCommand {
   BuildIOSCommand() {
@@ -81,6 +83,13 @@ class BuildIOSCommand extends BuildSubCommand {
 
     final String typeName = artifacts.getEngineType(TargetPlatform.ios, buildInfo.mode);
     printStatus('Building $app for $logTarget ($typeName)...');
+    // BD ADD: START
+    FlutterBuildInfo.instance.platform = 'ios';
+    if (app != null) {
+      FlutterBuildInfo.instance.pkgName = app.toString();
+    }
+    await FlutterBuildInfo.instance.reportInfo();
+    // END
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,

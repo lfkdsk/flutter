@@ -13,6 +13,8 @@ import 'features.dart';
 import 'globals.dart';
 import 'macos/cocoapods.dart';
 import 'project.dart';
+// BD ADD:
+import 'calculate_build_info.dart';
 
 void _renderTemplateToFile(String template, dynamic context, String filePath) {
   final String renderedTemplate =
@@ -339,6 +341,8 @@ Future<void> _writeMacOSPluginRegistrant(FlutterProject project, List<Plugin> pl
 void refreshPluginsList(FlutterProject project, {bool checkProjects = false}) {
   final List<Plugin> plugins = findPlugins(project);
   final bool changed = _writeFlutterPluginsList(project, plugins);
+  // BD ADD:
+  FlutterBuildInfo.instance.depList.addAll(plugins);
   if (changed) {
     if (checkProjects && !project.ios.existsSync()) {
       return;

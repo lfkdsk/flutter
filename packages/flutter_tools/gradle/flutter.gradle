@@ -48,6 +48,14 @@ if (localPropertiesFile.exists()) {
 }
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 
+// BD ADD: START
+class BdFlutterConfigExtension {
+    def needArmeabi
+}
+
+project.extensions.create('bdFlutterConfig', BdFlutterConfigExtension)
+// END
+
 apply plugin: FlutterPlugin
 apply from: "$flutterRoot/packages/flutter_tools/gradle/tt_flutter.gradle"
 
@@ -565,6 +573,13 @@ class FlutterPlugin implements Plugin<Project> {
                 libFlutterPlatforms.add('android-x86')
                 libFlutterPlatforms.add('android-x64')
             }
+            // BD ADD: START
+            def needArmeabi = true
+            def value = project.extensions.findByName('bdFlutterConfig')
+            if (value != null && value.needArmeabi != null) {
+                needArmeabi = value.needArmeabi
+            }
+            // END
             Task packFlutterSnapshotsAndLibsTask = project.tasks.create(name: "packLibs${FLUTTER_BUILD_PREFIX}${variant.name.capitalize()}", type: Jar) {
                 destinationDir libJar.parentFile
                 archiveName libJar.name
@@ -584,14 +599,19 @@ class FlutterPlugin implements Plugin<Project> {
                     // TODO(blasten): The libs should be outside `flutter.jar` when the artifacts are downloaded.
                     from(project.zipTree("${flutterRoot}/bin/cache/artifacts/engine/${engineArtifactSubdir}/flutter.jar")) {
                         include 'lib/**'
+                        // BD ADD: START
+                        if (!needArmeabi) {
+                            exclude 'lib/armeabi/*'
+                        }
+                        // END
                     }
                 }
                 dependsOn compileTasks
                 // Add the ELF library.
                 compileTasks.each { compileTask ->
-                    // Bytedance ADD
+                    // BD ADD: START
                     // 复制armeabi-v7a的libapp.so到armeabi
-                    if (compileTask.abi.equals(ARCH_ARM32)) {
+                    if (compileTask.abi.equals(ARCH_ARM32) && needArmeabi) {
                         from(compileTask.intermediateDir) {
                             include '*.so'
                             rename { String filename ->
@@ -599,7 +619,7 @@ class FlutterPlugin implements Plugin<Project> {
                             }
                         }
                     }
-                    // Bytedance ADD END
+                    // END
                     from(compileTask.intermediateDir) {
                         include '*.so'
                         rename { String filename ->

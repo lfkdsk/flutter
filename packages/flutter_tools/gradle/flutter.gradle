@@ -38,6 +38,14 @@ android {
     }
 }
 
+// BD ADD: START
+class BdFlutterConfigExtension {
+    def needArmeabi
+}
+
+project.extensions.create('bdFlutterConfig', BdFlutterConfigExtension)
+// END
+
 apply plugin: FlutterPlugin
 
 class FlutterPlugin implements Plugin<Project> {
@@ -684,12 +692,30 @@ class FlutterPlugin implements Plugin<Project> {
                 }
             }
             File libJar = project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/libs.jar")
+            // BD ADD: START
+            def needArmeabi = true
+            def value = project.extensions.findByName('bdFlutterConfig')
+            if (value != null && value.needArmeabi != null) {
+                needArmeabi = value.needArmeabi
+            }
+            // END
             Task packFlutterAppAotTask = project.tasks.create(name: "packLibs${FLUTTER_BUILD_PREFIX}${variant.name.capitalize()}", type: Jar) {
                 destinationDir libJar.parentFile
                 archiveName libJar.name
                 dependsOn compileTask
                 targetPlatforms.each { targetPlatform ->
                     String abi = PLATFORM_ARCH_MAP[targetPlatform]
+                    // BD ADD: START
+                    // 复制armeabi-v7a的libapp.so到armeabi
+                    if (abi.equals(ARCH_ARM32) && needArmeabi) {
+                        from(compileTask.intermediateDir) {
+                            include '*.so'
+                            rename { String filename ->
+                                return "lib/armeabi/lib${filename}"
+                            }
+                        }
+                    }
+                    // END
                     from("${compileTask.intermediateDir}/${abi}") {
                         include "*.so"
                         // Move `app.so` to `lib/<abi>/libapp.so`

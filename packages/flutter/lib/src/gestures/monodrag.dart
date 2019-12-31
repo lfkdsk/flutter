@@ -1,7 +1,7 @@
 // Copyright 2015 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 
 import 'arena.dart';
@@ -253,8 +253,21 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
 
       final VelocityEstimate estimate = tracker.getVelocityEstimate();
       if (estimate != null && _isFlingGesture(estimate)) {
-        final Velocity velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
-          .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
+//  BD MOD: START
+//        final Velocity velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
+//            .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
+        Velocity velocity;
+        //TODO 这里需要加个开关
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          var maxVelocity = maxFlingVelocity ?? kMaxFlingVelocity;
+          double velocitX = math.max(-maxVelocity, math.min(estimate.pixelsPerSecond.dx, maxVelocity));
+          double velocitY = math.max(-maxVelocity, math.min(estimate.pixelsPerSecond.dy, maxVelocity));
+          velocity = Velocity(pixelsPerSecond: Offset(velocitX, velocitY));
+        } else {
+          velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
+              .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
+        }
+//  END
         invokeCallback<void>('onEnd', () => onEnd(DragEndDetails(
           velocity: velocity,
           primaryVelocity: _getPrimaryValueFromOffset(velocity.pixelsPerSecond),

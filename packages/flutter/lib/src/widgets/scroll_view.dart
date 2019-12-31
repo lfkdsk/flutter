@@ -23,6 +23,7 @@ import 'scroll_physics.dart';
 import 'scrollable.dart';
 import 'sliver.dart';
 import 'viewport.dart';
+import 'smooth_physics.dart';
 
 // Examples can assume:
 // int itemCount;
@@ -368,9 +369,21 @@ abstract class ScrollView extends StatelessWidget {
         return buildViewport(context, offset, axisDirection, slivers);
       },
     );
-    final Widget scrollableResult = primary && scrollController != null
+    Widget scrollableResult = primary && scrollController != null
         ? PrimaryScrollController.none(child: scrollable)
         : scrollable;
+
+    // BD ADD: START
+    if (physics is SmoothScrollPhysics) {
+      scrollableResult = NotificationListener<ScrollEndNotification>(
+        child: scrollableResult,
+        onNotification: (ScrollEndNotification notification) {
+          (physics as SmoothScrollPhysics).onScrollStartConsumed(false);
+          return false;
+        }
+      );
+    };
+    // END
 
     if (keyboardDismissBehavior == ScrollViewKeyboardDismissBehavior.onDrag) {
       return NotificationListener<ScrollUpdateNotification>(

@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// BD ADD:
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -66,6 +68,9 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
     PointerDeviceKind? kind,
     this.dragStartBehavior = DragStartBehavior.start,
     this.velocityTrackerBuilder = _defaultBuilder,
+// BD ADD:START
+    this.clampFlingingVelocityByTruncation,
+// END
   }) : assert(dragStartBehavior != null),
        super(debugOwner: debugOwner, kind: kind);
 
@@ -196,6 +201,11 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
   ///    determining the initial fling velocity for a [Scrollable] on iOS, to
   ///    match the native behavior on that platform.
   GestureVelocityTrackerBuilder velocityTrackerBuilder;
+
+// BD ADD:START
+  /// Clamp initial flinging velocity by truncation instead of [Velocity.clampMagnitude].
+  bool? clampFlingingVelocityByTruncation;
+// END
 
   _DragState _state = _DragState.ready;
   late OffsetPair _initialPosition;
@@ -444,8 +454,20 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
 
     final VelocityEstimate? estimate = tracker.getVelocityEstimate();
     if (estimate != null && isFlingGesture(estimate, tracker.kind)) {
-      final Velocity velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
-        .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
+      // BD MOD: START
+      // final Velocity velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
+      //   .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
+      Velocity velocity;
+      if (defaultTargetPlatform == TargetPlatform.android && clampFlingingVelocityByTruncation == true) {
+        var maxVelocity = maxFlingVelocity ?? kMaxFlingVelocity;
+        double velocitX = math.max(-maxVelocity, math.min(estimate.pixelsPerSecond.dx, maxVelocity));
+        double velocitY = math.max(-maxVelocity, math.min(estimate.pixelsPerSecond.dy, maxVelocity));
+        velocity = Velocity(pixelsPerSecond: Offset(velocitX, velocitY));
+      } else {
+        velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
+            .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
+      }
+      // END
       details = DragEndDetails(
         velocity: velocity,
         primaryVelocity: _getPrimaryValueFromOffset(velocity.pixelsPerSecond),
@@ -502,7 +524,10 @@ class VerticalDragGestureRecognizer extends DragGestureRecognizer {
   VerticalDragGestureRecognizer({
     Object? debugOwner,
     PointerDeviceKind? kind,
-  }) : super(debugOwner: debugOwner, kind: kind);
+// BD ADD:START
+    bool? clampFlingingVelocityByTruncation,
+// END
+  }) : super(debugOwner: debugOwner, kind: kind, clampFlingingVelocityByTruncation: clampFlingingVelocityByTruncation);
 
   @override
   bool isFlingGesture(VelocityEstimate estimate, PointerDeviceKind kind) {
@@ -543,7 +568,10 @@ class HorizontalDragGestureRecognizer extends DragGestureRecognizer {
   HorizontalDragGestureRecognizer({
     Object? debugOwner,
     PointerDeviceKind? kind,
-  }) : super(debugOwner: debugOwner, kind: kind);
+// BD ADD:START
+    bool? clampFlingingVelocityByTruncation,
+// END
+  }) : super(debugOwner: debugOwner, kind: kind, clampFlingingVelocityByTruncation: clampFlingingVelocityByTruncation);
 
   @override
   bool isFlingGesture(VelocityEstimate estimate, PointerDeviceKind kind) {

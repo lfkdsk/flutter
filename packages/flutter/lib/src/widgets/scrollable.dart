@@ -27,6 +27,8 @@ import 'scroll_context.dart';
 import 'scroll_controller.dart';
 import 'scroll_metrics.dart';
 import 'scroll_physics.dart';
+// BD ADD:
+import 'smooth_physics.dart';
 import 'scroll_position.dart';
 import 'scroll_position_with_single_context.dart';
 import 'ticker_provider.dart';
@@ -496,7 +498,10 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
         case Axis.vertical:
           _gestureRecognizers = <Type, GestureRecognizerFactory>{
             VerticalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<VerticalDragGestureRecognizer>(
-              () => VerticalDragGestureRecognizer(),
+              // BD MOD: START
+              // () => VerticalDragGestureRecognizer(),
+              () => VerticalDragGestureRecognizer(clampFlingingVelocityByTruncation: widget.physics is SmoothScrollPhysics),
+              // END
               (VerticalDragGestureRecognizer instance) {
                 instance
                   ..onDown = _handleDragDown
@@ -516,7 +521,10 @@ class ScrollableState extends State<Scrollable> with TickerProviderStateMixin, R
         case Axis.horizontal:
           _gestureRecognizers = <Type, GestureRecognizerFactory>{
             HorizontalDragGestureRecognizer: GestureRecognizerFactoryWithHandlers<HorizontalDragGestureRecognizer>(
-              () => HorizontalDragGestureRecognizer(),
+              // BD MOD: START
+              // () => HorizontalDragGestureRecognizer(),
+              () => HorizontalDragGestureRecognizer(clampFlingingVelocityByTruncation: widget.physics is SmoothScrollPhysics),
+              // END
               (HorizontalDragGestureRecognizer instance) {
                 instance
                   ..onDown = _handleDragDown

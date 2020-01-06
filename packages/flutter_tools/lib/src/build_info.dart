@@ -20,6 +20,8 @@ class BuildInfo {
     this.fileSystemScheme,
     this.buildNumber,
     this.buildName,
+    // BD ADD:
+    this.lite = false,
   });
 
   final BuildMode mode;
@@ -56,6 +58,8 @@ class BuildInfo {
   /// On Android it is used as versionName.
   /// On Xcode builds it is used as CFBundleShortVersionString,
   final String buildName;
+  // BD ADD:
+  final bool lite;
 
   static const BuildInfo debug = BuildInfo(BuildMode.debug, null);
   static const BuildInfo profile = BuildInfo(BuildMode.profile, null);
@@ -106,6 +110,19 @@ class AndroidBuildInfo {
 
   /// The target platforms for the build.
   final Iterable<AndroidArch> targetArchs;
+
+  // TODO 全部使用了官方的，154上该逻辑被删除 @王莹
+//  BuildInfo withTargetPlatform(TargetPlatform targetPlatform) =>
+//      BuildInfo(mode, flavor,
+//          trackWidgetCreation: trackWidgetCreation,
+//          compilationTraceFilePath: compilationTraceFilePath,
+//          createPatch: createPatch,
+//          extraFrontEndOptions: extraFrontEndOptions,
+//          extraGenSnapshotOptions: extraGenSnapshotOptions,
+//          buildSharedLibrary: buildSharedLibrary,
+//          // BD ADD:
+//          lite: lite,
+//          targetPlatform: targetPlatform);
 }
 
 /// The type of build.

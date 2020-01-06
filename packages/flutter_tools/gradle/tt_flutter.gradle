@@ -52,9 +52,13 @@ class FlutterPatchPlugin implements Plugin<Project> {
                 project.property('target-platform') == 'android-arm64') {
             targetArch = 'arm64'
         }
-        debugFlutterJar = baseEnginePath.resolve("android-${targetArch}").resolve("flutter.jar").toFile()
-        profileFlutterJar = baseEnginePath.resolve("android-${targetArch}-profile").resolve("flutter.jar").toFile()
-        releaseFlutterJar = baseEnginePath.resolve("android-${targetArch}-release").resolve("flutter.jar").toFile()
+        String liteSuffix = ''
+        if (project.hasProperty('lite') && project.property('lite').toBoolean()) {
+            liteSuffix = '-lite'
+        }
+        debugFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}").resolve("flutter.jar").toFile()
+        profileFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-profile").resolve("flutter.jar").toFile()
+        releaseFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-release").resolve("flutter.jar").toFile()
 
         File pluginsFile = new File(project.projectDir.parentFile.parentFile, '.flutter-plugins')
         Properties plugins = readPropertiesIfExist(pluginsFile)

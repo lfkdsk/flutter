@@ -2864,6 +2864,17 @@ String getCreationLocationForError(Element element) {
   });
   return location ?? 'none';
 }
+
+/// simplify location string
+String simplifyFileLocationKey(String key) {
+  if (key?.startsWith('file:') ?? false) {
+    final int index = key.lastIndexOf('/');
+    if (index > 0) {
+      key = key.substring(index);
+    }
+  }
+  return key;
+}
 // END
 
 /// Returns the creation location of an object if one is available.

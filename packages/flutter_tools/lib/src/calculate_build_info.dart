@@ -83,7 +83,7 @@ class FlutterBuildInfo {
     frameworkCid = _runGit('git log -n 1 --pretty=format:%H');
     if (frameworkCid != null) {
       frameworkVersion =
-          GitTagVersion.determine().frameworkVersionFor(frameworkCid);
+          BDGitTagVersion.determine().frameworkVersionFor(frameworkCid);
     }
     engineCid = runSafeCmd(
         <String>['cat', '${Cache.flutterRoot}/bin/internal/ttengine.version']);
@@ -171,7 +171,7 @@ class FlutterBuildInfo {
       newIp = ip.replaceAll('\.', '_');
     }
     final String newFrameworkVersion =
-        frameworkVersion.replaceAll('\.', '_').replaceAll('-', '_').replaceAll('+', '_');
+    frameworkVersion.replaceAll('\.', '_').replaceAll('-', '_').replaceAll('+', '_');
     await findIndexAndUploadResult(
         result, 'v_${newFrameworkVersion}_ip_${newIp}_t_$newReportTime.json');
   }

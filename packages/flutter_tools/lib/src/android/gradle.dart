@@ -608,6 +608,8 @@ Future<void> _buildGradleProjectV1(FlutterProject project, String gradle) async 
   if (exitCode != 0)
     throwToolExit('Gradle build failed: $exitCode', exitCode: exitCode);
 
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
   printStatus('Built ${fs.path.relative(project.android.gradleAppOutV1File.path)}.');
   // BD ADD:
   await FlutterBuildInfo.instance.reportInfo();
@@ -681,6 +683,11 @@ Future<void> _buildGradleProjectV2(
   } else {
     command.add('-q');
   }
+  // BD ADD: START
+  if (buildInfo.lite) {
+    command.add('-Plite=true');
+  }
+  // END
   if (artifacts is LocalEngineArtifacts) {
     final LocalEngineArtifacts localEngineArtifacts = artifacts;
     printTrace('Using local engine: ${localEngineArtifacts.engineOutPath}');

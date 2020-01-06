@@ -268,6 +268,7 @@ Future<XcodeBuildResult> buildXcodeProject({
   DarwinArch activeArch,
   bool codesign = true,
   bool usesTerminalUi = true,
+  bool compressSize = false,
 }) async {
   if (!await upgradePbxProjWithFlutterAssets(app.project))
     return XcodeBuildResult(success: false);
@@ -335,6 +336,7 @@ Future<XcodeBuildResult> buildXcodeProject({
     project: project,
     targetOverride: targetOverride,
     buildInfo: buildInfo,
+    compressSize: compressSize
   );
   await processPodsIfNeeded(project.ios, getIosBuildDirectory(), buildInfo.mode);
 
@@ -515,6 +517,13 @@ Future<XcodeBuildResult> buildXcodeProject({
         // Previous output directory might have incompatible artifacts
         // (for example, kernel binary files produced from previous run).
         fs.directory(outputDir).deleteSync(recursive: true);
+      }
+      //删除ios包内容中的icudtl.dat文件
+      if(compressSize) {
+        final String icu = '${expectedOutputDirectory}/Frameworks/Flutter.framework/icudtl.dat';
+        if(fs.file(icu).existsSync()) {
+          fs.file(icu).deleteSync();
+        }
       }
       copyDirectorySync(fs.directory(expectedOutputDirectory), fs.directory(outputDir));
     } else {

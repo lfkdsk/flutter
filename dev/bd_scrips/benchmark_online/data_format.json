@@ -1,0 +1,41 @@
+{
+  "Benchmarks": [
+    {
+      "Timeseries": {
+        "Key": "ahNzfmZsdXR0ZXItZGFzaGJvYXJkcmALEgpUaW1lc2VyaWVzIlB0aWxlc19zY3JvbGxfcGVyZl9fdGltZWxpbmVfc3VtbWFyeS45MHRoX3BlcmNlbnRpbGVfZnJhbWVfcmFzdGVyaXplcl90aW1lX21pbGxpcww",
+        "Timeseries": {
+          "ID": "tiles_scroll_perf__timeline_summary.90th_percentile_frame_rasterizer_time_millis",
+          "TaskName": "tiles_scroll_perf__timeline_summary",
+          "Label": "90th_percentile_frame_rasterizer_time_millis",
+          "Unit": "ms",
+          "Goal": 7.4,
+          "Baseline": 7.7,
+          "Archived": false
+        }
+      },
+      "Values": [
+        {
+          "CreateTimestamp": 1565937767180,
+          "Revision": "5a4d3cd52c6ae0828946480020f4fc239b95b162",
+          "TaskKey": "ahNzfmZsdXR0ZXItZGFzaGJvYXJkclgLEglDaGVja2xpc3QiOGZsdXR0ZXIvZmx1dHRlci81YTRkM2NkNTJjNmFlMDgyODk0NjQ4MDAyMGY0ZmMyMzliOTViMTYyDAsSBFRhc2sYgIDAgoXyxAkM",
+          "Value": 6.476,
+          "DataMissing": false
+        },
+        {
+          "CreateTimestamp": 1565930796262,
+          "Revision": "ad940c7b4992a2d1b7869e25d5b6134725caebaa",
+          "TaskKey": "ahNzfmZsdXR0ZXItZGFzaGJvYXJkclgLEglDaGVja2xpc3QiOGZsdXR0ZXIvZmx1dHRlci9hZDk0MGM3YjQ5OTJhMmQxYjc4NjllMjVkNWI2MTM0NzI1Y2FlYmFhDAsSBFRhc2sYgIDAvLO8yAsM",
+          "Value": 6.678,
+          "DataMissing": false
+        },
+        {
+          "CreateTimestamp": 1665924524000,
+          "Revision": "5a4d3cd52c6ae0828946480020f4fc239b95b1621",
+          "TaskKey": "ahNzfmZsdXR0ZXItZGFzaGJvYXJkclgLEglDaGVja2xpc3QiOGZsdXR0ZXIvZmx1dHRlci81YTRkM2NkNTJjNmFlMDgyODk0NjQ4MDAyMGY0ZmMyMzliOTViMTYyDAsSBFRhc2sYgIDAgoXylAoM",
+          "Value": 17.775,
+          "DataMissing": false
+        }
+      ]
+    }
+  ]
+}

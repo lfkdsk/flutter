@@ -196,7 +196,13 @@ class FlutterPlugin implements Plugin<Project> {
             String basePlatformArch = getBasePlatform(project)
             // This is meant to include the compiled classes only, however it will include `libflutter.so` as well.
             Path baseEnginePath = Paths.get(flutterRoot.absolutePath, "bin", "cache", "artifacts", "engine")
-            File debugJar = baseEnginePath.resolve("${basePlatformArch}").resolve("flutter.jar").toFile()
+            // BD ADD: START
+            String liteSuffix = ''
+            if (project.hasProperty('lite') && project.property('lite').toBoolean()) {
+                liteSuffix = '-lite'
+            }
+            // END
+            File debugJar = baseEnginePath.resolve("${basePlatformArch}${liteSuffix}").resolve("flutter.jar").toFile()
             baseJar["debug"] = debugJar
             if (!debugJar.isFile()) {
                 project.exec {
@@ -208,8 +214,8 @@ class FlutterPlugin implements Plugin<Project> {
                     throw new GradleException("Unable to find flutter.jar in SDK: ${debugJar}")
                 }
             }
-            baseJar["profile"] = baseEnginePath.resolve("${basePlatformArch}-profile").resolve("flutter.jar").toFile()
-            baseJar["release"] = baseEnginePath.resolve("${basePlatformArch}-release").resolve("flutter.jar").toFile()
+            baseJar["profile"] = baseEnginePath.resolve("${basePlatformArch}${liteSuffix}-profile").resolve("flutter.jar").toFile()
+            baseJar["release"] = baseEnginePath.resolve("${basePlatformArch}${liteSuffix}-release").resolve("flutter.jar").toFile()
 
             // Add flutter.jar dependencies to all <buildType>Api configurations, including custom ones
             // added after applying the Flutter plugin.
@@ -486,6 +492,12 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('track-widget-creation')) {
             trackWidgetCreationValue = project.property('track-widget-creation').toBoolean()
         }
+        // BD ADD: START
+        Boolean liteValue = false
+        if (project.hasProperty('lite')) {
+            liteValue = project.property('lite').toBoolean()
+        }
+        // END
         String compilationTraceFilePathValue = null
         if (project.hasProperty('compilation-trace-file')) {
             compilationTraceFilePathValue = project.property('compilation-trace-file')
@@ -563,6 +575,8 @@ class FlutterPlugin implements Plugin<Project> {
                     intermediateDir project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/${targetArch}")
                     extraFrontEndOptions extraFrontEndOptionsValue
                     extraGenSnapshotOptions extraGenSnapshotOptionsValue
+                    // BD ADD:
+                    useLite liteValue
                 }
             }
 
@@ -734,6 +748,10 @@ abstract class BaseFlutterTask extends DefaultTask {
     String fileSystemScheme
     @Input
     Boolean trackWidgetCreation
+    // BD ADD: START
+    @Optional @Input
+    Boolean useLite
+    // END
     @Optional @Input
     String compilationTraceFilePath
     @Optional @Input
@@ -793,6 +811,11 @@ abstract class BaseFlutterTask extends DefaultTask {
                 if (trackWidgetCreation) {
                     args "--track-widget-creation"
                 }
+                // BD ADD: START
+                if (useLite) {
+                    args "--lite"
+                }
+                // END
                 if (extraFrontEndOptions != null) {
                     args "--extra-front-end-options", "${extraFrontEndOptions}"
                 }

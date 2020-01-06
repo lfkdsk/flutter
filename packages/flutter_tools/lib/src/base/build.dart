@@ -91,6 +91,8 @@ class AOTSnapshotter {
     DarwinArch darwinArch,
     List<String> extraGenSnapshotOptions = const <String>[],
     @required bool bitcode,
+    // BD ADD:
+    bool compressSize = false
   }) async {
     if (bitcode && platform != TargetPlatform.ios) {
       printError('Bitcode is only supported for iOS.');
@@ -127,13 +129,32 @@ class AOTSnapshotter {
       printTrace('Extra gen_snapshot options: $extraGenSnapshotOptions');
       genSnapshotArgs.addAll(extraGenSnapshotOptions);
     }
+    // BD ADD: START
+    if (platform != TargetPlatform.ios) {
+      compressSize = false;
+    }
+    // END
 
     final String assembly = fs.path.join(outputDir.path, 'snapshot_assembly.S');
+    // BD ADD: START
+    String isolateSnapshotData;
+    String vmSnapshotData;
+    // END
     if (platform == TargetPlatform.ios || platform == TargetPlatform.darwin_x64) {
       // Assembly AOT snapshot.
       outputPaths.add(assembly);
       genSnapshotArgs.add('--snapshot_kind=app-aot-assembly');
       genSnapshotArgs.add('--assembly=$assembly');
+      // BD ADD: START
+      if (compressSize) {
+        isolateSnapshotData = fs.path.join(
+            outputDir.path, 'isolate_snapshot_data');
+        vmSnapshotData = fs.path.join(
+            outputDir.path, 'vm_snapshot_data');
+        genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
+        genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
+      }
+      // END
     } else {
       final String aotSharedLibrary = fs.path.join(outputDir.path, 'app.so');
       outputPaths.add(aotSharedLibrary);
@@ -197,11 +218,21 @@ class AOTSnapshotter {
     // On iOS, we use Xcode to compile the snapshot into a dynamic library that the
     // end-developer can link into their app.
     if (platform == TargetPlatform.ios || platform == TargetPlatform.darwin_x64) {
+      // BD MOD:
+      // final RunResult result = await _buildFramework(
+      //   appleArch: darwinArch,
+      //   assemblyPath: bitcode ? '$assembly.bitcode' : assembly,
+      //   outputPath: outputDir.path,
+      //   bitcode: bitcode,
+      // );
       final RunResult result = await _buildFramework(
         appleArch: darwinArch,
         assemblyPath: bitcode ? '$assembly.bitcode' : assembly,
         outputPath: outputDir.path,
         bitcode: bitcode,
+        compressSize: compressSize,
+        isolateSnapshotData: isolateSnapshotData,
+        vmSnapshotData: vmSnapshotData
       );
       if (result.exitCode != 0)
         return result.exitCode;
@@ -216,6 +247,11 @@ class AOTSnapshotter {
     @required String assemblyPath,
     @required String outputPath,
     @required bool bitcode,
+    // BD ADD: START
+    bool compressSize = false,
+    String isolateSnapshotData,
+    String vmSnapshotData,
+    // END
   }) async {
     final String targetArch = getNameForDarwinArch(appleArch);
     printStatus('Building App.framework for $targetArch...');
@@ -252,6 +288,18 @@ class AOTSnapshotter {
       '-o', appLib,
       assemblyO,
     ];
+
+    // BD ADD: START
+    if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
+        await runCheckedAsync(['rm', '-f', '$isolateSnapshotData.gz']);
+        await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
+
+        await runCheckedAsync(['rm', '-f', '$vmSnapshotData.gz']);
+        await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
+    }
+    // END
     final RunResult linkResult = await xcode.clang(linkArgs);
     if (linkResult.exitCode != 0) {
       printError('Failed to link AOT snapshot. Linker terminated with exit code ${compileResult.exitCode}');
@@ -281,6 +329,8 @@ class AOTSnapshotter {
     @required String outputPath,
     @required bool trackWidgetCreation,
     List<String> extraFrontEndOptions = const <String>[],
+    // BD ADD:
+    bool lite = false,
   }) async {
     final FlutterProject flutterProject = FlutterProject.current();
     final Directory outputDir = fs.directory(outputPath);
@@ -309,6 +359,8 @@ class AOTSnapshotter {
       aot: true,
       trackWidgetCreation: trackWidgetCreation,
       targetProductVm: buildMode == BuildMode.release,
+      // BD ADD:
+      lite: lite,
     ));
 
     // Write path to frontend_server, since things need to be re-generated when that changes.

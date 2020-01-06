@@ -59,15 +59,30 @@ BuildApp() {
     assets_path="${FLTAssetsPath}"
   fi
 
+  # BD ADD:
+  # ios lite 版本标记
+  local lite_flag=""
+  local lite_suffix=""
+  if [[  -n "$LITE" ]]; then
+      lite_flag="--lite"
+      lite_suffix="-lite"
+  fi
+  # END
+
   # Use FLUTTER_BUILD_MODE if it's set, otherwise use the Xcode build configuration name
   # This means that if someone wants to use an Xcode build config other than Debug/Profile/Release,
   # they _must_ set FLUTTER_BUILD_MODE so we know what type of artifact to build.
   local build_mode="$(echo "${FLUTTER_BUILD_MODE:-${CONFIGURATION}}" | tr "[:upper:]" "[:lower:]")"
   local artifact_variant="unknown"
   case "$build_mode" in
-    *release*) build_mode="release"; artifact_variant="ios-release";;
-    *profile*) build_mode="profile"; artifact_variant="ios-profile";;
-    *debug*) build_mode="debug"; artifact_variant="ios";;
+    # BD MOD: START
+    # *release*) build_mode="release"; artifact_variant="ios-release";;
+    # *profile*) build_mode="profile"; artifact_variant="ios-profile";;
+    # *debug*) build_mode="debug"; artifact_variant="ios";;
+    *release*) build_mode="release"; artifact_variant="ios-release"${lite_suffix};;
+    *profile*) build_mode="profile"; artifact_variant="ios-profile"${lite_suffix};;
+    *debug*) build_mode="debug"; artifact_variant="ios"${lite_suffix};;
+    # END
     *)
       EchoError "========================================================================"
       EchoError "ERROR: Unknown FLUTTER_BUILD_MODE: ${build_mode}."
@@ -93,6 +108,12 @@ BuildApp() {
     EchoError "then re-run Archive from Xcode."
     EchoError "========================================================================"
     exit -1
+  fi
+
+  # ios拆包方案标示
+  local compress_size_flag=""
+  if [[  -n "$COMPRESS_SIZE" ]] && [[ "$build_mode" == "release" ]]; then
+      compress_size_flag="--compress-size"
   fi
 
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
@@ -189,7 +210,9 @@ BuildApp() {
       --ios-arch="${archs}"                                                 \
       ${flutter_engine_flag}                                                \
       ${local_engine_flag}                                                  \
-      ${bitcode_flag}
+      ${bitcode_flag}                                         \
+      ${compress_size_flag}                                                 \
+      ${lite_flag}
 
     if [[ $? -ne 0 ]]; then
       EchoError "Failed to build ${project_path}."
@@ -256,6 +279,9 @@ BuildApp() {
     precompilation_flag="--precompiled"
   fi
 
+  local app_framework_dir="${derived_dir}/App.framework"
+  local asset_dir="${app_framework_dir}/${assets_path}"
+
   StreamOutput " ├─Assembling Flutter resources..."
   RunCommand "${FLUTTER_ROOT}/bin/flutter"     \
     ${verbose_flag}                                                         \
@@ -264,11 +290,34 @@ BuildApp() {
     --target="${target_path}"                                               \
     --${build_mode}                                                         \
     --depfile="${build_dir}/snapshot_blob.bin.d"                            \
-    --asset-dir="${derived_dir}/App.framework/${assets_path}"               \
+    --asset-dir="${asset_dir}"               \
     ${precompilation_flag}                                                  \
     ${flutter_engine_flag}                                                  \
     ${local_engine_flag}                                                    \
     ${track_widget_creation_flag}
+
+  # BD ADD:START
+  if [[ "$compress_size_flag" != "" ]]; then
+    RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${app_framework_dir}/icudtl.dat"
+    if [[ -e "${project_path}/.ios" ]]; then
+      RunCommand rm -rf -- "${derived_dir}/engine/Flutter.framework/icudtl.dat"
+    else
+      RunCommand rm -rf -- "${derived_dir}/Flutter.framework/icudtl.dat"
+    fi
+    local current_path=`pwd`
+    RunCommand cd ${app_framework_dir}/
+    zip -q -r flutter_compress_icudtl.zip icudtl.dat
+    zip -q -r flutter_compress_assets.zip ${assets_path}
+    RunCommand rm -f icudtl.dat
+    local dirPath=`dirname ${assets_path}`
+    if [ "${dirPath}" == "." ];then
+      RunCommand rm -rf "${assets_path}"
+    else
+      RunCommand rm -rf "${dirPath}"
+    fi
+    RunCommand cd ${current_path}
+  fi
+  # END
 
   if [[ $? -ne 0 ]]; then
     EchoError "Failed to package ${project_path}."

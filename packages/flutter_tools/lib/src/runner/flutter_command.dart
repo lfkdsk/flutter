@@ -260,6 +260,12 @@ abstract class FlutterCommand extends Command<void> {
     argParser.addFlag('release',
       negatable: false,
       help: 'Build a release version of your app${defaultToRelease ? ' (default mode)' : ''}.');
+    // BD ADD: START
+    argParser.addFlag('lite',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size');
+    // END
   }
 
   void usesFuchsiaOptions({ bool hide = false }) {
@@ -360,6 +366,11 @@ abstract class FlutterCommand extends Command<void> {
       buildName: argParser.options.containsKey('build-name')
           ? argResults['build-name']
           : null,
+      // BD ADD: START
+      lite: argParser.options.containsKey('lite')
+          ? argResults['lite']
+          : false,
+      // END
     );
   }
 

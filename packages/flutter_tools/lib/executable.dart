@@ -23,6 +23,8 @@ import 'src/commands/clean.dart';
 import 'src/commands/config.dart';
 import 'src/commands/create.dart';
 import 'src/commands/daemon.dart';
+// BD ADD:
+import 'src/commands/develop.dart';
 import 'src/commands/devices.dart';
 import 'src/commands/doctor.dart';
 import 'src/commands/drive.dart';
@@ -50,9 +52,9 @@ import 'src/web/compile.dart';
 import 'src/web/web_runner.dart';
 
 // BD ADD: START
+import 'src/artifacts.dart';
 import 'src/calculate_build_info.dart';
 // END
-
 /// Main entry point for commands.
 ///
 /// This function is intended to be used from the `flutter` command line tool.
@@ -67,6 +69,14 @@ Future<void> main(List<String> args) async {
   final bool verboseHelp = help && verbose;
   // BD ADD: START
   final bool lite = args.contains('--lite');
+  EngineMode engineMode = EngineMode.normal;
+  if (lite) {
+    engineMode = EngineMode.lite;
+    print('Currently in lite mode...');
+  }
+  setEngineMode(engineMode);
+
+  // BD ADD: START
   if (args.contains('build')) {
     FlutterBuildInfo.instance.needReport =
         !args.contains('--debug') && !args.contains('--profile');
@@ -93,6 +103,8 @@ Future<void> main(List<String> args) async {
     CleanCommand(),
     ConfigCommand(verboseHelp: verboseHelp),
     CreateCommand(),
+    // BD ADD:
+    DevelopCommand(),
     DaemonCommand(hidden: !verboseHelp),
     DevicesCommand(),
     DoctorCommand(verbose: verbose),

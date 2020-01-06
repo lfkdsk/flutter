@@ -7,6 +7,7 @@ import 'dart:async';
 // BD ADD: START
 import 'package:flutter/boost.dart';
 import 'dart:ui' as ui;
+import 'package:flutter/widgets.dart';
 // END
 import 'package:flutter/foundation.dart';
 
@@ -149,11 +150,22 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
 
   T _result;
 
+  // BD ADD:
+  bool _isPushing = false;
+
   void _handleStatusChanged(AnimationStatus status) {
     switch (status) {
       case AnimationStatus.completed:
         if (overlayEntries.isNotEmpty)
           overlayEntries.first.opaque = opaque;
+        // BD ADD: START
+        if (_isPushing) {
+          FpsUtils.instance.getFps(
+              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              recordInFramework: true, isFromFramework: true);
+          _isPushing = false;
+        }
+        // END
         break;
       case AnimationStatus.forward:
       case AnimationStatus.reverse:
@@ -169,6 +181,14 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
           navigator.finalizeRoute(this);
           assert(overlayEntries.isEmpty);
         }
+        // BD ADD: START
+        if (_isPushing) {
+          FpsUtils.instance.getFps(
+              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              isFromFramework: true);
+          _isPushing = false;
+        }
+        // END
         break;
     }
     changedInternalState();
@@ -195,12 +215,22 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     assert(!_transitionCompleter.isCompleted, 'Cannot reuse a $runtimeType after disposing it.');
     _animation.addStatusListener(_handleStatusChanged);
     // BD ADD: START
+    final String key = 'Route(${simplifyFileLocationKey(settings.name)})';
+    void startRecord() {
+      if (!_isPushing && FpsUtils.instance.enableAutoRecord) {
+        FpsUtils.instance.startRecord(
+            key, timeOut: const Duration(seconds: 2), isFromFramework: true);
+        _isPushing = true;
+      }
+    }
     if (ignoreFirstFrameTimeCost()) {
-      ui.window.addNextFrameCallback((){
+      ui.window.addNextFrameCallback(() {
+        startRecord();
         _controller.forward();
       });
       return null;
     }
+    startRecord();
     // END
     return _controller.forward();
   }

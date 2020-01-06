@@ -6,13 +6,14 @@
 ///
 
 import 'dart:ui' as engine;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 // ignore: avoid_classes_with_only_static_members
 /// See also: https://jira.bytedance.com/browse/FLUTTER-15
 class Boost {
   /// All native engine flags to improve performance
-  static const int _kAllFlags = 0x7F;
+  static const int _kAllFlags = 0xFF;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-25
   static const int _kDisableGC = 1 << 0;
@@ -35,6 +36,8 @@ class Boost {
   /// See also: https://jira.bytedance.com/browse/FLUTTER-80
   static const int _kEnableExtendBufferQueue = 1 << 6;
 
+  static const int _kNotifyIdle = 1 << 7;
+
   /// if true, will close semantics calculate when draw a frame.
   /// See also: https://jira.bytedance.com/browse/FLUTTER-3
   static bool _disabledSemantics = true;
@@ -51,13 +54,17 @@ class Boost {
   static bool get reuseTransitionsWidget => _reuseTransitionsWidget;
 
   /// https://jira.bytedance.com/browse/FLUTTER-234
-  static bool _ignoreTransitionsFirstFrameTimeCost = true;
+  static bool _ignoreTransitionsFirstFrameTimeCost = false;
 
   /// If true, will ignore first frame time cost when drive the transitions.
-  static bool get ignoreTransitionsFirstFrameTimeCost => _ignoreTransitionsFirstFrameTimeCost;
+  static bool get ignoreTransitionsFirstFrameTimeCost =>
+      _ignoreTransitionsFirstFrameTimeCost;
 
   /// enable or disable semantics, reuseWidget and so on.
-  static void enable({bool disableSemantics = true, bool reuseWidget = true, bool ignoreTransitionsFirstFrameTimeCost = true}) {
+  static void enable(
+      {bool disableSemantics = true,
+      bool reuseWidget = true,
+      bool ignoreTransitionsFirstFrameTimeCost = false}) {
     _disabledSemantics = disableSemantics;
     RendererBinding?.instance?.setSemanticsEnabled(!disableSemantics);
     _reuseTransitionsWidget = reuseWidget;
@@ -73,7 +80,8 @@ class Boost {
       bool delayPlatformMessage,
       bool uiMessageAtHead,
       bool enableWaitSwapBuffer,
-      bool extendBufferQueue) {
+      bool extendBufferQueue,
+      bool notifyIdle) {
     if (isAll) {
       return _kAllFlags.toUnsigned(16);
     }
@@ -99,6 +107,9 @@ class Boost {
     if (extendBufferQueue) {
       flags |= _kEnableExtendBufferQueue;
     }
+    if (notifyIdle) {
+      flags |= _kNotifyIdle;
+    }
     return flags.toUnsigned(16);
   }
 
@@ -110,7 +121,8 @@ class Boost {
       bool delayPlatformMessage = false,
       bool uiMessageAtHead = false,
       bool enableWaitSwapBuffer = false,
-      bool extendBufferQueue = false}) {
+      bool extendBufferQueue = false,
+      bool notifyIdle = false}) {
     final int flags = _ensureFlags(
         false,
         disableGC,
@@ -119,7 +131,8 @@ class Boost {
         delayPlatformMessage,
         uiMessageAtHead,
         enableWaitSwapBuffer,
-        extendBufferQueue);
+        extendBufferQueue,
+        notifyIdle);
     engine.startBoost(flags, duration.inMilliseconds);
   }
 
@@ -131,7 +144,8 @@ class Boost {
       bool delayFuture = false,
       bool delayPlatformMessage = false,
       bool uiMessageAtHead = false,
-      bool extendBufferQueue = false}) {
+      bool extendBufferQueue = false,
+      bool notifyIdle = false}) {
     final int flags = _ensureFlags(
         finishAll,
         disableGC,
@@ -140,7 +154,8 @@ class Boost {
         delayPlatformMessage,
         uiMessageAtHead,
         enableWaitSwapBuffer,
-        extendBufferQueue);
+        extendBufferQueue,
+        notifyIdle);
     engine.finishBoost(flags);
   }
 
@@ -152,5 +167,54 @@ class Boost {
   /// preload fonts
   static void preloadFontFamilies(List<String> fontFamilies, Locale locale) {
     engine.preloadFontFamilies(fontFamilies, locale?.toString());
+  }
+
+  /// 滚动中回调，每次需要重新赋值，避免无法销毁情况
+  static engine.NotifyIdleCallback localNotifyIdleCallbackScrolling;
+
+  /// 滚动结束回调，每次需要重新赋值，避免无法销毁情况
+  static engine.NotifyIdleCallback localNotifyIdleCallbackScrollEnd;
+
+  /// 是否正在处理 idleCallback
+  static bool localIsIdleCallbacksHandling = false;
+
+  /// 一帧时间
+  static const int oneFrameMicros = 16667;
+
+  /// 内部调用，回调赋值
+  static void ensureNotifyIdle() {
+    engine.window.onNotifyIdle = (Duration duration) {
+      if (localNotifyIdleCallbackScrollEnd == null &&
+          localNotifyIdleCallbackScrolling == null) {
+        return;
+      }
+      localIsIdleCallbacksHandling = true;
+      try {
+        // 如果 duration < 17ms，说明是页面滚动过程中，否则认为是页面静止状态
+        // 用完后即将 callback 设置为 null，避免存在多个列表泄漏的问题
+        if (duration.inMicroseconds < oneFrameMicros) {
+          if (localNotifyIdleCallbackScrolling != null) {
+            final engine.NotifyIdleCallback _localCallback =
+                localNotifyIdleCallbackScrolling;
+            localNotifyIdleCallbackScrolling = null;
+            _localCallback(duration);
+          }
+        } else if (localNotifyIdleCallbackScrollEnd != null) {
+          final engine.NotifyIdleCallback _localCallback =
+              localNotifyIdleCallbackScrollEnd;
+          localNotifyIdleCallbackScrollEnd = null;
+          _localCallback(duration);
+        }
+      } catch (e, stacktrace) {
+        debugPrint(stacktrace.toString());
+      }
+      localIsIdleCallbacksHandling = false;
+    };
+  }
+
+  /// 重置 callback，避免可能的泄漏问题
+  static void resetIdleCallbacks() {
+    localNotifyIdleCallbackScrolling = null;
+    localNotifyIdleCallbackScrollEnd = null;
   }
 }

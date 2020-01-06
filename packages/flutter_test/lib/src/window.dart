@@ -434,6 +434,61 @@ class TestWindow implements Window {
   void addNextFrameCallback(callback) {
     _window.addNextFrameCallback(callback);
   }
+
+  @override
+  void startRecordFps(String key) {
+    _window.startRecordFps(key);
+  }
+
+  @override
+  List obtainFps(String key, bool stopRecord) {
+    return _window.obtainFps(key, stopRecord);
+  }
+
+  @override
+  VoidCallback get exitApp => _window.exitApp;
+
+  @override
+  set exitApp(VoidCallback callback) {
+    _window.exitApp = callback;
+  }
+
+  @override
+  NotifyIdleCallback get onNotifyIdle => _window.onNotifyIdle;
+
+  @override
+  set onNotifyIdle(NotifyIdleCallback callback) {
+    _window.onNotifyIdle = callback;
+  }
+
+  @override
+  int getEngineMainEnterMicros() {
+    return _window.getEngineMainEnterMicros();
+  }
+
+  @override
+  TimeToFirstFrameMicrosCallback get onTimeToFirstFrameMicros => _window.onTimeToFirstFrameMicros;
+
+  @override
+  set onTimeToFirstFrameMicros(TimeToFirstFrameMicrosCallback callback) {
+    _window.onTimeToFirstFrameMicros = callback;
+  }
+
+  @override
+  int get timeToFrameworkInitMicros => _window.timeToFrameworkInitMicros;
+
+  @override
+  set timeToFrameworkInitMicros(int time) {
+    _window.timeToFrameworkInitMicros = time;
+  }
+
+  @override
+  int get timeToFirstFrameMicros => _window.timeToFirstFrameMicros;
+
+  @override
+  set timeToFirstFrameMicros(int time) {
+    _window.timeToFirstFrameMicros = time;
+  }
   // END
 
 }

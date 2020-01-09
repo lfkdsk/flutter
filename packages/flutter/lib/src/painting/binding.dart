@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:typed_data' show Uint8List;
-import 'dart:ui' as ui show instantiateImageCodec, Codec;
+// BD MOD:
+// import 'dart:ui' as ui show instantiateImageCodec, Codec;
+import 'dart:ui' as ui show instantiateImageCodec, Codec, getNativeImage, Image;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show ServicesBinding;
 
@@ -90,6 +92,13 @@ mixin PaintingBinding on BindingBase, ServicesBinding {
       targetWidth: cacheWidth,
       targetHeight: cacheHeight,
     );
+  }
+
+  /**
+   * BD ADD:
+   */
+  Future<ui.Image> getNativeImage(String url, {int width: 0, int height: 0, double scale: 1.0}) {
+    return ui.getNativeImage(url, width: width, height: height, scale: scale);
   }
 
   @override

@@ -13,6 +13,8 @@ import '../globals.dart';
 import '../ios/mac.dart';
 import '../runner/flutter_command.dart' show DevelopmentArtifact, FlutterCommandResult;
 import 'build.dart';
+// BD ADD:
+import '../calculate_build_info.dart';
 
 /// Builds an .app for an iOS app to be used for local testing on an iOS device
 /// or simulator. Can only be run on a macOS host. For producing deployment
@@ -32,7 +34,19 @@ class BuildIOSCommand extends BuildSubCommand {
       ..addFlag('codesign',
         defaultsTo: true,
         help: 'Codesign the application bundle (only available on device builds).',
+      )
+      // BD ADD: START
+      ..addFlag('compress-size',
+        help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
+        negatable: false,
+      )
+      ..addFlag('lite',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size',
       );
+      // END
+
   }
 
   @override
@@ -77,12 +91,23 @@ class BuildIOSCommand extends BuildSubCommand {
 
     final String typeName = artifacts.getEngineType(TargetPlatform.ios, buildInfo.mode);
     printStatus('Building $app for $logTarget ($typeName)...');
+    // BD ADD: START
+    FlutterBuildInfo.instance.platform = 'ios';
+    if (app != null) {
+      FlutterBuildInfo.instance.pkgName = app.toString();
+    }
+    await FlutterBuildInfo.instance.reportInfo();
+    // END
+    final bool compressSize = buildInfo.mode == BuildMode.release
+        ? argResults['compress-size']
+        : false;
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,
       targetOverride: targetFile,
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
+      compressSize: compressSize
     );
 
     if (!result.success) {

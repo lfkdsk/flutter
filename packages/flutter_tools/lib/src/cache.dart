@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
+import 'package:yaml/yaml.dart';
 
 import 'android/gradle_utils.dart';
 import 'base/common.dart';
@@ -234,6 +235,14 @@ class Cache {
 
   static Cache get instance => context.get<Cache>();
 
+  /// BD ADD: START
+  String get customEngineRevision {
+    _customEngineRevision ??= getVersionFor('ttengine');
+    return _customEngineRevision;
+  }
+  String _customEngineRevision;
+  /// END
+
   /// Return the top-level directory in the cache; this is `bin/cache`.
   Directory getRoot() {
     if (_rootOverride != null) {
@@ -293,6 +302,11 @@ class Cache {
   }
 
   String getVersionFor(String artifactName) {
+    // BD ADD: START
+    if (artifactName != null && artifactName == 'engine') {
+      artifactName = 'ttengine';
+    }
+    // END
     final File versionFile = fs.file(fs.path.join(
         _rootOverride?.path ?? flutterRoot, 'bin', 'internal',
         '$artifactName.version'));
@@ -370,6 +384,9 @@ class Cache {
         rethrow;
       }
     }
+    /// BD MOD:
+    /// cache.setStampFor(customEngineName, customEngineVersion);
+    cache.setStampFor(customEngineName, customEngineRevision);
   }
 
   Future<bool> areRemoteArtifactsAvailable({
@@ -388,6 +405,24 @@ class Cache {
     return allAvailible;
   }
 }
+
+YamlMap _customEngineConfig;
+
+YamlMap get customEngineConfig {
+  _customEngineConfig ??= loadYaml(fs
+    .file(fs.path
+    .join(Cache.flutterRoot, 'bin', 'internal', 'tt_engine.yaml'))
+    .readAsStringSync());
+  return _customEngineConfig;
+}
+
+const String customEngineName = 'tt_engine';
+/// BD DEL:
+/// String get customEngineVersion => customEngineConfig['ref'];
+
+YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
+
+String get customEngineDownloadUrl => customEngineConfig['url'];
 
 /// Representation of a set of artifacts used by the tool.
 abstract class ArtifactSet {
@@ -427,6 +462,8 @@ abstract class CachedArtifact extends ArtifactSet {
 
   Directory get location => cache.getArtifactDirectory(name);
   String get version => cache.getVersionFor(name);
+  /// BD ADD:
+  String get customEngineVersion => cache.customEngineRevision;
 
   /// Keep track of the files we've downloaded for this execution so we
   /// can delete them after completion. We don't delete them right after
@@ -640,6 +677,9 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
   @override
   bool isUpToDateInner() {
+    if (customEngineVersion != cache.getStampFor(customEngineName)) {
+      return false;
+    }
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (String pkgName in getPackageDirs()) {
       final String pkgPath = fs.path.join(pkgDir.path, pkgName);
@@ -670,14 +710,32 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (String pkgName in getPackageDirs()) {
-      await _downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      final String pkgPath = fs.path.join(pkgDir.path, pkgName);
+      final Directory dir = fs.directory(pkgPath);
+      if (dir.existsSync())
+        dir.deleteSync(recursive: true);
+      if (customEngineArtifacts.contains(pkgName)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        logger.printStatus('Downloading from TT ' + customEngineUrl + pkgName + '.zip');
+        await _downloadZipArchive('Downloading package $pkgName...',
+          Uri.parse(customEngineUrl + pkgName + '.zip'), pkgDir);
+      } else {
+        await _downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      }
     }
 
     for (List<String> toolsDir in getBinaryDirs()) {
       final String cacheDir = toolsDir[0];
       final String urlPath = toolsDir[1];
       final Directory dir = fs.directory(fs.path.join(location.path, cacheDir));
-      await _downloadZipArchive('Downloading $cacheDir tools...', Uri.parse(url + urlPath), dir);
+      if (customEngineArtifacts.contains(cacheDir)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        logger.printStatus('Downloading from TT ' + customEngineUrl + urlPath);
+        await _downloadZipArchive(
+            'Downloading $cacheDir tools...', Uri.parse(customEngineUrl + urlPath), dir);
+      } else
+        await _downloadZipArchive(
+            'Downloading $cacheDir tools...', Uri.parse(url + urlPath), dir);
 
       _makeFilesExecutable(dir);
 
@@ -697,6 +755,7 @@ abstract class EngineCachedArtifact extends CachedArtifact {
       final String licenseDestinationPath = fs.path.join(location.path, licenseDir, 'LICENSE');
       await licenseSource.copy(licenseDestinationPath);
     }
+
   }
 
   Future<bool> checkForArtifacts(String engineVersion) async {
@@ -737,6 +796,7 @@ abstract class EngineCachedArtifact extends CachedArtifact {
       }
     }
   }
+
 }
 
 
@@ -1293,6 +1353,12 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-arm64-release/darwin-x64', 'android-arm64-release/darwin-x64.zip'],
   <String>['android-x64-profile/darwin-x64', 'android-x64-profile/darwin-x64.zip'],
   <String>['android-x64-release/darwin-x64', 'android-x64-release/darwin-x64.zip'],
+
+  // BD ADD:
+  <String>['android-arm-profile-lite/darwin-x64', 'android-arm-profile-lite/darwin-x64.zip'],
+  <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
+  <String>['android-arm64-profile-lite/darwin-x64', 'android-arm64-profile-lite/darwin-x64.zip'],
+  <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
 ];
 
 const List<List<String>> _linuxBinaryDirs = <List<String>>[
@@ -1317,6 +1383,11 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios', 'ios/artifacts.zip'],
   <String>['ios-profile', 'ios-profile/artifacts.zip'],
   <String>['ios-release', 'ios-release/artifacts.zip'],
+  // BD ADD: START
+  <String>['ios-lite', 'ios-lite/artifacts.zip'],
+  <String>['ios-profile-lite', 'ios-profile-lite/artifacts.zip'],
+  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
+  // END
 ];
 
 const List<List<String>> _androidBinaryDirs = <List<String>>[
@@ -1331,6 +1402,17 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
   <String>['android-x64-profile', 'android-x64-profile/artifacts.zip'],
   <String>['android-x64-release', 'android-x64-release/artifacts.zip'],
   <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],
+
+  // BD ADD: START
+  <String>['android-x86-lite', 'android-x86-lite/artifacts.zip'],
+  <String>['android-x64-lite', 'android-x64-lite/artifacts.zip'],
+  <String>['android-arm-lite', 'android-arm-lite/artifacts.zip'],
+  <String>['android-arm-profile-lite', 'android-arm-profile-lite/artifacts.zip'],
+  <String>['android-arm-release-lite', 'android-arm-release-lite/artifacts.zip'],
+  <String>['android-arm64-lite', 'android-arm64-lite/artifacts.zip'],
+  <String>['android-arm64-profile-lite', 'android-arm64-profile-lite/artifacts.zip'],
+  <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
+  // END
 ];
 
 const List<List<String>> _dartSdks = <List<String>> [

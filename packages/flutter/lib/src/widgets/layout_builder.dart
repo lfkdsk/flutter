@@ -7,6 +7,8 @@ import 'package:flutter/rendering.dart';
 
 import 'debug.dart';
 import 'framework.dart';
+// BD ADD:
+import 'widget_inspector.dart';
 
 /// The signature of the [LayoutBuilder] builder function.
 typedef LayoutWidgetBuilder = Widget Function(BuildContext context, BoxConstraints constraints);
@@ -99,11 +101,18 @@ class _LayoutBuilderElement<ConstraintType extends Constraints> extends RenderOb
           built = widget.builder(this, constraints);
           debugWidgetBuilderValue(widget, built);
         } catch (e, stack) {
-          built = ErrorWidget.builder(
-            _debugReportException(
-              ErrorDescription('building $widget'),
-              e,
-              stack,
+          // TODO @孙坤
+//          // BD MOD: START
+//          //built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
+//          built = ErrorWidget.builder(_debugReportException(
+//              ErrorDescription('building $this'), e, stack,
+//              informationCollector: () sync* {
+//                yield ErrorDescription(
+//                    'ErrorWidgetLocation:' + getCreationLocationForError(this));
+//              }));
+//          // END
+          built = ErrorWidget.builder(_debugReportException(
+              ErrorDescription('building $this'), e, stack,
               informationCollector: () sync* {
                 yield DiagnosticsDebugCreator(DebugCreator(this));
               },
@@ -115,6 +124,17 @@ class _LayoutBuilderElement<ConstraintType extends Constraints> extends RenderOb
         _child = updateChild(_child, built, null);
         assert(_child != null);
       } catch (e, stack) {
+        // TODO @孙坤
+//        // BD MOD: START
+//        //built = ErrorWidget.builder(_debugReportException('building $widget', e, stack));
+//        built = ErrorWidget.builder(
+//            _debugReportException(
+//                ErrorDescription('building $this'), e, stack,
+//                informationCollector: () sync* {
+//                  yield ErrorDescription('ErrorWidgetLocation:' +
+//                      getCreationLocationForError(this));
+//                }));
+//        // END
         built = ErrorWidget.builder(
           _debugReportException(
             ErrorDescription('building $widget'),

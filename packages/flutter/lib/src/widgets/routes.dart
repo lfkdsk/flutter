@@ -5,6 +5,11 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+// BD ADD: START
+import 'package:flutter/boost.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/widgets.dart';
+// END
 import 'package:flutter/foundation.dart';
 
 import 'basic.dart';
@@ -146,11 +151,22 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
 
   T _result;
 
+  // BD ADD:
+  bool _isPushing = false;
+
   void _handleStatusChanged(AnimationStatus status) {
     switch (status) {
       case AnimationStatus.completed:
         if (overlayEntries.isNotEmpty)
           overlayEntries.first.opaque = opaque;
+        // BD ADD: START
+        if (_isPushing) {
+          FpsUtils.instance.getFps(
+              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              recordInFramework: true, isFromFramework: true);
+          _isPushing = false;
+        }
+        // END
         break;
       case AnimationStatus.forward:
       case AnimationStatus.reverse:
@@ -166,6 +182,14 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
           navigator.finalizeRoute(this);
           assert(overlayEntries.isEmpty);
         }
+        // BD ADD: START
+        if (_isPushing) {
+          FpsUtils.instance.getFps(
+              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              isFromFramework: true);
+          _isPushing = false;
+        }
+        // END
         break;
     }
     changedInternalState();
@@ -180,6 +204,11 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     assert(_animation != null, '$runtimeType.createAnimation() returned null.');
     super.install(insertionPoint);
   }
+  // BD ADD:
+  /// If true, will ignore first frame time cost when drive the transitions.
+  bool ignoreFirstFrameTimeCost() {
+    return false;
+  }
 
   @override
   TickerFuture didPush() {
@@ -187,6 +216,24 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     assert(!_transitionCompleter.isCompleted, 'Cannot reuse a $runtimeType after disposing it.');
     _didPushOrReplace();
     super.didPush();
+    // BD ADD: START
+    final String key = 'Route(${simplifyFileLocationKey(settings.name)})';
+    void startRecord() {
+      if (!_isPushing && FpsUtils.instance.enableAutoRecord) {
+        FpsUtils.instance.startRecord(
+            key, timeOut: const Duration(seconds: 2), isFromFramework: true);
+        _isPushing = true;
+      }
+    }
+    if (ignoreFirstFrameTimeCost()) {
+      ui.window.addNextFrameCallback(() {
+        startRecord();
+        _controller.forward();
+      });
+      return null;
+    }
+    startRecord();
+    // END
     return _controller.forward();
   }
 
@@ -677,7 +724,30 @@ class _ModalScopeState<T> extends State<_ModalScope<T>> {
           child: FocusScope(
             node: focusScopeNode, // immutable
             child: RepaintBoundary(
-              child: AnimatedBuilder(
+              // BD MOD: START
+              // child: AnimatedBuilder(
+              child: Boost.reuseTransitionsWidget ?
+                widget.route.buildTransitions(
+                  context,
+                  widget.route.animation,
+                  widget.route.secondaryAnimation,
+                  IgnorePointer(
+                    ignoring: widget.route.animation?.status == AnimationStatus.reverse,
+                    child:  _page ??= RepaintBoundary(
+                      key: widget.route._subtreeKey, // immutable
+                      child: Builder(
+                        builder: (BuildContext context) {
+                          return widget.route.buildPage(
+                            context,
+                            widget.route.animation,
+                            widget.route.secondaryAnimation,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ) : AnimatedBuilder(
+              // END
                 animation: _listenable, // immutable
                 builder: (BuildContext context, Widget child) {
                   return widget.route.buildTransitions(

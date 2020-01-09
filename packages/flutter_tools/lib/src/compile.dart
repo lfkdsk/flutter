@@ -289,6 +289,8 @@ class KernelCompiler {
     String initializeFromDill,
     String platformDill,
     @required List<String> dartDefines,
+    // BD ADD:
+    bool lite = false,
   }) async {
     final String frontendServer = artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
@@ -321,6 +323,9 @@ class KernelCompiler {
         '-D$dartDefine',
       ..._buildModeOptions(buildMode),
       if (trackWidgetCreation) '--track-widget-creation',
+      // BD ADD: START
+      if (lite) '--lite',
+      // END
       if (!linkPlatformKernelIn) '--no-link-platform',
       if (aot) ...<String>[
         '--aot',

@@ -52,6 +52,7 @@ Future<void> updateGeneratedXcodeProperties({
   bool useMacOSConfig = false,
   bool setSymroot = true,
   String buildDirOverride,
+  bool compressSize = false,
 }) async {
   final List<String> xcodeBuildSettings = _xcodeBuildSettingsLines(
     project: project,
@@ -60,6 +61,7 @@ Future<void> updateGeneratedXcodeProperties({
     useMacOSConfig: useMacOSConfig,
     setSymroot: setSymroot,
     buildDirOverride: buildDirOverride,
+    compressSize:compressSize,
   );
 
   _updateGeneratedXcodePropertiesFile(
@@ -152,6 +154,7 @@ List<String> _xcodeBuildSettingsLines({
   bool useMacOSConfig = false,
   bool setSymroot = true,
   String buildDirOverride,
+  bool compressSize = false,
 }) {
   final List<String> xcodeBuildSettings = <String>[];
 
@@ -214,7 +217,15 @@ List<String> _xcodeBuildSettingsLines({
   if (buildInfo.trackWidgetCreation) {
     xcodeBuildSettings.add('TRACK_WIDGET_CREATION=true');
   }
+  // BD ADD: START
+  if (compressSize) {
+    xcodeBuildSettings.add('COMPRESS_SIZE=true');
+  }
 
+  if (buildInfo.lite) {
+    xcodeBuildSettings.add('LITE=true');
+  }
+  // END
   return xcodeBuildSettings;
 }
 

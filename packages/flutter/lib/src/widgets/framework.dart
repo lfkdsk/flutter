@@ -11,6 +11,8 @@ import 'package:flutter/rendering.dart';
 
 import 'debug.dart';
 import 'focus_manager.dart';
+// BD ADD:
+import 'widget_inspector.dart';
 
 export 'dart:ui' show hashValues, hashList;
 
@@ -2489,6 +2491,11 @@ class BuildOwner {
     assert(_debugStateLockLevel >= 0);
   }
 
+  /// BD ADD: START
+  bool dirtyElementsIsNotEmpty() {
+    return _dirtyElements.isNotEmpty;
+  }
+  /// END
   Map<Element, Set<GlobalKey>> _debugElementsThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans;
 
   void _debugTrackElementThatWillNeedToBeRebuiltDueToGlobalKeyShenanigans(Element node, GlobalKey key) {
@@ -4223,6 +4230,15 @@ abstract class ComponentElement extends Element {
       built = build();
       debugWidgetBuilderValue(widget, built);
     } catch (e, stack) {
+      // TODO @孙坤
+//      // BD MOD: START
+//      //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
+//      built = ErrorWidget.builder(_debugReportException(
+//          ErrorDescription('building $this'), e, stack,
+//          informationCollector:() sync*{
+//            yield ErrorDescription('ErrorWidgetLocation:' + getCreationLocationForError(this));
+//          }));
+//      // END
       built = ErrorWidget.builder(
         _debugReportException(
           ErrorDescription('building $this'),
@@ -4243,11 +4259,18 @@ abstract class ComponentElement extends Element {
       _child = updateChild(_child, built, slot);
       assert(_child != null);
     } catch (e, stack) {
-      built = ErrorWidget.builder(
-        _debugReportException(
-          ErrorDescription('building $this'),
-          e,
-          stack,
+      // TODO @孙坤
+//      // BD MOD: START
+//      //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
+//      built = ErrorWidget.builder(_debugReportException(
+//          ErrorDescription('building $this'), e, stack,
+//          informationCollector: () sync* {
+//            yield ErrorDescription(
+//                'ErrorWidgetLocation:' + getCreationLocationForError(this));
+//          }));
+//      // END
+      built = ErrorWidget.builder(_debugReportException(
+          ErrorDescription('building $this'), e, stack,
           informationCollector: () sync* {
             yield DiagnosticsDebugCreator(DebugCreator(this));
           },
@@ -5050,10 +5073,9 @@ abstract class RenderObjectElement extends Element {
   void mount(Element parent, dynamic newSlot) {
     super.mount(parent, newSlot);
     _renderObject = widget.createRenderObject(this);
-    assert(() {
-      _debugUpdateRenderObjectOwner();
-      return true;
-    }());
+    //BD MOD
+    //assert(() { _debugUpdateRenderObjectOwner(); return true; }());
+    _debugUpdateRenderObjectOwner();
     assert(_slot == newSlot);
     attachRenderObject(newSlot);
     _dirty = false;
@@ -5071,11 +5093,13 @@ abstract class RenderObjectElement extends Element {
     _dirty = false;
   }
 
+  //BD MOD
   void _debugUpdateRenderObjectOwner() {
-    assert(() {
-      _renderObject.debugCreator = DebugCreator(this);
-      return true;
-    }());
+    //assert(() {
+    //  _renderObject.debugCreator = DebugCreator(this);
+    //  return true;
+    //}());
+    _renderObject.debugCreator = DebugCreator(this);
   }
 
   @override

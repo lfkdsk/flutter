@@ -594,7 +594,16 @@ class FlutterValidator extends DoctorValidator {
       final FlutterVersion version = FlutterVersion.instance;
       versionChannel = version.channel;
       frameworkVersion = version.frameworkVersion;
-      messages.add(ValidationMessage(userMessages.flutterVersion(frameworkVersion, Cache.flutterRoot)));
+      // BD MOD: START
+    // messages.add(ValidationMessage(userMessages.flutterVersion(frameworkVersion, Cache.flutterRoot)));
+    final String changelog =
+        'https://code.byted.org/tech_client/flutter/blob/${version.getBranchName()}/CHANGELOG.md';
+    messages.add(ValidationMessage(userMessages.flutterVersion(
+        version.frameworkVersion,
+        version.bdFrameworkVersion,
+        Cache.flutterRoot)));
+    messages.add(ValidationMessage(userMessages.flutterChangelog(changelog)));
+    // END
       messages.add(ValidationMessage(userMessages.flutterRevision(version.frameworkRevisionShort, version.frameworkAge, version.frameworkDate)));
       messages.add(ValidationMessage(userMessages.engineRevision(version.engineRevisionShort)));
       messages.add(ValidationMessage(userMessages.dartRevision(version.dartSdkVersion)));
@@ -602,7 +611,6 @@ class FlutterValidator extends DoctorValidator {
       messages.add(ValidationMessage.error(e.message));
       valid = ValidationType.partial;
     }
-
     final String genSnapshotPath =
       artifacts.getArtifactPath(Artifact.genSnapshot);
 
@@ -617,9 +625,14 @@ class FlutterValidator extends DoctorValidator {
       valid = ValidationType.partial;
     }
 
+    // BD MOD: START
+    // return ValidationResult(valid, messages,
+    //   statusInfo: userMessages.flutterStatusInfo(version.channel, version.frameworkVersion, os.name, platform.localeName),
+    // );
     return ValidationResult(valid, messages,
-      statusInfo: userMessages.flutterStatusInfo(versionChannel, frameworkVersion, os.name, platform.localeName),
+      statusInfo: userMessages.flutterStatusInfo(versionChannel, frameworkVersion, version.bdFrameworkVersion, changelog, os.name, platform.localeName),
     );
+    // END
   }
 }
 

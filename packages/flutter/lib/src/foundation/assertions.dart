@@ -606,6 +606,14 @@ class FlutterError extends Error with DiagnosticableTreeMixin implements Asserti
 
   static int _errorCount = 0;
 
+  // BD ADD: START
+  static int get errorCount => _errorCount;
+
+  static set errorCount(int newCount) {
+    _errorCount = newCount;
+  }
+  // END
+
   /// Resets the count of errors used by [dumpErrorToConsole] to decide whether
   /// to show a complete error message or an abbreviated one.
   ///

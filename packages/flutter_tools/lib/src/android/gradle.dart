@@ -40,6 +40,8 @@ Directory getApkDirectory(FlutterProject project) {
         .childDirectory('outputs')
         .childDirectory('apk');
 }
+// BD ADD:
+import 'package:flutter_tools/src/calculate_build_info.dart';
 
 /// The directory where the app bundle artifact is generated.
 @visibleForTesting
@@ -577,6 +579,8 @@ Future<void> buildGradleAar({
     '$successMark Built ${fs.path.relative(repoDirectory.path)}.',
     color: TerminalColor.green,
   );
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 /// Prints how to consume the AAR from a host app.
@@ -696,6 +700,12 @@ Future<void> buildPluginsAsAar(
   if (!flutterPluginFile.existsSync()) {
     return;
   }
+  // TODO 丢失了如下代码，请检查@王莹
+//  // BD ADD: START
+//  if (buildInfo.lite) {
+//    command.add('-Plite=true');
+//  }
+//  // END
   final List<String> plugins = flutterPluginFile.readAsStringSync().split('\n');
   for (String plugin in plugins) {
     final List<String> pluginParts = plugin.split('=');

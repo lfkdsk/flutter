@@ -4,13 +4,17 @@
 
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback;
+// BD MOD:
+// import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback;
+import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback, window;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+// BD ADD:
+import 'package:flutter/widgets.dart';
 
 import 'app.dart';
 import 'debug.dart';
@@ -779,12 +783,30 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
         return true;
       }());
     }
-    if (!kReleaseMode) {
-      if (_needToReportFirstFrame && _reportFirstFrame) {
-        developer.Timeline.instantSync('Widgets built first useful frame');
+// BD MOD: START
+//    if (!kReleaseMode) {
+//      if (_needToReportFirstFrame && _reportFirstFrame) {
+//        developer.Timeline.instantSync('Widgets built first useful frame');
+//      }
+//    }
+//    _needToReportFirstFrame = false;
+    if (_needToReportFirstFrame && _reportFirstFrame) {
+      int engineEnterTime = ui.window.getEngineMainEnterMicros();
+      int timeToFirstFrameMicros = developer.Timeline.now - engineEnterTime;
+      int timeToFrameworkInitMicros =
+          BindingBase.frameworkInitializationdTimeMicros - engineEnterTime;
+      ui.window.timeToFirstFrameMicros = timeToFirstFrameMicros;
+      ui.window.timeToFrameworkInitMicros = timeToFrameworkInitMicros;
+      if (ui.window.onTimeToFirstFrameMicros != null) {
+        ui.window.onTimeToFirstFrameMicros(
+            timeToFrameworkInitMicros, timeToFirstFrameMicros);
+      }
+      if (!kReleaseMode) {
+        developer.Timeline.instantSync('Widgets completed first useful frame');
       }
     }
     _needToReportFirstFrame = false;
+    // END
   }
 
   /// The [Element] that is at the root of the hierarchy (and which wraps the
@@ -1079,8 +1101,26 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
   /// binding instance to a [TestWidgetsFlutterBinding], not a
   /// [WidgetsFlutterBinding].
   static WidgetsBinding ensureInitialized() {
-    if (WidgetsBinding.instance == null)
+    if (WidgetsBinding.instance == null) {
       WidgetsFlutterBinding();
+      // BD ADD: START
+      final VoidCallback preCallback = ui.window.exitApp;
+      ui.window.exitApp = () {
+        if (preCallback != null) {
+          preCallback();
+        }
+        runApp(Container());
+      };
+      // END
+    }
     return WidgetsBinding.instance;
   }
+
+  // BD ADD: START
+  @override
+  void handleMemoryPressure() {
+    super.handleMemoryPressure();
+    PaintingBinding.instance.imageCache.clear();
+  }
+  // END
 }

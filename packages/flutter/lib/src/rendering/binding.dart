@@ -17,6 +17,8 @@ import 'debug.dart';
 import 'object.dart';
 import 'view.dart';
 
+// BD ADD:
+import 'package:flutter/boost.dart';
 export 'package:flutter/gestures.dart' show HitTestResult;
 
 // Examples can assume:
@@ -255,7 +257,9 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
   /// Whether the render tree associated with this binding should produce a tree
   /// of [SemanticsNode] objects.
   void setSemanticsEnabled(bool enabled) {
-    if (enabled) {
+    // BD MOD:
+    // if (enabled) {
+    if (enabled && !Boost.disabledSemantics) {
       _semanticsHandle ??= _pipelineOwner.ensureSemantics();
     } else {
       _semanticsHandle?.dispose();
@@ -340,6 +344,8 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
   // When editing the above, also update widgets/binding.dart's copy.
   @protected
   void drawFrame() {
+    // BD ADD:
+    Boost.resetIdleCallbacks();
     assert(renderView != null);
     pipelineOwner.flushLayout();
     pipelineOwner.flushCompositingBits();

@@ -554,6 +554,12 @@ tasks:
     stage: devicelab_ios
     required_agent_capabilities: ["mac-catalina/ios"]
 
+  cubic_bezier_perf_ios__timeline_summary:
+    description: >
+      Measures the runtime performance of cubic bezier animations on IOS.
+    stage: devicelab_ios
+    required_agent_capabilities: ["mac/ios"]
+
   smoke_catalina_start_up:
     description: >
       A smoke test that runs on macOS Catalina, which is a clone of the Gallery startup latency test.

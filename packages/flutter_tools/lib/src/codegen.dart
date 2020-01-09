@@ -110,6 +110,8 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     String initializeFromDill,
     String platformDill,
     List<String> dartDefines,
+    // BD ADD:
+    bool lite = false,
   }) async {
     if (fileSystemRoots != null || fileSystemScheme != null || depFilePath != null || targetModel != null || sdkRoot != null || packagesPath != null) {
       printTrace('fileSystemRoots, fileSystemScheme, depFilePath, targetModel,'

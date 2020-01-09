@@ -2708,7 +2708,9 @@ void main() {
         composing: TextRange(start: 5, end: 14),
       ),
     );
-    final FocusNode focusNode = FocusNode(debugLabel: 'Test Focus Node');
+    final GlobalKey<EditableTextState> editableTextKey =
+        GlobalKey<EditableTextState>();
+    final FocusNode focusNode = FocusNode();
 
     await tester.pumpWidget(MaterialApp( // So we can show overlays.
       home: EditableText(
@@ -2755,7 +2757,7 @@ void main() {
         child: SizedBox(
           width: 100,
           child: EditableText(
-            showSelectionHandles: true,
+            key: editableTextKey,
             controller: controller,
             focusNode: FocusNode(),
             style: Typography(platform: TargetPlatform.android).black.subhead,
@@ -2800,7 +2802,7 @@ void main() {
       final FadeTransition left = transitions[1];
       final FadeTransition right = transitions[2];
 
-      if (expectedLeftVisibleBefore)
+      if (leftVisibleBefore)
         expect(left.opacity.value, equals(1.0));
       if (expectedRightVisibleBefore)
         expect(right.opacity.value, equals(1.0));
@@ -2835,38 +2837,13 @@ void main() {
 
       final Size viewport = renderEditable.size;
 
-      void testPosition(double pos, HandlePositionInViewport expected) {
-        switch (expected) {
-          case HandlePositionInViewport.leftEdge:
-            expect(
-              pos,
-              inExclusiveRange(
-                0 - kMinInteractiveDimension,
-                0 + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          case HandlePositionInViewport.rightEdge:
-            expect(
-              pos,
-              inExclusiveRange(
-                viewport.width - kMinInteractiveDimension,
-                viewport.width + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          case HandlePositionInViewport.within:
-            expect(
-              pos,
-              inExclusiveRange(
-                0 - kMinInteractiveDimension,
-                viewport.width + kMinInteractiveDimension,
-              ),
-            );
-            break;
-          default:
-            throw TestFailure('HandlePositionInViewport can\'t be null.');
-        }
+      void testPosition(double pos, Symbol expected) {
+        if (expected == #left)
+          expect(pos, equals(0.0));
+        if (expected == #right)
+          expect(pos, equals(viewport.width));
+        if (expected == #middle)
+          expect(pos, inExclusiveRange(0.0, viewport.width));
       }
       expect(state.selectionOverlay.handlesAreVisible, isTrue);
       testPosition(handles[0].localToGlobal(Offset.zero).dx, leftPosition);
@@ -2877,7 +2854,7 @@ void main() {
     await tester.tapAt(const Offset(20, 10));
     renderEditable.selectWord(cause: SelectionChangedCause.longPress);
     await tester.pump();
-    await verifyVisibility(HandlePositionInViewport.leftEdge, true, HandlePositionInViewport.within, true);
+    await verifyVisibility(true, #left, true, #middle);
 
     // Drag the text slightly so the first word is partially visible. Only the
     // right handle should be visible.

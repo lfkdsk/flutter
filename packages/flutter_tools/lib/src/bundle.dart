@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+// BD ADD:
+import 'package:flutter_tools/src/cache.dart';
 import 'package:meta/meta.dart';
 import 'package:pool/pool.dart';
 
@@ -43,6 +45,9 @@ String getKernelPathForTransformerOptions(
 }
 
 const String defaultPrivateKeyPath = 'privatekey.der';
+
+// BD ADD:
+const String _KFlutterVersion = 'flutter_version';
 
 /// Provides a `build` method that builds the bundle.
 class BundleBuilder {
@@ -171,6 +176,7 @@ Future<AssetBundle> buildAssets({
   return assetBundle;
 }
 
+//TODO writeFlutterVersion逻辑丢失 @孙坤
 Future<void> writeBundle(
   Directory bundleDir,
   Map<String, DevFSContent> assetEntries,

@@ -39,6 +39,11 @@ class AotBuilder {
     if (platform == null) {
       throwToolExit('No AOT build platform specified');
     }
+    // BD ADD: START Wangying
+    if (argResults['lite']) {
+      print('Build with lite edition...');
+    }
+    // END
     if (_canUseAssemble(platform)
         && extraGenSnapshotOptions?.isEmpty != false
         && extraFrontEndOptions?.isEmpty != false) {

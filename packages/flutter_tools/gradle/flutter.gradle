@@ -25,6 +25,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 
+// TODO @林学彬 对比154
 buildscript {
     repositories {
         google()
@@ -42,7 +43,25 @@ android {
     }
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+
+// BD ADD: START
+class BdFlutterConfigExtension {
+    def needArmeabi
+}
+
+project.extensions.create('bdFlutterConfig', BdFlutterConfigExtension)
+// END
+
 apply plugin: FlutterPlugin
+apply from: "$flutterRoot/packages/flutter_tools/gradle/tt_flutter.gradle"
 
 class FlutterPlugin implements Plugin<Project> {
     private static final String MAVEN_REPO      = "http://download.flutter.io";
@@ -581,6 +600,12 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('track-widget-creation')) {
             trackWidgetCreationValue = project.property('track-widget-creation').toBoolean()
         }
+        // BD ADD: START
+        Boolean liteValue = false
+        if (project.hasProperty('lite')) {
+            liteValue = project.property('lite').toBoolean()
+        }
+        // END
         String extraFrontEndOptionsValue = null
         if (project.hasProperty('extra-front-end-options')) {
             extraFrontEndOptionsValue = project.property('extra-front-end-options')
@@ -622,6 +647,8 @@ class FlutterPlugin implements Plugin<Project> {
                 intermediateDir project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/")
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
+                // BD ADD:
+                useLite liteValue
             }
             File libJar = project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/libs.jar")
             Task packFlutterAppAotTask = project.tasks.create(name: "packLibs${FLUTTER_BUILD_PREFIX}${variant.name.capitalize()}", type: Jar) {
@@ -630,6 +657,17 @@ class FlutterPlugin implements Plugin<Project> {
                 dependsOn compileTask
                 targetPlatforms.each { targetPlatform ->
                     String abi = PLATFORM_ARCH_MAP[targetPlatform]
+                    // BD ADD: START
+                    // 复制armeabi-v7a的libapp.so到armeabi
+                    if (abi.equals(ARCH_ARM32)) {
+                        from(compileTask.intermediateDir) {
+                            include '*.so'
+                            rename { String filename ->
+                                return "lib/armeabi/lib${filename}"
+                            }
+                        }
+                    }
+                    // END
                     from("${compileTask.intermediateDir}/${abi}") {
                         include "*.so"
                         // Move `app.so` to `lib/<abi>/libapp.so`
@@ -742,6 +780,10 @@ abstract class BaseFlutterTask extends DefaultTask {
     String fileSystemScheme
     @Input
     Boolean trackWidgetCreation
+    // BD ADD: START
+    @Optional @Input
+    Boolean useLite
+    // END
     @Optional @Input
     List<String> targetPlatformValues
     File sourceDir
@@ -795,6 +837,11 @@ abstract class BaseFlutterTask extends DefaultTask {
             args "-dTargetFile=${targetPath}"
             args "-dTargetPlatform=android"
             args "-dBuildMode=${buildMode}"
+            // BD ADD: START
+            if (useLite) {
+                args "--lite"
+            }
+            // END
             if (extraFrontEndOptions != null) {
                 args "-dExtraFrontEndOptions=${extraFrontEndOptions}"
             }

@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// BD ADD:
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -340,6 +343,13 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
   }
 
   void _createOrObtainChild(int index, { RenderBox after }) {
+    // BD ADD: START
+    // ignore: always_specify_types
+    if (!kReleaseMode) {
+      final Map<String, String> arguments = {'index': '$index'};
+      Timeline.startSync('createOrObtainChild', arguments: arguments);
+    }
+    // END
     invokeLayoutCallback<SliverConstraints>((SliverConstraints constraints) {
       assert(constraints == this.constraints);
       if (_keepAliveBucket.containsKey(index)) {
@@ -354,10 +364,24 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
         _childManager.createChild(index, after: after);
       }
     });
+    // BD ADD: START
+    if (!kReleaseMode) {
+      Timeline.finishSync();
+    }
+    // END
   }
 
   void _destroyOrCacheChild(RenderBox child) {
     final SliverMultiBoxAdaptorParentData childParentData = child.parentData;
+    // BD ADD: START
+    // ignore: always_specify_types, prefer_single_quotes
+    if (!kReleaseMode) {
+      final Map<String, String> arguments = {
+        'index': "${childParentData?.index}"
+      };
+      Timeline.startSync('destroyOrCacheChild', arguments: arguments);
+    }
+    // END
     if (childParentData.keepAlive) {
       assert(!childParentData._keptAlive);
       remove(child);
@@ -370,6 +394,11 @@ abstract class RenderSliverMultiBoxAdaptor extends RenderSliver
       _childManager.removeChild(child);
       assert(child.parent == null);
     }
+    // BD ADD: START
+    if (!kReleaseMode) {
+      Timeline.finishSync();
+    }
+    // END
   }
 
   @override

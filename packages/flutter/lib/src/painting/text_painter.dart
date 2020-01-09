@@ -851,4 +851,16 @@ class TextPainter {
     assert(!_needsLayout);
     return _paragraph.computeLineMetrics();
   }
+
+  /// Returns a list of text boxes that enclose the given text range.
+  ///
+  List<TextBox> getBoxesForRange(int start, int end) {
+    assert(!_needsLayout);
+    if(start != null && end != null){
+      return _paragraph.getBoxesForRange(start, end);
+    } else {
+      return null;
+    }
+  }
+
 }

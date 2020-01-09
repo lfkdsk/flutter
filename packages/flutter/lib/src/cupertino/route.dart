@@ -11,6 +11,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/animation.dart' show Curves;
+// BD ADD:
+import 'package:flutter/boost.dart';
 
 import 'colors.dart';
 import 'interface_level.dart';
@@ -148,6 +150,11 @@ class CupertinoPageRoute<T> extends PageRoute<T> {
       'Cannot read the previousTitle for a route that has not yet been installed',
     );
     return _previousTitle;
+  }
+  // BD ADD:
+  @override
+  bool ignoreFirstFrameTimeCost() {
+    return Boost.ignoreTransitionsFirstFrameTimeCost;
   }
 
   @override

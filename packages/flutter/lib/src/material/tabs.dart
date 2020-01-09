@@ -602,6 +602,8 @@ class TabBar extends StatefulWidget implements PreferredSizeWidget {
     this.unselectedLabelColor,
     this.unselectedLabelStyle,
     this.dragStartBehavior = DragStartBehavior.start,
+    this.highlightColor,
+    this.splashColor,
     this.onTap,
   }) : assert(tabs != null),
        assert(isScrollable != null),
@@ -735,6 +737,12 @@ class TabBar extends StatefulWidget implements PreferredSizeWidget {
   /// callbacks should not make changes to the TabController since that would
   /// interfere with the default tap handler.
   final ValueChanged<int> onTap;
+
+  /// highlightColor
+  final Color highlightColor;
+
+  /// splashColor
+  final Color splashColor;
 
   /// A size whose height depends on if the tabs have both icons and text.
   ///
@@ -1058,6 +1066,8 @@ class _TabBarState extends State<TabBar> {
     final int tabCount = widget.tabs.length;
     for (int index = 0; index < tabCount; index += 1) {
       wrappedTabs[index] = InkWell(
+        highlightColor: widget.highlightColor,
+        splashColor: widget.splashColor,
         onTap: () { _handleTap(index); },
         child: Padding(
           padding: EdgeInsets.only(bottom: widget.indicatorWeight),

@@ -1,0 +1,163 @@
+import org.apache.commons.io.FileUtils
+import org.gradle.api.GradleException
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.jar.JarEntry
+import java.util.jar.JarFile
+import java.util.jar.JarInputStream
+import java.util.jar.JarOutputStream
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url 'https://dl.google.com/dl/android/maven2'
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+    }
+}
+
+apply plugin: FlutterPatchPlugin
+
+class FlutterPatchPlugin implements Plugin<Project> {
+    private Properties localProperties
+    private File flutterRoot
+    private File debugFlutterJar
+    private File profileFlutterJar
+    private File releaseFlutterJar
+    private String targetArch
+    static final String flutterBuildPrefix = "flutterBuild"
+
+
+    @Override
+    void apply(Project project) {
+        String flutterRootPath = resolveProperty(project, "flutter.sdk", System.env.FLUTTER_ROOT)
+        if (flutterRootPath == null) {
+            throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file or with a FLUTTER_ROOT environment variable.")
+        }
+        flutterRoot = project.file(flutterRootPath)
+        if (!flutterRoot.isDirectory()) {
+            throw new GradleException("flutter.sdk must point to the Flutter SDK directory")
+        }
+
+        Path baseEnginePath = Paths.get(flutterRoot.absolutePath, "bin", "cache", "artifacts", "engine")
+        targetArch = 'arm'
+        if (project.hasProperty('target-platform') &&
+                project.property('target-platform') == 'android-arm64') {
+            targetArch = 'arm64'
+        }
+        String liteSuffix = ''
+        if (project.hasProperty('lite') && project.property('lite').toBoolean()) {
+            liteSuffix = '-lite'
+        }
+        debugFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}").resolve("flutter.jar").toFile()
+        profileFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-profile").resolve("flutter.jar").toFile()
+        releaseFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-release").resolve("flutter.jar").toFile()
+
+        File pluginsFile = new File(project.projectDir.parentFile.parentFile, '.flutter-plugins')
+        Properties plugins = readPropertiesIfExist(pluginsFile)
+
+        plugins.each { name, _ ->
+            def pluginProject = project.rootProject.findProject(":$name")
+            if (pluginProject == null) {
+                project.logger.error("Plugin project :$name not found. Please update settings.gradle.")
+            }
+        }
+        
+        if (project.hasProperty('localEngineOut')) {
+            String engineOutPath = project.property('localEngineOut')
+            File engineOut = project.file(engineOutPath)
+            File flutterJar = Paths.get(engineOut.absolutePath, "flutter.jar").toFile()
+            createJarContainsArmeabi(flutterJar)
+        }
+
+        createJarContainsArmeabi(debugFlutterJar)
+        createJarContainsArmeabi(profileFlutterJar)
+        createJarContainsArmeabi(releaseFlutterJar)
+    }
+
+    private void createJarContainsArmeabi(File file) {
+        // flutter_origin.jar为原文件的备份
+        File originFile = new File(file.getParent() + File.separator + "flutter_origin.jar")
+
+        JarFile flutterJarFile = new JarFile(file)
+        // 说明是新的flutter.jar，需要重新复制flutter_origin.jar
+        if (flutterJarFile.getJarEntry("lib/armeabi/libflutter.so") == null) {
+            FileUtils.copyFile(file, originFile)
+        } else {
+            // 已经是处理好的jar了
+            return
+        }
+
+        String path = file.path
+        file.delete()
+        File result = new File(path)
+
+        JarFile jarFile = new JarFile(originFile)
+        JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(result))
+        JarInputStream jarInputStream = new JarInputStream(new FileInputStream(originFile))
+        JarEntry jarEntry
+        // copy所有文件，同时排除gradle.properties中排除的文件
+        while ((jarEntry = jarInputStream.nextJarEntry) != null) {
+            if (!jarEntry.isDirectory()) {
+                jarOutputStream.putNextEntry(jarEntry)
+                copyStream(jarFile.getInputStream(jarEntry), jarOutputStream)
+                jarOutputStream.closeEntry()
+            }
+        }
+
+        if (targetArch == 'arm' && jarFile.getJarEntry("lib/armeabi/libflutter.so") == null) {
+            jarEntry = jarFile.getJarEntry("lib/armeabi-v7a/libflutter.so")
+            jarOutputStream.putNextEntry(new JarEntry("lib/armeabi/libflutter.so"))
+            copyStream(jarFile.getInputStream(jarEntry), jarOutputStream)
+            jarOutputStream.closeEntry()
+        }
+        jarOutputStream.close()
+        jarInputStream.close()
+        jarFile.close()
+    }
+
+
+    private static void copyStream(InputStream input, OutputStream output) throws IOException {
+        byte[] bytes = new byte[2048]
+        int bytesRead
+        while ((bytesRead = input.read(bytes)) != -1) {
+            output.write(bytes, 0, bytesRead)
+        }
+    }
+
+
+    private Properties readPropertiesIfExist(File propertiesFile) {
+        Properties result = new Properties()
+        if (propertiesFile.exists()) {
+            propertiesFile.withReader('UTF-8') { reader -> result.load(reader) }
+        }
+        return result
+    }
+
+    private String resolveProperty(Project project, String name, String defaultValue) {
+        if (localProperties == null) {
+            localProperties = readPropertiesIfExist(project.rootProject.file('local.properties'))
+        }
+        String result
+        if (project.hasProperty(name)) {
+            result = project.property(name)
+        }
+        if (result == null) {
+            result = localProperties.getProperty(name)
+        }
+        if (result == null) {
+            result = defaultValue
+        }
+        return result
+    }
+
+}
+
+

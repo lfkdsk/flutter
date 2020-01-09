@@ -23,6 +23,8 @@ import 'src/commands/clean.dart';
 import 'src/commands/config.dart';
 import 'src/commands/create.dart';
 import 'src/commands/daemon.dart';
+// BD ADD:
+import 'src/commands/develop.dart';
 import 'src/commands/devices.dart';
 import 'src/commands/doctor.dart';
 import 'src/commands/drive.dart';
@@ -49,6 +51,10 @@ import 'src/runner/flutter_command.dart';
 import 'src/web/compile.dart';
 import 'src/web/web_runner.dart';
 
+// BD ADD: START
+import 'src/artifacts.dart';
+import 'src/calculate_build_info.dart';
+// END
 /// Main entry point for commands.
 ///
 /// This function is intended to be used from the `flutter` command line tool.
@@ -61,6 +67,32 @@ Future<void> main(List<String> args) async {
       (args.isNotEmpty && args.first == 'help') || (args.length == 1 && verbose);
   final bool muteCommandLogging = help || doctor;
   final bool verboseHelp = help && verbose;
+  // BD ADD: START
+  final bool lite = args.contains('--lite');
+  EngineMode engineMode = EngineMode.normal;
+  if (lite) {
+    engineMode = EngineMode.lite;
+    print('Currently in lite mode...');
+  }
+  setEngineMode(engineMode);
+
+  // BD ADD: START
+  if (args.contains('build')) {
+    FlutterBuildInfo.instance.needReport =
+        !args.contains('--debug') && !args.contains('--profile');
+    FlutterBuildInfo.instance.isAot =
+        (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
+    if (FlutterBuildInfo.instance.isAot &&
+        (args.length >= 2 && args[1] == 'ios' || args.contains('ios')
+            || args.contains('--target-platform=ios'))) {
+      FlutterBuildInfo.instance.platform = 'ios';
+    }
+    if (args.contains('--compress-size')) {
+      FlutterBuildInfo.instance.useCompressSize = true;
+    }
+    FlutterBuildInfo.instance.isLite = lite;
+  }
+  // END
 
   await runner.run(args, <FlutterCommand>[
     AnalyzeCommand(verboseHelp: verboseHelp),
@@ -71,6 +103,8 @@ Future<void> main(List<String> args) async {
     CleanCommand(),
     ConfigCommand(verboseHelp: verboseHelp),
     CreateCommand(),
+    // BD ADD:
+    DevelopCommand(),
     DaemonCommand(hidden: !verboseHelp),
     DevicesCommand(),
     DoctorCommand(verbose: verbose),

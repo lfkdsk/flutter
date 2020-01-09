@@ -51,6 +51,11 @@ class BuildIOSCommand extends BuildSubCommand {
         negatable: false,
         defaultsTo: false,
         help: 'Flutter lite edition to reduce package size',
+      )
+      ..addFlag('lite-global',
+      negatable: false,
+      defaultsTo: false,
+      help: 'Flutter lite global edition to reduce package size',
       );
       // END
 

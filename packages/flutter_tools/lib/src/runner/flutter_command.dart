@@ -253,6 +253,10 @@ abstract class FlutterCommand extends Command<void> {
       negatable: false,
       defaultsTo: false,
       help: 'Flutter lite edition to reduce package size');
+    argParser.addFlag('lite-global',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size, with global langage');
     // END
   }
 
@@ -454,6 +458,9 @@ abstract class FlutterCommand extends Command<void> {
       // BD ADD: START
       lite: argParser.options.containsKey('lite') 
           ? argResults['lite'] 
+          : false,
+      liteGlobal: argParser.options.containsKey('lite-global')
+          ? argResults['lite-global']
           : false,
       // END
     );

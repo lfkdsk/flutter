@@ -65,7 +65,7 @@ artifacts: [
     android-arm-dynamic-profile-lite,
     android-arm-dynamic-release-lite,
     android-arm64-dynamic-profile-lite,
-    android-arm64-dynamic-release-lite
+    android-arm64-dynamic-release-lite,
 
     android-x86-liteg,
     android-x64-liteg,

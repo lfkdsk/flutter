@@ -67,11 +67,39 @@ class BuildIOSCommand extends BuildSubCommand {
   @override
   final String description = 'Build an iOS application bundle (Mac OS X host only).';
 
+  // BD MOD: START
+  // @override
+  // Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
+  //   DevelopmentArtifact.universal,
+  //  DevelopmentArtifact.iOS,
+  // };
   @override
-  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
-    DevelopmentArtifact.universal,
-    DevelopmentArtifact.iOS,
-  };
+  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => getAdjustRequiredArtifacts();
+  // END
+
+  // BD ADD: START
+  Set<DevelopmentArtifact> getAdjustRequiredArtifacts() {
+    bool liteMode = false;
+    if (argParser.options.containsKey('lite')) {
+      liteMode = liteMode | argResults['lite'];
+    }
+    if (argParser.options.containsKey('lite-global')) {
+      liteMode = liteMode | argResults['lite-global'];
+    }
+    if (liteMode) {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.iOS,
+        DevelopmentArtifact.iOS_lite,
+      };
+    } else {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.iOS,
+      };
+    }
+  }
+  // END
 
   @override
   Future<FlutterCommandResult> runCommand() async {

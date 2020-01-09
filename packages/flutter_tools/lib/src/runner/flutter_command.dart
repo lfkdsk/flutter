@@ -585,6 +585,10 @@ abstract class FlutterCommand extends Command<void> {
     DevelopmentArtifact.universal,
     DevelopmentArtifact.iOS,
     DevelopmentArtifact.android,
+    // BD ADD: START
+    DevelopmentArtifact.iOS_lite,
+    DevelopmentArtifact.android_lite,
+    // END
   };
 
   /// Subclasses must implement this to execute the command.
@@ -722,6 +726,8 @@ mixin DeviceBasedDevelopmentArtifacts on FlutterCommand {
     final Set<DevelopmentArtifact> artifacts = <DevelopmentArtifact>{
       DevelopmentArtifact.universal,
     };
+    // BD ADD:
+    final bool isLite = argResults['lite'] | argResults['lite-global'];
     for (Device device in devices) {
       final TargetPlatform targetPlatform = await device.targetPlatform;
       switch (targetPlatform) {
@@ -730,12 +736,22 @@ mixin DeviceBasedDevelopmentArtifacts on FlutterCommand {
         case TargetPlatform.android_x64:
         case TargetPlatform.android_x86:
           artifacts.add(DevelopmentArtifact.android);
+          // BD ADD:
+          if (isLite) {
+            artifacts.add(DevelopmentArtifact.android_lite);
+          }
+          // END
           break;
         case TargetPlatform.web:
           artifacts.add(DevelopmentArtifact.web);
           break;
         case TargetPlatform.ios:
           artifacts.add(DevelopmentArtifact.iOS);
+          // BD ADD: START
+          if (isLite) {
+            artifacts.add(DevelopmentArtifact.iOS_lite);
+          }
+          // END
           break;
         case TargetPlatform.darwin_x64:
         case TargetPlatform.fuchsia:
@@ -758,6 +774,8 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
     // If there is no specified target device, fallback to the default
     // confiugration.
     final String rawTargetPlatform = argResults['target-platform'];
+    // BD ADD:
+    final bool isLite = argResults['lite'] | argResults['lite-global'];
     final TargetPlatform targetPlatform = getTargetPlatformForName(rawTargetPlatform);
     if (targetPlatform == null) {
       return super.requiredArtifacts;
@@ -772,12 +790,21 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
         artifacts.add(DevelopmentArtifact.android);
+        // BD ADD: START
+        if (isLite) {
+          artifacts.add(DevelopmentArtifact.android_lite);
+        }
+        // END
         break;
       case TargetPlatform.web:
         artifacts.add(DevelopmentArtifact.web);
         break;
       case TargetPlatform.ios:
         artifacts.add(DevelopmentArtifact.iOS);
+        // BD ADD: START
+        if (isLite) {
+          artifacts.add(DevelopmentArtifact.iOS_lite);
+        }
         break;
       case TargetPlatform.darwin_x64:
       case TargetPlatform.fuchsia:

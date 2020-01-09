@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math';
 
 import '../android/apk.dart';
 import '../project.dart';
@@ -33,12 +34,39 @@ class BuildApkCommand extends BuildSubCommand {
 
   @override
   final String name = 'apk';
-
+  // BD MOD: START
+  // @override
+  // Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
+  //   DevelopmentArtifact.universal,
+  // DevelopmentArtifact.android,
+  // };
   @override
-  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
-    DevelopmentArtifact.universal,
-    DevelopmentArtifact.android,
-  };
+  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => getAdjustRequiredArtifacts();
+  // END
+
+  // BD ADD: START
+  Set<DevelopmentArtifact> getAdjustRequiredArtifacts() {
+    bool liteMode = false;
+    if (argParser.options.containsKey('lite')) {
+      liteMode = liteMode | argResults['lite'];
+    }
+    if (argParser.options.containsKey('lite-global')) {
+      liteMode = liteMode | argResults['lite-global'];
+    }
+    if (liteMode) {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.android,
+        DevelopmentArtifact.android_lite,
+      };
+    } else {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.android,
+      };
+    }
+  }
+  // END
 
   @override
   final String description = 'Build an Android APK file from your app.\n\n'

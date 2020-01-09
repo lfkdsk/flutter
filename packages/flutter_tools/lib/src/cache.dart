@@ -31,9 +31,14 @@ class DevelopmentArtifact {
 
   /// Artifacts required for Android development.
   static const DevelopmentArtifact android = DevelopmentArtifact._('android');
+  // BD ADD:
+  static const DevelopmentArtifact android_lite = DevelopmentArtifact._('android-lite');
 
   /// Artifacts required for iOS development.
   static const DevelopmentArtifact iOS = DevelopmentArtifact._('ios');
+
+  // BD ADD:
+  static const DevelopmentArtifact iOS_lite = DevelopmentArtifact._('ios-lite');
 
   /// Artifacts required for web development,
   static const DevelopmentArtifact web = DevelopmentArtifact._('web', unstable: true);
@@ -56,7 +61,11 @@ class DevelopmentArtifact {
   /// The vaulues of DevelopmentArtifacts.
   static final List<DevelopmentArtifact> values = <DevelopmentArtifact>[
     android,
+    // BD ADD:
+    android_lite,
     iOS,
+    // BD ADD:
+    iOS_lite,
     web,
     macOS,
     windows,
@@ -75,6 +84,10 @@ class Cache {
       _artifacts.add(MaterialFonts(this));
       _artifacts.add(AndroidEngineArtifacts(this));
       _artifacts.add(IOSEngineArtifacts(this));
+      // BD ADD: START
+      _artifacts.add(AndroidEngineLiteArtifacts(this));
+      _artifacts.add(IOSEngineLiteArtifacts(this));
+      // END
       _artifacts.add(GradleWrapper(this));
       _artifacts.add(FlutterWebSdk(this));
       _artifacts.add(FlutterSdk(this));
@@ -836,6 +849,49 @@ class AndroidEngineArtifacts extends EngineCachedArtifact {
   List<String> getLicenseDirs() { return <String>[]; }
 }
 
+// BD ADD: START
+class AndroidEngineLiteArtifacts extends EngineCachedArtifact {
+  AndroidEngineLiteArtifacts(Cache cache) : super(
+    'android-lite-sdk',
+    cache,
+    const <DevelopmentArtifact>{ DevelopmentArtifact.android_lite },
+  );
+
+  @override
+  List<String> getPackageDirs() => const <String>[];
+
+  @override
+  List<List<String>> getBinaryDirs() {
+    final List<List<String>> binaryDirs = <List<String>>[];
+    if (cache.includeAllPlatforms) {
+      binaryDirs
+        ..addAll(_osxLiteBinaryDirs)
+        ..addAll(_linuxBinaryDirs)
+        ..addAll(_windowsBinaryDirs)
+        ..addAll(_androidLiteBinaryDirs)
+        ..addAll(_dartSdks);
+    } else if (platform.isWindows) {
+      binaryDirs
+        ..addAll(_windowsBinaryDirs)
+        ..addAll(_androidLiteBinaryDirs);
+    } else if (platform.isMacOS) {
+      binaryDirs
+        ..addAll(_osxLiteBinaryDirs)
+        ..addAll(_androidLiteBinaryDirs);
+    } else if (platform.isLinux) {
+      binaryDirs
+        ..addAll(_linuxBinaryDirs)
+        ..addAll(_androidLiteBinaryDirs);
+    }
+    return binaryDirs;
+  }
+
+  @override
+  List<String> getLicenseDirs() { return <String>[]; }
+}
+
+// END
+
 class IOSEngineArtifacts extends EngineCachedArtifact {
   IOSEngineArtifacts(Cache cache) : super(
     'ios-sdk',
@@ -865,6 +921,38 @@ class IOSEngineArtifacts extends EngineCachedArtifact {
     return <String>[];
   }
 }
+
+// BD ADD: START
+class IOSEngineLiteArtifacts extends EngineCachedArtifact {
+  IOSEngineLiteArtifacts(Cache cache) : super(
+    'ios-lite-sdk',
+    cache,
+    <DevelopmentArtifact>{ DevelopmentArtifact.iOS_lite},
+  );
+
+  @override
+  List<List<String>> getBinaryDirs() {
+    final List<List<String>> binaryDirs = <List<String>>[];
+    if (platform.isMacOS || cache.includeAllPlatforms) {
+      binaryDirs.addAll(_iosLiteBinaryDirs);
+    }
+    return binaryDirs;
+  }
+
+  @override
+  List<String> getLicenseDirs() {
+    if (cache.includeAllPlatforms || platform.isMacOS) {
+      return const <String>['ios', 'ios-profile', 'ios-release'];
+    }
+    return const <String>[];
+  }
+
+  @override
+  List<String> getPackageDirs() {
+    return <String>[];
+  }
+}
+// END
 
 /// A cached artifact containing Gradle Wrapper scripts and binaries.
 ///
@@ -1014,7 +1102,10 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
 //  <String>['android-arm64-dynamic-profile/darwin-x64', 'android-arm64-dynamic-profile/darwin-x64.zip'],
 //  <String>['android-arm64-dynamic-release/darwin-x64', 'android-arm64-dynamic-release/darwin-x64.zip'],
 
-  // BD ADD:
+];
+
+// BD ADD: START
+const List<List<String>> _osxLiteBinaryDirs = <List<String>>[
   <String>['android-arm-profile-lite/darwin-x64', 'android-arm-profile-lite/darwin-x64.zip'],
   <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
   <String>['android-arm64-profile-lite/darwin-x64', 'android-arm64-profile-lite/darwin-x64.zip'],
@@ -1025,6 +1116,7 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-arm64-profile-liteg/darwin-x64', 'android-arm64-profile-liteg/darwin-x64.zip'],
   <String>['android-arm64-release-liteg/darwin-x64', 'android-arm64-release-liteg/darwin-x64.zip'],
 ];
+// END
 
 const List<List<String>> _linuxBinaryDirs = <List<String>>[
   <String>['android-arm-profile/linux-x64', 'android-arm-profile/linux-x64.zip'],
@@ -1061,8 +1153,10 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
 //  <String>['android-arm-dynamic-release', 'android-arm-dynamic-release/artifacts.zip'],
 //  <String>['android-arm64-dynamic-profile', 'android-arm64-dynamic-profile/artifacts.zip'],
 //  <String>['android-arm64-dynamic-release', 'android-arm64-dynamic-release/artifacts.zip'],
+];
 
-  // BD ADD: START
+// BD ADD: START
+const List<List<String>> _androidLiteBinaryDirs = <List<String>>[
   <String>['android-x86-lite', 'android-x86-lite/artifacts.zip'],
   <String>['android-x64-lite', 'android-x64-lite/artifacts.zip'],
   <String>['android-arm-lite', 'android-arm-lite/artifacts.zip'],
@@ -1080,14 +1174,17 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
   <String>['android-arm64-liteg', 'android-arm64-liteg/artifacts.zip'],
   <String>['android-arm64-profile-liteg', 'android-arm64-profile-liteg/artifacts.zip'],
   <String>['android-arm64-release-liteg', 'android-arm64-release-liteg/artifacts.zip'],
-  // END
 ];
+// END
 
 const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios', 'ios/artifacts.zip'],
   <String>['ios-profile', 'ios-profile/artifacts.zip'],
   <String>['ios-release', 'ios-release/artifacts.zip'],
-  // BD ADD: START
+];
+
+// BD ADD: START
+const List<List<String>> _iosLiteBinaryDirs = <List<String>>[
   <String>['ios-lite', 'ios-lite/artifacts.zip'],
   <String>['ios-profile-lite', 'ios-profile-lite/artifacts.zip'],
   <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
@@ -1095,8 +1192,8 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios-liteg', 'ios-liteg/artifacts.zip'],
   <String>['ios-profile-liteg', 'ios-profile-liteg/artifacts.zip'],
   <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
-  // END
 ];
+// END
 
 const List<List<String>> _dartSdks = <List<String>> [
   <String>['darwin-x64', 'dart-sdk-darwin-x64.zip'],

@@ -75,6 +75,8 @@ class _ManifestAssetBundle implements AssetBundle {
   static const String _fontManifestJson = 'FontManifest.json';
   static const String _fontSetMaterial = 'material';
   static const String _license = 'LICENSE';
+  // BD ADD:
+  static const String _KFlutterVersion = 'flutter_version';
 
   @override
   bool wasBuiltOnce() => _lastBuildTimestamp != null;
@@ -247,6 +249,7 @@ class _ManifestAssetBundle implements AssetBundle {
 
     // TODO(ianh): Only do the following line if we've changed packages or if our LICENSE file changed
     entries[_license] = _obtainLicenses(packageMap, assetBasePath, reportPackages: reportLicensedPackages);
+    entries[_KFlutterVersion] = DevFSFileContent(fs.file(fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
 
     return 0;
   }

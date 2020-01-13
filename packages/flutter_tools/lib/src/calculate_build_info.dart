@@ -103,7 +103,7 @@ class FlutterBuildInfo {
 
   static String runSafeCmd(List<String> cmd) {
     try {
-      return runSync(cmd);
+      return processUtils.runSync(cmd).stdout.trim();
     } on Error {
       return null;
     }
@@ -111,7 +111,7 @@ class FlutterBuildInfo {
 
   static String _runGit(String command) {
     try {
-      return runSync(command.split(' '), workingDirectory: Cache.flutterRoot);
+      return processUtils.runSync(command.split(' '), workingDirectory: Cache.flutterRoot).stdout.trim();
     } on Error {
       return null;
     }
@@ -188,9 +188,10 @@ class FlutterBuildInfo {
       final Map<String, String> map = new Map<String, String>();
       map['name'] = plugin.name;
       map['path'] = plugin.path;
-      map['androidPackage'] = plugin.androidPackage;
-      map['iosPrefix'] = plugin.iosPrefix;
-      map['pluginClass'] = plugin.pluginClass;
+      // TODO @林学彬
+//      map['androidPackage'] = plugin.androidPackage;
+//      map['iosPrefix'] = plugin.iosPrefix;
+//      map['pluginClass'] = plugin.pluginClass;
       list.add(map);
     }
 
@@ -237,9 +238,10 @@ class FlutterBuildInfo {
       });
       try {
         if (findTosResp?.body?.isNotEmpty == true) {
-          final List list = json.decode(findTosResp.body);
+          // TODO @林学彬
+          final List list = json.decode(findTosResp.body) as List;
           if (list?.isNotEmpty == true) {
-            final Map<String, dynamic> map = list[0];
+            final Map<String, dynamic> map = list[0] as Map<String, dynamic>;
             if (map != null && map.containsKey('Host') &&
                 map.containsKey('Port')) {
               tosHost = '${map['Host']}:${map['Port']}';

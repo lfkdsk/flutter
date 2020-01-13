@@ -9,6 +9,7 @@ import 'package:flutter_tools/src/version.dart';
 
 import '../runner/flutter_command.dart';
 
+// TODO @邱鑫玥，检验替换成processUtils.run是否OK
 class DevelopCommand extends FlutterCommand {
   DevelopCommand() {
     addSubcommand(DevelopInitCommand());
@@ -43,7 +44,7 @@ class DevelopInitCommand extends FlutterCommand {
     );
 
     try {
-      await runCheckedAsync(<String>['npm', '-v']);
+      await processUtils.run(<String>['npm', '-v'], throwOnError: true);
     } catch (e) {
       status.stop();
       printError('Please install npm : brew install npm');
@@ -52,8 +53,8 @@ class DevelopInitCommand extends FlutterCommand {
       return const FlutterCommandResult(ExitStatus.fail);
     }
 
-    await runCheckedAsync(<String>['npm', 'install', '-g', 'commitizen']);
-    await runCheckedAsync(<String>['npm', 'install'],
+    await processUtils.run(<String>['npm', 'install', '-g', 'commitizen']);
+    await processUtils.run(<String>['npm', 'install'],
         workingDirectory: Cache.flutterRoot);
 
     status.stop();
@@ -85,38 +86,38 @@ class DevelopPublishCommand extends FlutterCommand {
 
   @override
   Future<FlutterCommandResult> runCommand() async {
-    final bool isRepublish = argResults['republish'];
+    final bool isRepublish = argResults['republish'] as bool;
 
     final Status status = logger.startProgress(
       'Running "flutter develop publish" ...',
       timeout: const TimeoutConfiguration().slowOperation,
     );
     if (isRepublish) {
-      final RunResult commitRes = await runCheckedAsync(
+      final RunResult commitRes = await processUtils.run(
           <String>['git', 'rev-list', '--tags', '--max-count=1'],
           workingDirectory: Cache.flutterRoot);
-      final RunResult tagRes = await runCheckedAsync(
+      final RunResult tagRes = await processUtils.run(
           <String>['git', 'describe', '--tags', '${commitRes.stdout.trim()}']);
       final String tag = tagRes.stdout.trim();
-      await runCheckedAsync(<String>['git', 'tag', '-d', tag]);
+      await processUtils.run(<String>['git', 'tag', '-d', tag]);
 
-      await runCheckedAsync(<String>[
+      await processUtils.run(<String>[
         'git',
         'add',
         '.',
       ], workingDirectory: Cache.flutterRoot);
-      await runCheckedAsync(<String>['git', 'commit', '--amend', '--no-edit'],
+      await processUtils.run(<String>['git', 'commit', '--amend', '--no-edit'],
           workingDirectory: Cache.flutterRoot);
 
-      await runCheckedAsync(<String>['git', 'tag', tag]);
+      await processUtils.run(<String>['git', 'tag', tag]);
 
       status.stop();
       printStatus('flutter develop publish succeed');
     } else {
       final String version =
-          argResults['version'] ?? BDGitTagVersion.determine().nextVersion();
+          (argResults['version'] ?? BDGitTagVersion.determine().nextVersion()) as String;
 
-      final RunResult releaseRes = await runCheckedAsync(<String>[
+      final RunResult releaseRes = await processUtils.run(<String>[
         'npm',
         'run',
         'release',

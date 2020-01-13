@@ -11,8 +11,6 @@ import '../ios/bitcode.dart';
 import '../resident_runner.dart';
 import '../runner/flutter_command.dart';
 import 'build.dart';
-// BD ADD:
-import '../calculate_build_info.dart';
 
 /// Builds AOT snapshots into platform specific library containers.
 class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmentArtifacts {
@@ -33,8 +31,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         defaultsTo: false,
         help: 'Report timing information about build steps in machine readable form,',
       )
-      // BD ADD: START
-      ..addFlag('track-widget-creation', defaultsTo: false, hide: true,)
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,)
@@ -82,7 +78,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       throwToolExit('Unknown platform: $targetPlatform');
     }
 
-    // TODO 代码移位置，对比154 @王莹@林学彬@孙坤@谢然
+    // TODO 代码移位置，对比154 @王莹@林学彬@谢然
     aotBuilder ??= AotBuilder();
 
     await aotBuilder.build(
@@ -92,6 +88,10 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       mainDartFile: findMainDartFile(targetFile),
       bitcode: boolArg('bitcode'),
       quiet: boolArg('quiet'),
+      // BD ADD: START
+      trackWidgetCreation: boolArg('track-widget-creation'),
+      useLite: boolArg('lite'),
+      // END
       reportTimings: boolArg('report-timings'),
       iosBuildArchs: stringsArg('ios-arch').map<DarwinArch>(getIOSArchForName),
       extraFrontEndOptions: stringsArg(FlutterOptions.kExtraFrontEndOptions),

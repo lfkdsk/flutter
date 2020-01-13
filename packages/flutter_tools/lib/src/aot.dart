@@ -31,6 +31,10 @@ class AotBuilder {
     bool bitcode = kBitcodeEnabledDefault,
     bool quiet = true,
     bool reportTimings = false,
+    // BD ADD ：START
+    bool trackWidgetCreation = false,
+    bool useLite = false,
+    // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     List<String> extraFrontEndOptions,
     List<String> extraGenSnapshotOptions,
@@ -40,7 +44,7 @@ class AotBuilder {
       throwToolExit('No AOT build platform specified');
     }
     // BD ADD: START Wangying
-    if (argResults['lite']) {
+    if (useLite) {
       print('Build with lite edition...');
     }
     // END
@@ -81,7 +85,7 @@ class AotBuilder {
         buildMode: buildMode,
         mainPath: mainDartFile,
         packagesPath: PackageMap.globalPackagesPath,
-        trackWidgetCreation: false,
+        trackWidgetCreation: trackWidgetCreation,
         outputPath: outputPath,
         extraFrontEndOptions: extraFrontEndOptions,
         dartDefines: dartDefines,

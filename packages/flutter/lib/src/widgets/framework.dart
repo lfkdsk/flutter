@@ -4230,15 +4230,6 @@ abstract class ComponentElement extends Element {
       built = build();
       debugWidgetBuilderValue(widget, built);
     } catch (e, stack) {
-      // TODO @孙坤
-//      // BD MOD: START
-//      //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
-//      built = ErrorWidget.builder(_debugReportException(
-//          ErrorDescription('building $this'), e, stack,
-//          informationCollector:() sync*{
-//            yield ErrorDescription('ErrorWidgetLocation:' + getCreationLocationForError(this));
-//          }));
-//      // END
       built = ErrorWidget.builder(
         _debugReportException(
           ErrorDescription('building $this'),
@@ -4259,16 +4250,6 @@ abstract class ComponentElement extends Element {
       _child = updateChild(_child, built, slot);
       assert(_child != null);
     } catch (e, stack) {
-      // TODO @孙坤
-//      // BD MOD: START
-//      //built = ErrorWidget.builder(_debugReportException('building $this', e, stack));
-//      built = ErrorWidget.builder(_debugReportException(
-//          ErrorDescription('building $this'), e, stack,
-//          informationCollector: () sync* {
-//            yield ErrorDescription(
-//                'ErrorWidgetLocation:' + getCreationLocationForError(this));
-//          }));
-//      // END
       built = ErrorWidget.builder(_debugReportException(
           ErrorDescription('building $this'), e, stack,
           informationCollector: () sync* {

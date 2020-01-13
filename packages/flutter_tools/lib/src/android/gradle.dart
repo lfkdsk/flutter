@@ -26,6 +26,8 @@ import '../reporting/reporting.dart';
 import 'android_sdk.dart';
 import 'gradle_errors.dart';
 import 'gradle_utils.dart';
+// BD ADD: LinXueBin
+import 'package:flutter_tools/src/calculate_build_info.dart';
 
 /// The directory where the APK artifact is generated.
 @visibleForTesting
@@ -40,8 +42,6 @@ Directory getApkDirectory(FlutterProject project) {
         .childDirectory('outputs')
         .childDirectory('apk');
 }
-// BD ADD:
-import 'package:flutter_tools/src/calculate_build_info.dart';
 
 /// The directory where the app bundle artifact is generated.
 @visibleForTesting
@@ -295,6 +295,15 @@ Future<void> buildGradleApp({
     command.add('-Plocal-engine-repo=${localEngineRepo.path}');
     command.add('-Plocal-engine-build-mode=${buildInfo.modeName}');
     command.add('-Plocal-engine-out=${localEngineArtifacts.engineOutPath}');
+    command.add('-Ptarget-platform=${getTargetPlatformByLocalEnginePath(
+        localEngineArtifacts.engineOutPath)}');
+  } else {
+    if (androidBuildInfo.targetArchs.isNotEmpty) {
+      final String targetPlatforms = androidBuildInfo
+          .targetArchs
+          .map(getPlatformNameForAndroidArch).join(',');
+      command.add('-Ptarget-platform=$targetPlatforms');
+    }
   }
   if (target != null) {
     command.add('-Ptarget=$target');
@@ -319,12 +328,6 @@ Future<void> buildGradleApp({
   }
   if (androidBuildInfo.shrink) {
     command.add('-Pshrink=true');
-  }
-  if (androidBuildInfo.targetArchs.isNotEmpty) {
-    final String targetPlatforms = androidBuildInfo
-      .targetArchs
-      .map(getPlatformNameForAndroidArch).join(',');
-    command.add('-Ptarget-platform=$targetPlatforms');
   }
   if (shouldBuildPluginAsAar) {
     // Pass a system flag instead of a project flag, so this flag can be
@@ -896,7 +899,8 @@ Directory _getLocalEngineRepo({
   assert(engineOutPath != null);
   assert(androidBuildInfo != null);
 
-  final String abi = getEnumName(androidBuildInfo.targetArchs.first);
+//  final String abi = getEnumName(androidBuildInfo.targetArchs.first);
+  final String abi = getAbiByEngineOutPath(engineOutPath);
   final Directory localEngineRepo = fs.systemTempDirectory
     .createTempSync('flutter_tool_local_engine_repo.');
 
@@ -946,4 +950,31 @@ Directory _getLocalEngineRepo({
     );
   }
   return localEngineRepo;
+}
+
+String getAbiByEngineOutPath(String engineOutPath) {
+  String result = 'armeabi_v7a';
+  if (engineOutPath.contains('x86')) {
+    result = 'x86';
+  } else if (engineOutPath.contains('x64')) {
+    result = 'x86_64';
+  } else if (engineOutPath.contains('arm64')) {
+    result = 'arm64_v8a';
+  }
+  if (engineOutPath.contains('lite')) {
+    result += '_lite';
+  }
+  return result;
+}
+
+String getTargetPlatformByLocalEnginePath(String engineOutPath) {
+  String result = 'android-arm';
+  if (engineOutPath.contains('x86')) {
+    result = 'android-x86';
+  } else if (engineOutPath.contains('x64')) {
+    result = 'android-x64';
+  } else if (engineOutPath.contains('arm64')) {
+    result = 'android-arm64';
+  }
+  return result;
 }

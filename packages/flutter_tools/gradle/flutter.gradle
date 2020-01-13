@@ -61,10 +61,12 @@ project.extensions.create('bdFlutterConfig', BdFlutterConfigExtension)
 // END
 
 apply plugin: FlutterPlugin
-apply from: "$flutterRoot/packages/flutter_tools/gradle/tt_flutter.gradle"
+//apply from: "$flutterRoot/packages/flutter_tools/gradle/tt_flutter.gradle"
 
 class FlutterPlugin implements Plugin<Project> {
-    private static final String MAVEN_REPO      = "http://download.flutter.io";
+    // BD MOD:
+    //private static final String MAVEN_REPO      = "http://download.flutter.io";
+    private static final String MAVEN_REPO      = "http://tosv.byted.org/obj/toutiao.ios.arch/flutter/framework/";
 
     // The platforms that can be passed to the `--Ptarget-platform` flag.
     private static final String PLATFORM_ARM32  = "android-arm";
@@ -117,6 +119,7 @@ class FlutterPlugin implements Plugin<Project> {
     private String localEngineSrcPath
     private Properties localProperties
     private String engineVersion
+    private String engineCid
 
     @Override
     void apply(Project project) {
@@ -163,9 +166,10 @@ class FlutterPlugin implements Plugin<Project> {
             throw new GradleException("flutter.sdk must point to the Flutter SDK directory")
         }
 
+        engineCid = Paths.get(flutterRoot.absolutePath, "bin", "internal", "ttengine.version").toFile().text.trim()
         engineVersion = useLocalEngine()
             ? "+" // Match any version since there's only one.
-            : "1.0.0-" + Paths.get(flutterRoot.absolutePath, "bin", "internal", "engine.version").toFile().text.trim()
+            : "1.0.0-" + engineCid
 
         String flutterExecutableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "flutter.bat" : "flutter"
         flutterExecutable = Paths.get(flutterRoot.absolutePath, "bin", flutterExecutableName).toFile();
@@ -225,7 +229,7 @@ class FlutterPlugin implements Plugin<Project> {
         }
         String repository = useLocalEngine()
             ? project.property('local-engine-repo')
-            : MAVEN_REPO
+            : MAVEN_REPO + engineCid
 
         project.rootProject.allprojects {
             repositories {
@@ -236,7 +240,7 @@ class FlutterPlugin implements Plugin<Project> {
         }
         // Add the embedding dependency.
         addApiDependencies(project, buildType.name,
-                "io.flutter:flutter_embedding_$flutterBuildMode:$engineVersion")
+                "io.flutter:flutter_embedding_${flutterBuildMode}${useLite() ? "_lite" : ""}:$engineVersion")
 
         List<String> platforms = getTargetPlatforms().collect()
         // Debug mode includes x86 and x64, which are commonly used in emulators.
@@ -248,7 +252,7 @@ class FlutterPlugin implements Plugin<Project> {
             String arch = PLATFORM_ARCH_MAP[platform].replace("-", "_")
             // Add the `libflutter.so` dependency.
             addApiDependencies(project, buildType.name,
-                    "io.flutter:${arch}_$flutterBuildMode:$engineVersion")
+                    "io.flutter:${arch}_${flutterBuildMode}${useLite() ? "_lite" : ""}:$engineVersion")
         }
     }
 
@@ -340,7 +344,7 @@ class FlutterPlugin implements Plugin<Project> {
             addApiDependencies(
                 pluginProject,
                 buildType.name,
-                "io.flutter:flutter_embedding_$flutterBuildMode:$engineVersion"
+                "io.flutter:flutter_embedding_${flutterBuildMode}${useLite() ? "_lite" : ""}:$engineVersion"
             )
         }
         pluginProject.afterEvaluate {
@@ -486,6 +490,13 @@ class FlutterPlugin implements Plugin<Project> {
 
     private Boolean useLocalEngine() {
         return project.hasProperty('local-engine-repo')
+    }
+
+    private Boolean useLite() {
+        if (project.hasProperty('lite')) {
+            return project.property('lite').toBoolean()
+        }
+        return false
     }
 
     private Boolean isVerbose() {

@@ -412,7 +412,7 @@ YamlMap get customEngineConfig {
   _customEngineConfig ??= loadYaml(fs
     .file(fs.path
     .join(Cache.flutterRoot, 'bin', 'internal', 'tt_engine.yaml'))
-    .readAsStringSync());
+    .readAsStringSync()) as YamlMap;
   return _customEngineConfig;
 }
 
@@ -420,9 +420,9 @@ const String customEngineName = 'tt_engine';
 /// BD DEL:
 /// String get customEngineVersion => customEngineConfig['ref'];
 
-YamlList get customEngineArtifacts => customEngineConfig['artifacts'];
+YamlList get customEngineArtifacts => customEngineConfig['artifacts'] as YamlList;
 
-String get customEngineDownloadUrl => customEngineConfig['url'];
+String get customEngineDownloadUrl => customEngineConfig['url'] as String;
 
 /// Representation of a set of artifacts used by the tool.
 abstract class ArtifactSet {

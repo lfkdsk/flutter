@@ -791,14 +791,14 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
 //    }
 //    _needToReportFirstFrame = false;
     if (_needToReportFirstFrame && _reportFirstFrame) {
-      int engineEnterTime = ui.window.getEngineMainEnterMicros();
+      int engineEnterTime = window.getEngineMainEnterMicros();
       int timeToFirstFrameMicros = developer.Timeline.now - engineEnterTime;
       int timeToFrameworkInitMicros =
           BindingBase.frameworkInitializationdTimeMicros - engineEnterTime;
-      ui.window.timeToFirstFrameMicros = timeToFirstFrameMicros;
-      ui.window.timeToFrameworkInitMicros = timeToFrameworkInitMicros;
-      if (ui.window.onTimeToFirstFrameMicros != null) {
-        ui.window.onTimeToFirstFrameMicros(
+      window.timeToFirstFrameMicros = timeToFirstFrameMicros;
+      window.timeToFrameworkInitMicros = timeToFrameworkInitMicros;
+      if (window.onTimeToFirstFrameMicros != null) {
+        window.onTimeToFirstFrameMicros(
             timeToFrameworkInitMicros, timeToFirstFrameMicros);
       }
       if (!kReleaseMode) {
@@ -1104,8 +1104,8 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, ServicesBin
     if (WidgetsBinding.instance == null) {
       WidgetsFlutterBinding();
       // BD ADD: START
-      final VoidCallback preCallback = ui.window.exitApp;
-      ui.window.exitApp = () {
+      final VoidCallback preCallback = window.exitApp;
+      window.exitApp = () {
         if (preCallback != null) {
           preCallback();
         }

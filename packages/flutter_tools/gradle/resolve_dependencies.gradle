@@ -19,19 +19,20 @@
 
 import java.nio.file.Paths
 
+File flutterRoot = projectDir.parentFile.parentFile.parentFile
+
+assert flutterRoot.isDirectory()
+String engineVersion = Paths.get(flutterRoot.absolutePath, "bin", "internal", "ttengine.version")
+        .toFile().text.trim()
+
 repositories {
     google()
     jcenter()
     maven {
-        url "http://download.flutter.io"
+//        url "http://download.flutter.io"
+        url "http://tosv.byted.org/obj/toutiao.ios.arch/flutter/framework/" + engineVersion
     }
 }
-
-File flutterRoot = projectDir.parentFile.parentFile.parentFile
-
-assert flutterRoot.isDirectory()
-String engineVersion = Paths.get(flutterRoot.absolutePath, "bin", "internal", "engine.version")
-        .toFile().text.trim()
 
 configurations {
     flutterRelease.extendsFrom releaseImplementation

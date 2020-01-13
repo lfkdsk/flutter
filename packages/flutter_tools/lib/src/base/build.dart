@@ -258,7 +258,7 @@ class AOTSnapshotter {
     @required String assemblyPath,
     @required String outputPath,
     @required bool bitcode,
-    @required bool quiet
+    @required bool quiet,
     // BD ADD: START
     bool compressSize = false,
     String isolateSnapshotData,
@@ -314,14 +314,15 @@ class AOTSnapshotter {
       assemblyO,
     ];
 
+    // TODO @邱鑫玥，检验替换成processUtils.run是否OK
     // BD ADD: START
     if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
-        await runCheckedAsync(['rm', '-f', '$isolateSnapshotData.gz']);
-        await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
+        await processUtils.run(['rm', '-f', '$isolateSnapshotData.gz']);
+        await processUtils.run(['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
         linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
 
-        await runCheckedAsync(['rm', '-f', '$vmSnapshotData.gz']);
-        await runCheckedAsync(['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
+        await processUtils.run(['rm', '-f', '$vmSnapshotData.gz']);
+        await processUtils.run(['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
         linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
     }
     // END

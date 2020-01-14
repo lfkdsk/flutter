@@ -106,3 +106,9 @@ export 'src/widgets/viewport.dart';
 export 'src/widgets/visibility.dart';
 export 'src/widgets/widget_inspector.dart';
 export 'src/widgets/will_pop_scope.dart';
+
+/// BD ADD: START
+/// 移植Android滑动阻尼算法的physics和simulation
+export 'src/widgets/smooth_physics.dart';
+export 'src/widgets/smooth_simulation.dart';
+/// END

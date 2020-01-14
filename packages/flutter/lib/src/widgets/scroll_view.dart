@@ -20,6 +20,7 @@ import 'scroll_physics.dart';
 import 'scrollable.dart';
 import 'sliver.dart';
 import 'viewport.dart';
+import 'smooth_physics.dart';
 
 /// A widget that scrolls.
 ///
@@ -313,9 +314,28 @@ abstract class ScrollView extends StatelessWidget {
         return buildViewport(context, offset, axisDirection, slivers);
       },
     );
+    /// BD MOD: START
+    /// return primary && scrollController != null
+    ///      ? PrimaryScrollController.none(child: widget)
+    ///      : widget;
+
+    Widget widget;
+    if (physics is SmoothScrollPhysics) {
+      widget = NotificationListener<ScrollNotification>(
+        child: scrollable,
+        onNotification: (Notification notification) {
+          if (notification is ScrollEndNotification) {
+            (physics as SmoothScrollPhysics).onScrollStartConsumed(false);
+          }
+        },
+      );
+    } else {
+      widget = scrollable;
+    }
     return primary && scrollController != null
-      ? PrimaryScrollController.none(child: scrollable)
-      : scrollable;
+        ? PrimaryScrollController.none(child: widget)
+        : widget;
+    /// END
   }
 
   @override

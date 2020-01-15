@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4-7](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-6...bd1.5.4-7) (2020-01-07)
+
+
+### Features
+
+* 文字支持异步布局以及iOS线程QoS优化 ([e518696](https://code.byted.org/tech_client/flutter/commit/e518696))
+
+### [1.5.4-6](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-2...bd1.5.4-6) (2020-01-05)
+
+
+### Bug Fixes
+
+* fix fps draw_lock lock failed ([670be4b](https://code.byted.org/tech_client/flutter/commit/670be4b))
+
 ### [1.5.4-5](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-4...bd1.5.4-5) (2019-12-24)
 
 

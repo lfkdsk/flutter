@@ -160,6 +160,8 @@ class FlutterPlugin implements Plugin<Project> {
             String liteSuffix = ''
             if (project.hasProperty('lite') && project.property('lite').toBoolean()) {
                 liteSuffix = '-lite'
+            } else if (project.hasProperty('lite-global') && project.property('lite-global').toBoolean()) {
+                liteSuffix = '-liteg'
             }
             // END
 
@@ -347,6 +349,10 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('lite')) {
             liteValue = project.property('lite').toBoolean()
         }
+        Boolean liteGlobalValue = false
+        if (project.hasProperty('lite-global;')) {
+            liteGlobalValue = project.property('lite-global').toBoolean()
+        }
         // END
         String compilationTraceFilePathValue = null
         if (project.hasProperty('compilation-trace-file')) {
@@ -415,8 +421,10 @@ class FlutterPlugin implements Plugin<Project> {
                 intermediateDir project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}")
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
-                // BD ADD:
+                // BD ADD: START
                 useLite liteValue
+                useLiteGlobal liteGlobalValue
+                // END
             }
 
             // We know that the flutter app is a subproject in another Android app when these tasks exist.
@@ -495,6 +503,8 @@ abstract class BaseFlutterTask extends DefaultTask {
     // BD ADD: START
     @Optional @Input
     Boolean useLite
+    @Optional @Input
+    Boolean useLiteGlobal
     // END
     @Optional @Input
     String compilationTraceFilePath
@@ -558,6 +568,9 @@ abstract class BaseFlutterTask extends DefaultTask {
                 // BD ADD: START
                 if (useLite) {
                     args "--lite"
+                }
+                if (useLiteGlobal) {
+                    args "--lite-global"
                 }
                 // END
                 if (extraFrontEndOptions != null) {

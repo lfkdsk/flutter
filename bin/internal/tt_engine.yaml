@@ -10,6 +10,10 @@ artifacts: [
     ios-profile-lite,
     ios-release-lite,
 
+    ios-liteg,
+    ios-profile-liteg,
+    ios-release-liteg,
+
     common,
     sky_engine,
     darwin-x64,
@@ -31,6 +35,11 @@ artifacts: [
     android-arm-dynamic-release-lite/darwin-x64,
     android-arm64-dynamic-profile-lite/darwin-x64,
     android-arm64-dynamic-release-lite/darwin-x64,
+
+    android-arm-profile-liteg/darwin-x64,
+    android-arm-release-liteg/darwin-x64,
+    android-arm64-profile-liteg/darwin-x64,
+    android-arm64-release-liteg/darwin-x64,
 
     android-x86,
     android-x64,
@@ -56,5 +65,14 @@ artifacts: [
     android-arm-dynamic-profile-lite,
     android-arm-dynamic-release-lite,
     android-arm64-dynamic-profile-lite,
-    android-arm64-dynamic-release-lite
+    android-arm64-dynamic-release-lite,
+
+    android-x86-liteg,
+    android-x64-liteg,
+    android-arm-liteg,
+    android-arm-profile-liteg,
+    android-arm-release-liteg,
+    android-arm64-liteg,
+    android-arm64-profile-liteg,
+    android-arm64-release-liteg,
 ]

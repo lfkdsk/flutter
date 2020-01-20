@@ -224,8 +224,10 @@ class KernelCompiler {
     String fileSystemScheme,
     bool targetProductVm = false,
     String initializeFromDill,
-    // BD ADD:
+    // BD ADD: START
     bool lite = false,
+    bool liteGlobal = false,
+    // END
   }) async {
     final String frontendServer = artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
@@ -278,6 +280,9 @@ class KernelCompiler {
     // BD ADD: START
     if (lite) {
       command.add('--lite');
+    }
+    if (liteGlobal) {
+      command.add('--lite-global');
     }
     // END
     if (trackWidgetCreation)

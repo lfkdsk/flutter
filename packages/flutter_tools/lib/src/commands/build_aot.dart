@@ -79,6 +79,9 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     if (argResults['lite']) {
       print('Build with lite edition...');
     }
+    if (argResults['lite-global']) {
+      print('Build with lite global edition...');
+    }
     // END
     final BuildMode buildMode = getBuildMode();
 
@@ -110,6 +113,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         //trackWidgetCreation: false,
         trackWidgetCreation: argResults['track-widget-creation'],
         lite: argResults['lite'] && buildMode == BuildMode.release,
+        liteGlobal: argResults['lite-global'] && buildMode == BuildMode.release,
         // END
         outputPath: outputPath,
         extraFrontEndOptions: argResults[FlutterOptions.kExtraFrontEndOptions],

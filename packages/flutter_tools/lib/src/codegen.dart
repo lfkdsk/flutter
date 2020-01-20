@@ -109,8 +109,10 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     String depFilePath,
     TargetModel targetModel = TargetModel.flutter,
     String initializeFromDill,
-    // BD ADD:
+    // BD ADD: START
     bool lite = false,
+    bool liteGlobal = false,
+    // END
   }) async {
     if (fileSystemRoots != null || fileSystemScheme != null || depFilePath != null || targetModel != null || sdkRoot != null || packagesPath != null) {
       printTrace('fileSystemRoots, fileSystemScheme, depFilePath, targetModel,'

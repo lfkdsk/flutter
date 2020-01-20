@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.4-8](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-7...bd1.5.4-8) (2020-01-20)
+
+
+### Bug Fixes
+
+* **ios:** fix build ios command error with track-widget-creation ([8bd25ef](https://code.byted.org/tech_client/flutter/commit/8bd25ef))
+
 ### [1.5.4-7](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-6...bd1.5.4-7) (2020-01-07)
 
 

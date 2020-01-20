@@ -58,6 +58,9 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
     Object debugOwner,
     PointerDeviceKind kind,
     this.dragStartBehavior = DragStartBehavior.start,
+//BD ADD:START
+    this.clampFlingingVelocityByTruncation,
+//END
   }) : assert(dragStartBehavior != null),
        super(debugOwner: debugOwner, kind: kind);
 
@@ -136,6 +139,11 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
   ///
   /// If null then [kMaxFlingVelocity] is used.
   double maxFlingVelocity;
+
+//BD ADD:START
+  /// Clamp initial flinging velocity by truncation instead of [Velocity.clampMagnitude].
+  bool clampFlingingVelocityByTruncation;
+//END
 
   _DragState _state = _DragState.ready;
   Offset _initialPosition;
@@ -257,8 +265,7 @@ abstract class DragGestureRecognizer extends OneSequenceGestureRecognizer {
 //        final Velocity velocity = Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
 //            .clampMagnitude(minFlingVelocity ?? kMinFlingVelocity, maxFlingVelocity ?? kMaxFlingVelocity);
         Velocity velocity;
-        //TODO 这里需要加个开关
-        if (defaultTargetPlatform == TargetPlatform.android) {
+        if (defaultTargetPlatform == TargetPlatform.android && clampFlingingVelocityByTruncation == true) {
           var maxVelocity = maxFlingVelocity ?? kMaxFlingVelocity;
           double velocitX = math.max(-maxVelocity, math.min(estimate.pixelsPerSecond.dx, maxVelocity));
           double velocitY = math.max(-maxVelocity, math.min(estimate.pixelsPerSecond.dy, maxVelocity));
@@ -317,7 +324,10 @@ class VerticalDragGestureRecognizer extends DragGestureRecognizer {
   VerticalDragGestureRecognizer({
     Object debugOwner,
     PointerDeviceKind kind,
-  }) : super(debugOwner: debugOwner, kind: kind);
+//BD ADD:START
+    bool clampFlingingVelocityByTruncation,
+//END
+  }) : super(debugOwner: debugOwner, kind: kind, clampFlingingVelocityByTruncation: clampFlingingVelocityByTruncation);
 
   @override
   bool _isFlingGesture(VelocityEstimate estimate) {
@@ -356,7 +366,10 @@ class HorizontalDragGestureRecognizer extends DragGestureRecognizer {
   HorizontalDragGestureRecognizer({
     Object debugOwner,
     PointerDeviceKind kind,
-  }) : super(debugOwner: debugOwner, kind: kind);
+//BD ADD:START
+    bool clampFlingingVelocityByTruncation,
+//END
+  }) : super(debugOwner: debugOwner, kind: kind, clampFlingingVelocityByTruncation: clampFlingingVelocityByTruncation);
 
   @override
   bool _isFlingGesture(VelocityEstimate estimate) {

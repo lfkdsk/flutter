@@ -52,6 +52,7 @@ class BuildIOSCommand extends BuildSubCommand {
         defaultsTo: false,
         help: 'Flutter lite edition to reduce package size',
       )
+      ..addFlag('track-widget-creation', negatable: false, hide: true)
       ..addFlag('lite-global',
       negatable: false,
       defaultsTo: false,

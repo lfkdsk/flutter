@@ -34,10 +34,8 @@ class SmoothScrollSimulation extends Simulation {
       _startPosition = position;
       double totalDistance = 0.0;
       velocity *= _density;
-      if (velocity != 0) {
-        _duration = _calculateFlingDuration(velocity);
-        totalDistance = _calculateFlingDistance(velocity);
-      }
+      _duration = _calculateFlingDuration(velocity);
+      totalDistance = _calculateFlingDistance(velocity);
       _distance = totalDistance * (velocity).sign / _density;
       scrollListener.onScrollStartConsumed(true);
     }
@@ -134,7 +132,7 @@ class SmoothScrollSimulation extends Simulation {
     final int index = (nbSamples * t).toInt();
     double distanceCoefficient = 1.0;
     double velocityCoefficient = 0;
-    if (index < nbSamples) {
+    if (index >= 0 && index < nbSamples) {
       final double tInf = (index / nbSamples).toDouble();
       final double tSup = ((index + 1) / nbSamples).toDouble();
       final double dInf = splinePosition[index];
@@ -152,7 +150,7 @@ class SmoothScrollSimulation extends Simulation {
     final double t = timeOffset / _duration;
     final int index = (nbSamples * t).toInt();
     double velocityCoefficient = 0;
-    if (index < nbSamples) {
+    if (index >= 0 && index < nbSamples) {
       final double tInf = (index / nbSamples).toDouble();
       final double tSup = ((index + 1) / nbSamples).toDouble();
       final double dInf = splinePosition[index];

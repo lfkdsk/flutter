@@ -29,7 +29,7 @@ class SmoothScrollSimulation extends Simulation {
     Tolerance tolerance = Tolerance.defaultTolerance,
   }) : super(tolerance: tolerance) {
     checkInit();
-    if (needCalculateInitSetting || _duration == null || _duration == 0.0 || _startTime == 0) {
+    if (needCalculateInitSetting || _duration == null || _startTime == 0 || _distance == null) {
       _startTime = DateTime.now().microsecondsSinceEpoch;
       _startPosition = position;
       double totalDistance = 0.0;

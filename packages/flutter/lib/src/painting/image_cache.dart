@@ -411,7 +411,7 @@ class ImageCache {
       }
       _liveImages[key] = image;
       // BD ADD:
-      _checkImageSize(key, info, imageSize)
+      _checkImageSize(key, info, imageSize);
       final _PendingImage pendingImage = untrackedPendingImage ?? _pendingImages.remove(key);
       if (pendingImage != null) {
         pendingImage.removeListener();
@@ -605,7 +605,7 @@ class ImageCacheStatus {
   int get hashCode => hashValues(pending, keepAlive, live);
 
   @override
-  String toString() => '${objectRuntimeType(this, 'ImageCacheStatus')}(pending: $pending, live: $live, keepAlive: $keepAlive)';
+  String toString() => '$runtimeType(pending: $pending, live: $live, keepAlive: $keepAlive)';
 }
 
 class _CachedImage {

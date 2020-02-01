@@ -85,6 +85,7 @@ class ScrollAwareImageProvider<T> extends ImageProvider<T> {
     // allocations to do for texture memory, it's already there.
     if (stream.completer != null || PaintingBinding.instance.imageCache.containsKey(key)) {
       imageProvider.resolveStreamForKey(configuration, stream, key, handleError);
+      return;
     }
     // The context has gone out of the tree - ignore it.
     if (context.context == null) {

@@ -67,6 +67,10 @@ BuildApp() {
       lite_flag="--lite"
       lite_suffix="-lite"
   fi
+  if [[  -n "$LITE_GLOBAL" ]]; then
+      lite_flag="--lite-global"
+      lite_suffix="-liteg"
+  fi
   # END
 
   # Use FLUTTER_BUILD_MODE if it's set, otherwise use the Xcode build configuration name

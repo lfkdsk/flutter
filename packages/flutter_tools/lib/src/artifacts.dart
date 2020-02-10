@@ -16,7 +16,8 @@ import 'globals.dart';
 // BD ADD: START
 enum EngineMode {
   normal,
-  lite
+  lite,
+  lite_global
 }
 // END
 enum Artifact {
@@ -426,6 +427,8 @@ class CachedArtifacts extends Artifacts {
     String liteSuffix = '';
     if ( engineMode == EngineMode.lite ) {
       liteSuffix = '-lite';
+    } else if (engineMode == EngineMode.lite_global) {
+      liteSuffix = '-liteg';
     }
     // END
     switch (platform) {

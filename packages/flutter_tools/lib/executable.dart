@@ -69,10 +69,15 @@ Future<void> main(List<String> args) async {
   final bool verboseHelp = help && verbose;
   // BD ADD: START
   final bool lite = args.contains('--lite');
+  final bool liteGlobal = args.contains('--lite-global');
   EngineMode engineMode = EngineMode.normal;
   if (lite) {
     engineMode = EngineMode.lite;
     print('Currently in lite mode...');
+  }
+  if (liteGlobal) {
+    engineMode = EngineMode.lite_global;
+    print('Currently in lite global mode...');
   }
   setEngineMode(engineMode);
 
@@ -90,7 +95,7 @@ Future<void> main(List<String> args) async {
     if (args.contains('--compress-size')) {
       FlutterBuildInfo.instance.useCompressSize = true;
     }
-    FlutterBuildInfo.instance.isLite = lite;
+    FlutterBuildInfo.instance.isLite = lite || liteGlobal;
   }
   // END
 

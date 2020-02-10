@@ -342,6 +342,10 @@ abstract class FlutterCommand extends Command<void> {
         negatable: false,
         defaultsTo: false,
         help: 'Flutter lite edition to reduce package size');
+    argParser.addFlag('lite-global',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size, with global langage');
     // END
     argParser.addFlag('jit-release',
       negatable: false,
@@ -477,6 +481,9 @@ abstract class FlutterCommand extends Command<void> {
       // BD ADD: START
       lite: argParser.options.containsKey('lite')
           ? argResults['lite']
+          : false,
+      liteGlobal: argParser.options.containsKey('lite-global')
+          ? argResults['lite-global']
           : false,
       // END
     );
@@ -631,6 +638,10 @@ abstract class FlutterCommand extends Command<void> {
   /// Defaults to [DevelopmentArtifact.universal].
   Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
     DevelopmentArtifact.universal,
+    // BD ADD: START
+    DevelopmentArtifact.iOS_lite,
+    DevelopmentArtifact.android_lite,
+    // END
   };
 
   /// Subclasses must implement this to execute the command.
@@ -745,6 +756,14 @@ mixin DeviceBasedDevelopmentArtifacts on FlutterCommand {
     final Set<DevelopmentArtifact> artifacts = <DevelopmentArtifact>{
       DevelopmentArtifact.universal,
     };
+    // BD ADD:
+    final bool isLite = argResults['lite'] | argResults['lite-global'];
+    // TODO @林学彬 下面代码丢失
+//    // BD ADD: START
+//    if (isLite) {
+//      artifacts.add(DevelopmentArtifact.android_lite);
+//    }
+//    // END
     for (Device device in devices) {
       final TargetPlatform targetPlatform = await device.targetPlatform;
       final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform);
@@ -764,6 +783,14 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
     // If there is no specified target device, fallback to the default
     // confiugration.
     final String rawTargetPlatform = stringArg('target-platform');
+    // BD ADD:
+    final bool isLite = argResults['lite'] | argResults['lite-global'];
+    // TODO @林学彬 下面代码丢失
+//    // BD ADD: START
+//    if (isLite) {
+//      artifacts.add(DevelopmentArtifact.android_lite);
+//    }
+//    // END
     final TargetPlatform targetPlatform = getTargetPlatformForName(rawTargetPlatform);
     if (targetPlatform == null) {
       return super.requiredArtifacts;

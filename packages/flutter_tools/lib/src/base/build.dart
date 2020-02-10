@@ -345,8 +345,10 @@ class AOTSnapshotter {
     @required bool trackWidgetCreation,
     @required List<String> dartDefines,
     List<String> extraFrontEndOptions = const <String>[],
-    // BD ADD:
+    // BD ADD:START
     bool lite = false,
+    bool liteGlobal = false
+    // END
   }) async {
     final FlutterProject flutterProject = FlutterProject.current();
     final Directory outputDir = fs.directory(outputPath);
@@ -377,8 +379,10 @@ class AOTSnapshotter {
       buildMode: buildMode,
       trackWidgetCreation: trackWidgetCreation,
       dartDefines: dartDefines,
-      // BD ADD:
+      // BD ADD: START
       lite: lite,
+      liteGlobal: liteGlobal,
+      // END
     ));
 
     // Write path to frontend_server, since things need to be re-generated when that changes.

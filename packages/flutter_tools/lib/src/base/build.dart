@@ -313,16 +313,15 @@ class AOTSnapshotter {
       '-o', appLib,
       assemblyO,
     ];
-
-    // TODO @邱鑫玥，检验替换成processUtils.run是否OK
+    
     // BD ADD: START
     if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
-        await processUtils.run(['rm', '-f', '$isolateSnapshotData.gz']);
-        await processUtils.run(['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
+        await processUtils.run(<String>['rm', '-f', '$isolateSnapshotData.gz']);
+        await processUtils.run(<String>['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
         linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
 
-        await processUtils.run(['rm', '-f', '$vmSnapshotData.gz']);
-        await processUtils.run(['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
+        await processUtils.run(<String>['rm', '-f', '$vmSnapshotData.gz']);
+        await processUtils.run(<String>['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
         linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
     }
     // END

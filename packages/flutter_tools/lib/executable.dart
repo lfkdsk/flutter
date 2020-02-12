@@ -15,6 +15,8 @@ import 'src/build_runner/web_compilation_delegate.dart';
 
 import 'src/codegen.dart';
 import 'src/commands/analyze.dart';
+// BD ADD:
+import 'src/commands/analyze_size.dart';
 import 'src/commands/assemble.dart';
 import 'src/commands/attach.dart';
 import 'src/commands/build.dart';
@@ -94,50 +96,55 @@ Future<void> main(List<String> args) async {
   }
   // END
 
-  await runner.run(args, <FlutterCommand>[
-    AnalyzeCommand(verboseHelp: verboseHelp),
-    AssembleCommand(),
-    AttachCommand(verboseHelp: verboseHelp),
-    BuildCommand(verboseHelp: verboseHelp),
-    ChannelCommand(verboseHelp: verboseHelp),
-    CleanCommand(),
-    ConfigCommand(verboseHelp: verboseHelp),
-    CreateCommand(),
-    // BD ADD:
-    DevelopCommand(),
-    DaemonCommand(hidden: !verboseHelp),
-    DevicesCommand(),
-    DoctorCommand(verbose: verbose),
-    DriveCommand(),
-    EmulatorsCommand(),
-    FormatCommand(),
-    GenerateCommand(),
-    IdeConfigCommand(hidden: !verboseHelp),
-    InjectPluginsCommand(hidden: !verboseHelp),
-    InstallCommand(),
-    LogsCommand(),
-    MakeHostAppEditableCommand(),
-    PackagesCommand(),
-    PrecacheCommand(verboseHelp: verboseHelp),
-    RunCommand(verboseHelp: verboseHelp),
-    ScreenshotCommand(),
-    ShellCompletionCommand(),
-    TestCommand(verboseHelp: verboseHelp),
-    TrainingCommand(),
-    UnpackCommand(),
-    UpdatePackagesCommand(hidden: !verboseHelp),
-    UpgradeCommand(),
-    VersionCommand(),
-  ], verbose: verbose,
-     muteCommandLogging: muteCommandLogging,
-     verboseHelp: verboseHelp,
-     overrides: <Type, Generator>{
-       // The build runner instance is not supported in google3 because
-       // the build runner packages are not synced internally.
-       CodeGenerator: () => const BuildRunner(),
-       WebCompilationProxy: () => BuildRunnerWebCompilationProxy(),
-       // The web runner is not supported internally because it depends
-       // on dwds.
-       WebRunnerFactory: () => DwdsWebRunnerFactory(),
-     });
+  await runner.run(
+      args,
+      <FlutterCommand>[
+        AnalyzeCommand(verboseHelp: verboseHelp),
+        // BD ADD:
+        AnalyzeSizeCommand(),
+        AssembleCommand(),
+        AttachCommand(verboseHelp: verboseHelp),
+        BuildCommand(verboseHelp: verboseHelp),
+        ChannelCommand(verboseHelp: verboseHelp),
+        CleanCommand(),
+        ConfigCommand(verboseHelp: verboseHelp),
+        CreateCommand(),
+        DaemonCommand(hidden: !verboseHelp),
+        // BD ADD:
+        DevelopCommand(),
+        DevicesCommand(),
+        DoctorCommand(verbose: verbose),
+        DriveCommand(),
+        EmulatorsCommand(),
+        FormatCommand(),
+        GenerateCommand(),
+        IdeConfigCommand(hidden: !verboseHelp),
+        InjectPluginsCommand(hidden: !verboseHelp),
+        InstallCommand(),
+        LogsCommand(),
+        MakeHostAppEditableCommand(),
+        PackagesCommand(),
+        PrecacheCommand(verboseHelp: verboseHelp),
+        RunCommand(verboseHelp: verboseHelp),
+        ScreenshotCommand(),
+        ShellCompletionCommand(),
+        TestCommand(verboseHelp: verboseHelp),
+        TrainingCommand(),
+        UnpackCommand(),
+        UpdatePackagesCommand(hidden: !verboseHelp),
+        UpgradeCommand(),
+        VersionCommand(),
+      ],
+      verbose: verbose,
+      muteCommandLogging: muteCommandLogging,
+      verboseHelp: verboseHelp,
+      overrides: <Type, Generator>{
+        // The build runner instance is not supported in google3 because
+        // the build runner packages are not synced internally.
+        CodeGenerator: () => const BuildRunner(),
+        WebCompilationProxy: () => BuildRunnerWebCompilationProxy(),
+        // The web runner is not supported internally because it depends
+        // on dwds.
+        WebRunnerFactory: () => DwdsWebRunnerFactory(),
+      });
 }

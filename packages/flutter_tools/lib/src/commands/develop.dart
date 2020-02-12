@@ -9,7 +9,6 @@ import 'package:flutter_tools/src/version.dart';
 
 import '../runner/flutter_command.dart';
 
-// TODO @邱鑫玥，检验替换成processUtils.run是否OK
 class DevelopCommand extends FlutterCommand {
   DevelopCommand() {
     addSubcommand(DevelopInitCommand());

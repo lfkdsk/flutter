@@ -558,7 +558,7 @@ Future<XcodeBuildResult> buildXcodeProject({
       }
       //删除ios包内容中的icudtl.dat文件
       if(compressSize) {
-        final String icu = '${expectedOutputDirectory}/Frameworks/Flutter.framework/icudtl.dat';
+        final String icu = '$expectedOutputDirectory/Frameworks/Flutter.framework/icudtl.dat';
         if(fs.file(icu).existsSync()) {
           fs.file(icu).deleteSync();
         }

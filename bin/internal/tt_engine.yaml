@@ -34,7 +34,7 @@ artifacts: [
     android-arm64-profile-lite/darwin-x64,
     android-arm64-release-lite/darwin-x64,
     android-x64-profile-lite/darwin-x64,
-    android-x64-release-lite/darwin-x64.
+    android-x64-release-lite/darwin-x64,
     android-arm-dynamic-profile-lite/darwin-x64,
     android-arm-dynamic-release-lite/darwin-x64,
     android-arm64-dynamic-profile-lite/darwin-x64,
@@ -44,6 +44,8 @@ artifacts: [
     android-arm-release-liteg/darwin-x64,
     android-arm64-profile-liteg/darwin-x64,
     android-arm64-release-liteg/darwin-x64,
+    android-x64-profile-liteg/darwin-x64,
+    android-x64-release-liteg/darwin-x64,
 
     android-x86,
     android-x64,
@@ -53,6 +55,8 @@ artifacts: [
     android-arm64,
     android-arm64-profile,
     android-arm64-release,
+    android-x64-profile,
+    android-x64-release,
     android-arm-dynamic-profile,
     android-arm-dynamic-release,
     android-arm64-dynamic-profile,
@@ -66,6 +70,8 @@ artifacts: [
     android-arm64-lite,
     android-arm64-profile-lite,
     android-arm64-release-lite,
+    android-x64-profile-lite,
+    android-x64-release-lite,
     android-arm-dynamic-profile-lite,
     android-arm-dynamic-release-lite,
     android-arm64-dynamic-profile-lite,
@@ -79,4 +85,6 @@ artifacts: [
     android-arm64-liteg,
     android-arm64-profile-liteg,
     android-arm64-release-liteg,
+    android-x64-profile-liteg,
+    android-x64-release-liteg,
 ]

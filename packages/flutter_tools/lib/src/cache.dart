@@ -1024,7 +1024,7 @@ class AndroidInternalBuildLiteArtifacts extends EngineCachedArtifact {
   AndroidInternalBuildLiteArtifacts(Cache cache) : super(
     'android-internal-build-artifacts-lite',
     cache,
-    DevelopmentArtifact.androidInternalBuild,
+    DevelopmentArtifact.androidInternalBuildLite,
   );
 
   @override
@@ -1465,11 +1465,15 @@ const List<List<String>> _osxLiteBinaryDirs = <List<String>>[
   <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
   <String>['android-arm64-profile-lite/darwin-x64', 'android-arm64-profile-lite/darwin-x64.zip'],
   <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
+  <String>['android-x64-profile-lite/darwin-x64', 'android-x64-profile-lite/darwin-x64.zip'],
+  <String>['android-x64-release-lite/darwin-x64', 'android-x64-release-lite/darwin-x64.zip'],
 
   <String>['android-arm-profile-liteg/darwin-x64', 'android-arm-profile-liteg/darwin-x64.zip'],
   <String>['android-arm-release-liteg/darwin-x64', 'android-arm-release-liteg/darwin-x64.zip'],
   <String>['android-arm64-profile-liteg/darwin-x64', 'android-arm64-profile-liteg/darwin-x64.zip'],
   <String>['android-arm64-release-liteg/darwin-x64', 'android-arm64-release-liteg/darwin-x64.zip'],
+  <String>['android-x64-profile-liteg/darwin-x64', 'android-x64-profile-liteg/darwin-x64.zip'],
+  <String>['android-x64-release-liteg/darwin-x64', 'android-x64-release-liteg/darwin-x64.zip'],
 ];
 // END
 
@@ -1533,6 +1537,8 @@ const List<List<String>> _androidLiteBinaryDirs = <List<String>>[
   <String>['android-arm64-lite', 'android-arm64-lite/artifacts.zip'],
   <String>['android-arm64-profile-lite', 'android-arm64-profile-lite/artifacts.zip'],
   <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
+  <String>['android-x64-profile-lite', 'android-x64-profile-lite/artifacts.zip'],
+  <String>['android-x64-release-lite', 'android-x64-release-lite/artifacts.zip'],
 
   <String>['android-x86-liteg', 'android-x86-liteg/artifacts.zip'],
   <String>['android-x64-liteg', 'android-x64-liteg/artifacts.zip'],
@@ -1542,6 +1548,8 @@ const List<List<String>> _androidLiteBinaryDirs = <List<String>>[
   <String>['android-arm64-liteg', 'android-arm64-liteg/artifacts.zip'],
   <String>['android-arm64-profile-liteg', 'android-arm64-profile-liteg/artifacts.zip'],
   <String>['android-arm64-release-liteg', 'android-arm64-release-liteg/artifacts.zip'],
+  <String>['android-x64-profile-liteg', 'android-x64-profile-liteg/artifacts.zip'],
+  <String>['android-x64-release-liteg', 'android-x64-release-liteg/artifacts.zip'],
 ];
 // END
 

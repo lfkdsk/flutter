@@ -80,6 +80,16 @@ class AssembleCommand extends FlutterCommand {
       'resource-pool-size',
       help: 'The maximum number of concurrent tasks the build system will run.',
     );
+    // BD ADD: START
+    argParser.addFlag('lite',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size');
+    argParser.addFlag('lite-global',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite edition to reduce package size, with global langage');
+    // END
   }
 
   @override

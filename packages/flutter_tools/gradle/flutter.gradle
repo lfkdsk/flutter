@@ -341,12 +341,16 @@ class FlutterPlugin implements Plugin<Project> {
             if (!supportsBuildMode(flutterBuildMode)) {
                 return
             }
-            // TODO @林学彬 校验lite参数的添加逻辑
+            // BD ADD
+            String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
+            // BD MOD: START
+            // addApiDependencies(project, buildType.name, "io.flutter:${arch}_$flutterBuildMode:$engineVersion")
             addApiDependencies(
                 pluginProject,
                 buildType.name,
-                "io.flutter:flutter_embedding_${flutterBuildMode}${useLite() ? "_lite" : ""}:$engineVersion"
+                "io.flutter:flutter_embedding_${flutterBuildMode}${liteSuffix}:$engineVersion"
             )
+            // END
         }
         pluginProject.afterEvaluate {
             pluginProject.android.buildTypes {
@@ -493,12 +497,21 @@ class FlutterPlugin implements Plugin<Project> {
         return project.hasProperty('local-engine-repo')
     }
 
+    // BD ADD: START
     private Boolean useLite() {
         if (project.hasProperty('lite')) {
             return project.property('lite').toBoolean()
         }
         return false
     }
+
+    private Boolean useLiteGlobal() {
+        if (project.hasProperty('lite-global')) {
+            return project.property('lite-global').toBoolean()
+        }
+        return false
+    }
+    // END
 
     private Boolean isVerbose() {
         if (project.hasProperty('verbose')) {
@@ -618,7 +631,7 @@ class FlutterPlugin implements Plugin<Project> {
             liteValue = project.property('lite').toBoolean()
         }
         Boolean liteGlobalValue = false
-        if (project.hasProperty('lite-global;')) {
+        if (project.hasProperty('lite-global')) {
             liteGlobalValue = project.property('lite-global').toBoolean()
         }
         // END
@@ -669,6 +682,13 @@ class FlutterPlugin implements Plugin<Project> {
                 // END
             }
             File libJar = project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/libs.jar")
+            // BD ADD: START
+            def needArmeabi = true
+            def value = project.extensions.findByName('bdFlutterConfig')
+            if (value != null && value.needArmeabi != null) {
+                needArmeabi = value.needArmeabi
+            }
+            // END
             Task packFlutterAppAotTask = project.tasks.create(name: "packLibs${FLUTTER_BUILD_PREFIX}${variant.name.capitalize()}", type: Jar) {
                 destinationDir libJar.parentFile
                 archiveName libJar.name
@@ -677,7 +697,7 @@ class FlutterPlugin implements Plugin<Project> {
                     String abi = PLATFORM_ARCH_MAP[targetPlatform]
                     // BD ADD: START
                     // 复制armeabi-v7a的libapp.so到armeabi
-                    if (abi.equals(ARCH_ARM32)) {
+                    if (abi.equals(ARCH_ARM32) && needArmeabi) {
                         from(compileTask.intermediateDir) {
                             include '*.so'
                             rename { String filename ->
@@ -862,8 +882,9 @@ abstract class BaseFlutterTask extends DefaultTask {
                 args "--lite"
             }
             if (useLiteGlobal) {
-                    args "--lite-global"
-                }// END
+                args "--lite-global"
+            }
+            // END
             if (extraFrontEndOptions != null) {
                 args "-dExtraFrontEndOptions=${extraFrontEndOptions}"
             }

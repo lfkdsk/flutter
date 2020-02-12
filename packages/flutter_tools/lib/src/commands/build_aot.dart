@@ -91,6 +91,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       // BD ADD: START
       trackWidgetCreation: boolArg('track-widget-creation'),
       useLite: boolArg('lite'),
+      useLiteGlobal: boolArg('lite-global'),
       // END
       reportTimings: boolArg('report-timings'),
       iosBuildArchs: stringsArg('ios-arch').map<DarwinArch>(getIOSArchForName),

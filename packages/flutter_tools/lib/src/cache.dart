@@ -1060,7 +1060,7 @@ class AndroidGenSnapshotLiteArtifacts extends EngineCachedArtifact {
       ] else if (platform.isWindows)
         ..._windowsBinaryDirs
       else if (platform.isMacOS)
-          ..._osxBinaryDirs
+          ..._osxLiteBinaryDirs
         else if (platform.isLinux)
             ..._linuxBinaryDirs,
     ];

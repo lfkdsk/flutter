@@ -56,16 +56,16 @@ class BuildApkCommand extends BuildSubCommand {
   Set<DevelopmentArtifact> getAdjustRequiredArtifacts() {
     bool liteMode = false;
     if (argParser.options.containsKey('lite')) {
-      liteMode = liteMode | argResults['lite'];
+      liteMode = liteMode | boolArg('lite');
     }
     if (argParser.options.containsKey('lite-global')) {
-      liteMode = liteMode | argResults['lite-global'];
+      liteMode = liteMode | boolArg('lite-global');
     }
     if (liteMode) {
       return const <DevelopmentArtifact>{
+        DevelopmentArtifact.androidGenSnapshot,
+        DevelopmentArtifact.androidGenSnapshotLite,
         DevelopmentArtifact.universal,
-        DevelopmentArtifact.android,
-        DevelopmentArtifact.android_lite,
       };
     } else {
       return const <DevelopmentArtifact>{

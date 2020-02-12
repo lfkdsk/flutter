@@ -93,7 +93,7 @@ class BuildIOSCommand extends BuildSubCommand {
       return const <DevelopmentArtifact>{
         DevelopmentArtifact.universal,
         DevelopmentArtifact.iOS,
-        DevelopmentArtifact.iOS_lite,
+        DevelopmentArtifact.iOSLite,
       };
     } else {
       return const <DevelopmentArtifact>{

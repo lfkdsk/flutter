@@ -480,10 +480,10 @@ abstract class FlutterCommand extends Command<void> {
           : null,
       // BD ADD: START
       lite: argParser.options.containsKey('lite')
-          ? argResults['lite']
+          ? boolArg('lite')
           : false,
       liteGlobal: argParser.options.containsKey('lite-global')
-          ? argResults['lite-global']
+          ? boolArg('lite-global')
           : false,
       // END
     );
@@ -635,14 +635,9 @@ abstract class FlutterCommand extends Command<void> {
 
   /// The set of development artifacts required for this command.
   ///
-  /// Defaults to [DevelopmentArtifact.universal].
-  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
-    DevelopmentArtifact.universal,
-    // BD ADD: START
-    DevelopmentArtifact.iOS_lite,
-    DevelopmentArtifact.android_lite,
-    // END
-  };
+  /// Defaults to an empty set. Including [DevelopmentArtifact.universal] is
+  /// not required as it is always updated.
+  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{};
 
   /// Subclasses must implement this to execute the command.
   /// Optionally provide a [FlutterCommandResult] to send more details about the
@@ -756,17 +751,13 @@ mixin DeviceBasedDevelopmentArtifacts on FlutterCommand {
     final Set<DevelopmentArtifact> artifacts = <DevelopmentArtifact>{
       DevelopmentArtifact.universal,
     };
-    // BD ADD:
-    final bool isLite = argResults['lite'] | argResults['lite-global'];
-    // TODO @林学彬 下面代码丢失
-//    // BD ADD: START
-//    if (isLite) {
-//      artifacts.add(DevelopmentArtifact.android_lite);
-//    }
-//    // END
+    // BD ADD
+    final bool isLite = boolArg('lite') | boolArg('lite-global');
     for (Device device in devices) {
       final TargetPlatform targetPlatform = await device.targetPlatform;
-      final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform);
+      // BD MOD：
+      // final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform, isLite);
+      final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform, isLite: isLite);
       if (developmentArtifact != null) {
         artifacts.add(developmentArtifact);
       }
@@ -783,14 +774,6 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
     // If there is no specified target device, fallback to the default
     // confiugration.
     final String rawTargetPlatform = stringArg('target-platform');
-    // BD ADD:
-    final bool isLite = argResults['lite'] | argResults['lite-global'];
-    // TODO @林学彬 下面代码丢失
-//    // BD ADD: START
-//    if (isLite) {
-//      artifacts.add(DevelopmentArtifact.android_lite);
-//    }
-//    // END
     final TargetPlatform targetPlatform = getTargetPlatformForName(rawTargetPlatform);
     if (targetPlatform == null) {
       return super.requiredArtifacts;
@@ -799,7 +782,11 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
     final Set<DevelopmentArtifact> artifacts = <DevelopmentArtifact>{
       DevelopmentArtifact.universal,
     };
-    final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform);
+    // BD ADD
+    final bool isLite = boolArg('lite') | boolArg('lite-global');
+    // BD MOD:
+    // final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform);
+    final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform, isLite: isLite);
     if (developmentArtifact != null) {
       artifacts.add(developmentArtifact);
     }
@@ -809,18 +796,24 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
 
 // Returns the development artifact for the target platform, or null
 // if none is supported
-DevelopmentArtifact _artifactFromTargetPlatform(TargetPlatform targetPlatform) {
+// BD MOD:
+//DevelopmentArtifact _artifactFromTargetPlatform(TargetPlatform targetPlatform) {
+DevelopmentArtifact _artifactFromTargetPlatform(TargetPlatform targetPlatform, {bool isLite=false}) {
   switch (targetPlatform) {
     case TargetPlatform.android:
     case TargetPlatform.android_arm:
     case TargetPlatform.android_arm64:
     case TargetPlatform.android_x64:
     case TargetPlatform.android_x86:
-      return DevelopmentArtifact.androidGenSnapshot;
+      // BD MOD:
+      // return DevelopmentArtifact.androidGenSnapshot;
+      return isLite ? DevelopmentArtifact.androidGenSnapshotLite : DevelopmentArtifact.androidGenSnapshot;
     case TargetPlatform.web_javascript:
       return DevelopmentArtifact.web;
     case TargetPlatform.ios:
-      return DevelopmentArtifact.iOS;
+      // BD MOD:
+      // return DevelopmentArtifact.iOS;
+      return isLite ? DevelopmentArtifact.iOSLite : DevelopmentArtifact.iOS;
     case TargetPlatform.darwin_x64:
       if (featureFlags.isMacOSEnabled) {
         return DevelopmentArtifact.macOS;

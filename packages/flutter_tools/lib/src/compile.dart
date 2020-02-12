@@ -327,9 +327,7 @@ class KernelCompiler {
       if (trackWidgetCreation) '--track-widget-creation',
       // BD ADD: START
       if (lite) '--lite',
-      if (liteGlobal) {
-      command.add('--lite-global');
-    }
+      if (liteGlobal) '--lite-global',
     // END
       if (!linkPlatformKernelIn) '--no-link-platform',
       if (aot) ...<String>[

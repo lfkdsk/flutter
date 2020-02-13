@@ -652,7 +652,9 @@ class AndroidProject {
     if (isModule) {
       // A module type's Android project is used in add-to-app scenarios and
       // only supports the V2 embedding.
-      return AndroidEmbeddingVersion.v2;
+      // BD MOD:
+      // return AndroidEmbeddingVersion.v2;
+      return AndroidEmbeddingVersion.v1;
     }
     if (appManifestFile == null || !appManifestFile.existsSync()) {
       return AndroidEmbeddingVersion.v1;

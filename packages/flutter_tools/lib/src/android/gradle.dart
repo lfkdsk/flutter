@@ -32,15 +32,23 @@ import 'package:flutter_tools/src/calculate_build_info.dart';
 /// The directory where the APK artifact is generated.
 @visibleForTesting
 Directory getApkDirectory(FlutterProject project) {
+  // BD MOD :START
+  //return project.isModule
+  //    ? project.android.buildDirectory
+  //    .childDirectory('host')
+  //    .childDirectory('outputs')
+  //    .childDirectory('apk')
+  //    : project.android.buildDirectory
+  //    .childDirectory('app')
+  //    .childDirectory('outputs')
+  //    .childDirectory('apk');
   return project.isModule
-    ? project.android.buildDirectory
-        .childDirectory('host')
-        .childDirectory('outputs')
-        .childDirectory('apk')
+    ? project.android.gradleAppOutV1Directory
     : project.android.buildDirectory
         .childDirectory('app')
         .childDirectory('outputs')
         .childDirectory('apk');
+  // END
 }
 
 /// The directory where the app bundle artifact is generated.

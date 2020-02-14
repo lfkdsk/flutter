@@ -509,8 +509,7 @@ class AndroidDevice extends Device {
       case TargetPlatform.android_arm64:
         // BD MOD
         // androidArch = AndroidArch.arm64_v8a;
-        // BD ADD
-//        androidArchs.add(AndroidArch.armeabi_v7a);
+        androidArchs.add(AndroidArch.armeabi_v7a);
         androidArchs.add(AndroidArch.arm64_v8a);
         // END
         break;

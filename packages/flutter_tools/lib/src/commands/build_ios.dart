@@ -55,6 +55,11 @@ class BuildIOSCommand extends BuildSubCommand {
 //        defaultsTo: false,
 //        help: 'Flutter lite edition to reduce package size',
 //      );
+//    ..addFlag('lite-global',
+//    negatable: false,
+//    defaultsTo: false,
+//    help: 'Flutter lite global edition to reduce package size',
+//    );
       // END
 
   }
@@ -65,11 +70,38 @@ class BuildIOSCommand extends BuildSubCommand {
   @override
   final String description = 'Build an iOS application bundle (Mac OS X host only).';
 
+  // BD MOD: START
+  // @override
+  // Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
+  //   DevelopmentArtifact.universal,
+  //  DevelopmentArtifact.iOS,
+  // };
   @override
-  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
-    DevelopmentArtifact.universal,
-    DevelopmentArtifact.iOS,
-  };
+  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => getAdjustRequiredArtifacts();
+  // END
+
+  // BD ADD: START
+  Set<DevelopmentArtifact> getAdjustRequiredArtifacts() {
+    bool liteMode = false;
+    if (argParser.options.containsKey('lite')) {
+      liteMode = liteMode | boolArg('lite');
+    }
+    if (argParser.options.containsKey('lite-global')) {
+      liteMode = liteMode | boolArg('lite-global');
+    }
+    if (liteMode) {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.iOSLite,
+      };
+    } else {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.iOS,
+      };
+    }
+  }
+  // END
 
   @override
   Future<FlutterCommandResult> runCommand() async {
@@ -109,7 +141,7 @@ class BuildIOSCommand extends BuildSubCommand {
     await FlutterBuildInfo.instance.reportInfo();
     // END
     final bool compressSize = buildInfo.mode == BuildMode.release
-        ? argResults['compress-size']
+        ? boolArg('compress-size')
         : false;
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,

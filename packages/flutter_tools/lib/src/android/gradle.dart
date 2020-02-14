@@ -346,6 +346,15 @@ Future<void> buildGradleApp({
   }
   command.add(assembleTask);
 
+  // BD ADD: START
+  if (buildInfo.lite) {
+    command.add('-Plite=true');
+  }
+  if (buildInfo.liteGlobal) {
+    command.add('-Plite-global=true');
+  }
+  // END
+
   GradleHandledError detectedGradleError;
   String detectedGradleErrorLine;
   String consumeLog(String line) {
@@ -480,6 +489,8 @@ Future<void> buildGradleApp({
       color: TerminalColor.green,
     );
   }
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 /// Builds AAR and POM files.
@@ -554,6 +565,15 @@ Future<void> buildGradleAar({
   }
 
   command.add(aarTask);
+
+  // BD ADD: START
+  if (androidBuildInfo.buildInfo.lite) {
+    command.add('-Plite=true');
+  }
+  if (androidBuildInfo.buildInfo.liteGlobal) {
+    command.add('-Plite-global=true');
+  }
+  // END
 
   final Stopwatch sw = Stopwatch()..start();
   RunResult result;
@@ -711,12 +731,6 @@ Future<void> buildPluginsAsAar(
   if (!flutterPluginFile.existsSync()) {
     return;
   }
-  // TODO 丢失了如下代码，请检查@王莹
-//  // BD ADD: START
-//  if (buildInfo.lite) {
-//    command.add('-Plite=true');
-//  }
-//  // END
   final List<String> plugins = flutterPluginFile.readAsStringSync().split('\n');
   for (String plugin in plugins) {
     final List<String> pluginParts = plugin.split('=');
@@ -731,10 +745,16 @@ Future<void> buildPluginsAsAar(
     try {
       await buildGradleAar(
         project: FlutterProject.fromDirectory(pluginDirectory),
-        androidBuildInfo: const AndroidBuildInfo(
+        // BD MOD:
+        // androidBuildInfo: const AndroidBuildInfo(
+        androidBuildInfo: AndroidBuildInfo(
           BuildInfo(
             BuildMode.release, // Plugins are built as release.
             null, // Plugins don't define flavors.
+            // BD ADD: START
+            lite: androidBuildInfo.buildInfo.lite,
+            liteGlobal: androidBuildInfo.buildInfo.liteGlobal,
+            // END
           ),
         ),
         target: '',
@@ -747,6 +767,8 @@ Future<void> buildPluginsAsAar(
       throwToolExit('The plugin $pluginName could not be built due to the issue above.');
     }
   }
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 /// Returns the APK files for a given [FlutterProject] and [AndroidBuildInfo].

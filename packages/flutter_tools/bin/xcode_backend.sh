@@ -67,6 +67,10 @@ BuildApp() {
       lite_flag="--lite"
       lite_suffix="-lite"
   fi
+  if [[  -n "$LITE_GLOBAL" ]]; then
+      lite_flag="--lite-global"
+      lite_suffix="-liteg"
+  fi
   # END
 
   # Use FLUTTER_BUILD_MODE if it's set, otherwise use the Xcode build configuration name
@@ -296,6 +300,7 @@ BuildApp() {
     ${flutter_engine_flag}                                                  \
     ${local_engine_flag}                                                    \
     ${track_widget_creation_flag}
+    ${lite_flag}
 
   # BD ADD:START
   if [[ "$compress_size_flag" != "" ]]; then

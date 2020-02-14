@@ -225,6 +225,10 @@ List<String> _xcodeBuildSettingsLines({
   if (buildInfo.lite) {
     xcodeBuildSettings.add('LITE=true');
   }
+
+  if (buildInfo.liteGlobal) {
+    xcodeBuildSettings.add('LITE_GLOBAL=true');
+  }
   // END
   return xcodeBuildSettings;
 }

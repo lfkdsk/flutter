@@ -20,8 +20,10 @@ class BuildInfo {
     this.fileSystemScheme,
     this.buildNumber,
     this.buildName,
-    // BD ADD:
+    // BD ADD: START
     this.lite = false,
+    this.liteGlobal = false
+    // END
   });
 
   final BuildMode mode;
@@ -58,8 +60,10 @@ class BuildInfo {
   /// On Android it is used as versionName.
   /// On Xcode builds it is used as CFBundleShortVersionString,
   final String buildName;
-  // BD ADD:
+  // BD ADD:START
   final bool lite;
+  final bool liteGlobal;
+  // END
 
   static const BuildInfo debug = BuildInfo(BuildMode.debug, null);
   static const BuildInfo profile = BuildInfo(BuildMode.profile, null);

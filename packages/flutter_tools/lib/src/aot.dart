@@ -34,6 +34,7 @@ class AotBuilder {
     // BD ADD ：START
     bool trackWidgetCreation = false,
     bool useLite = false,
+    bool useLiteGlobal = false,
     // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     List<String> extraFrontEndOptions,
@@ -46,6 +47,9 @@ class AotBuilder {
     // BD ADD: START Wangying
     if (useLite) {
       print('Build with lite edition...');
+    }
+    if (useLiteGlobal) {
+      print('Build with lite global edition...');
     }
     // END
     if (_canUseAssemble(platform)
@@ -89,6 +93,10 @@ class AotBuilder {
         outputPath: outputPath,
         extraFrontEndOptions: extraFrontEndOptions,
         dartDefines: dartDefines,
+        // BD ADD: START : Only for release
+        lite: useLite && buildMode == BuildMode.release,
+        liteGlobal: useLiteGlobal && buildMode == BuildMode.release,
+        // END
       );
       if (kernelOut == null) {
         throwToolExit('Compiler terminated unexpectedly.');
@@ -220,6 +228,10 @@ class AotBuilder {
       ? const ProfileCopyFlutterAotBundle()
       : const ReleaseCopyFlutterAotBundle();
 
+    // BD ADD:
+    // The target was previously defined to include genSnapshot, where genSnapshot will be affected by lite, so there is no need to pass in a lite parameter.
+    // See AotElfRelease or AotElfProfile.
+    // END
     final BuildResult result = await buildSystem.build(target, Environment(
       projectDir: flutterProject.directory,
       outputDir: fs.directory(outputDir),

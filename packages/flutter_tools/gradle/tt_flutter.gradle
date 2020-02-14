@@ -55,6 +55,8 @@ class FlutterPatchPlugin implements Plugin<Project> {
         String liteSuffix = ''
         if (project.hasProperty('lite') && project.property('lite').toBoolean()) {
             liteSuffix = '-lite'
+        } else if (project.hasProperty('lite-global') && project.property('lite-global').toBoolean()) {
+            liteSuffix = '-liteg'
         }
         debugFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}").resolve("flutter.jar").toFile()
         profileFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-profile").resolve("flutter.jar").toFile()

@@ -84,10 +84,10 @@ class BuildIOSCommand extends BuildSubCommand {
   Set<DevelopmentArtifact> getAdjustRequiredArtifacts() {
     bool liteMode = false;
     if (argParser.options.containsKey('lite')) {
-      liteMode = liteMode | argResults['lite'];
+      liteMode = liteMode | boolArg('lite');
     }
     if (argParser.options.containsKey('lite-global')) {
-      liteMode = liteMode | argResults['lite-global'];
+      liteMode = liteMode | boolArg('lite-global');
     }
     if (liteMode) {
       return const <DevelopmentArtifact>{
@@ -142,7 +142,7 @@ class BuildIOSCommand extends BuildSubCommand {
     await FlutterBuildInfo.instance.reportInfo();
     // END
     final bool compressSize = buildInfo.mode == BuildMode.release
-        ? argResults['compress-size']
+        ? boolArg('compress-size')
         : false;
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,

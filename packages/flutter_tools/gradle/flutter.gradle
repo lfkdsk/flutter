@@ -25,7 +25,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 
-// TODO @林学彬 对比154
 buildscript {
     repositories {
         google()
@@ -238,9 +237,11 @@ class FlutterPlugin implements Plugin<Project> {
                 }
             }
         }
+        // BD ADD
+        String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
         // Add the embedding dependency.
         addApiDependencies(project, buildType.name,
-                "io.flutter:flutter_embedding_${flutterBuildMode}${useLite() ? "_lite" : ""}:$engineVersion")
+                "io.flutter:flutter_embedding_${flutterBuildMode}${liteSuffix}:$engineVersion")
 
         List<String> platforms = getTargetPlatforms().collect()
         // Debug mode includes x86 and x64, which are commonly used in emulators.
@@ -252,7 +253,7 @@ class FlutterPlugin implements Plugin<Project> {
             String arch = PLATFORM_ARCH_MAP[platform].replace("-", "_")
             // Add the `libflutter.so` dependency.
             addApiDependencies(project, buildType.name,
-                    "io.flutter:${arch}_${flutterBuildMode}${useLite() ? "_lite" : ""}:$engineVersion")
+                    "io.flutter:${arch}_${flutterBuildMode}${liteSuffix}:$engineVersion")
         }
     }
 

@@ -300,6 +300,7 @@ BuildApp() {
     ${flutter_engine_flag}                                                  \
     ${local_engine_flag}                                                    \
     ${track_widget_creation_flag}
+    ${lite_flag}
 
   # BD ADD:START
   if [[ "$compress_size_flag" != "" ]]; then

@@ -83,11 +83,40 @@ class BuildIOSFrameworkCommand extends BuildSubCommand {
       'and its plugins for integration into existing, plain Xcode projects.\n'
       'This can only be run on macOS hosts.';
 
+
+  // BD MOD: START
+  // @override
+  // Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
+  //   DevelopmentArtifact.universal,
+  //  DevelopmentArtifact.iOS,
+  // };
   @override
-  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => const <DevelopmentArtifact>{
-    DevelopmentArtifact.universal,
-    DevelopmentArtifact.iOS,
-  };
+  Future<Set<DevelopmentArtifact>> get requiredArtifacts async => getAdjustRequiredArtifacts();
+  // END
+
+  // BD ADD: START
+  Set<DevelopmentArtifact> getAdjustRequiredArtifacts() {
+    bool liteMode = false;
+    if (argParser.options.containsKey('lite')) {
+      liteMode = liteMode | boolArg('lite');
+    }
+    if (argParser.options.containsKey('lite-global')) {
+      liteMode = liteMode | boolArg('lite-global');
+    }
+    if (liteMode) {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.iOS,
+        DevelopmentArtifact.iOSLite,
+      };
+    } else {
+      return const <DevelopmentArtifact>{
+        DevelopmentArtifact.universal,
+        DevelopmentArtifact.iOS,
+      };
+    }
+  }
+  // END
 
   FlutterProject _project;
 

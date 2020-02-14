@@ -1120,7 +1120,8 @@ class IOSEngineLiteArtifacts extends EngineCachedArtifact {
   @override
   List<String> getLicenseDirs() {
     if (cache.includeAllPlatforms || platform.isMacOS) {
-      return const <String>['ios', 'ios-profile', 'ios-release'];
+      return const <String>['ios-lite', 'ios-profile-lite', 'ios-release-lite',
+        'ios-liteg', 'ios-profile-liteg', 'ios-release-liteg'];
     }
     return const <String>[];
   }

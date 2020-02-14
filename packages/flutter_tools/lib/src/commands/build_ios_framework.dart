@@ -106,7 +106,6 @@ class BuildIOSFrameworkCommand extends BuildSubCommand {
     if (liteMode) {
       return const <DevelopmentArtifact>{
         DevelopmentArtifact.universal,
-        DevelopmentArtifact.iOS,
         DevelopmentArtifact.iOSLite,
       };
     } else {

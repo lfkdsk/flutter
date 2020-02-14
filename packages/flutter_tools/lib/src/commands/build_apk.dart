@@ -63,7 +63,6 @@ class BuildApkCommand extends BuildSubCommand {
     }
     if (liteMode) {
       return const <DevelopmentArtifact>{
-        DevelopmentArtifact.androidGenSnapshot,
         DevelopmentArtifact.androidGenSnapshotLite,
         DevelopmentArtifact.universal,
       };

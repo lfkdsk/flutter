@@ -32,6 +32,7 @@ class AotBuilder {
     bool quiet = true,
     bool reportTimings = false,
     // BD ADD ：START
+    bool compressSize = false,
     bool trackWidgetCreation = false,
     bool useLite = false,
     bool useLiteGlobal = false,
@@ -124,6 +125,8 @@ class AotBuilder {
             extraGenSnapshotOptions: extraGenSnapshotOptions,
             bitcode: bitcode,
             quiet: quiet,
+            // BD ADD:
+            compressSize: compressSize
           ).then<int>((int buildExitCode) {
             return buildExitCode;
           });

@@ -119,16 +119,16 @@ class BuildIOSCommand extends BuildSubCommand {
       FlutterBuildInfo.instance.pkgName = app.toString();
     }
     await FlutterBuildInfo.instance.reportInfo();
+    final bool compressSize =
+        buildInfo.mode == BuildMode.release && boolArg('compress-size');
     // END
-    final bool compressSize = buildInfo.mode == BuildMode.release
-        ? boolArg('compress-size')
-        : false;
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,
       targetOverride: targetFile,
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
+      // BD ADD:
       compressSize: compressSize
     );
 

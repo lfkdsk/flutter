@@ -112,6 +112,17 @@ void main() {
       expect(await caughtError.future, true);
     });
 
+    test('obtainKey errors will be caught - check location', () async {
+      final ImageProvider imageProvider = ObtainKeyErrorImageProvider();
+      final Completer<bool> caughtError = Completer<bool>();
+      FlutterError.onError = (FlutterErrorDetails details) {
+        caughtError.complete(true);
+      };
+      await imageProvider.obtainCacheStatus(configuration: ImageConfiguration.empty);
+
+      expect(await caughtError.future, true);
+    });
+
     test('resolve sync errors will be caught', () async {
       bool uncaught = false;
       final Zone testZone = Zone.current.fork(specification: ZoneSpecification(
@@ -161,7 +172,6 @@ void main() {
     test('File image with empty file throws expected error - (image cache)', () async {
       final Completer<StateError> error = Completer<StateError>();
       FlutterError.onError = (FlutterErrorDetails details) {
-        print(details.exception);
         error.complete(details.exception as StateError);
       };
       final MemoryFileSystem fs = MemoryFileSystem();
@@ -173,7 +183,7 @@ void main() {
       expect(await error.future, isStateError);
     });
 
-    group(NetworkImage, () {
+    group('NetworkImage', () {
       MockHttpClient httpClient;
 
       setUp(() {

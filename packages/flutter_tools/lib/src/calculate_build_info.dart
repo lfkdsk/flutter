@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_tools/src/platform_plugins.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_tools/src/android/android_sdk.dart';
@@ -188,10 +189,17 @@ class FlutterBuildInfo {
       final Map<String, String> map = new Map<String, String>();
       map['name'] = plugin.name;
       map['path'] = plugin.path;
-      // TODO @林学彬
-//      map['androidPackage'] = plugin.androidPackage;
-//      map['iosPrefix'] = plugin.iosPrefix;
-//      map['pluginClass'] = plugin.pluginClass;
+      if (plugin.platforms != null) {
+        plugin.platforms.values.forEach((pv){
+          if (pv is AndroidPlugin) {
+            map['androidPackage'] = pv.package;
+            map['pluginClass'] = pv.pluginClass;
+          } else if (pv is IOSPlugin ) {
+            map['iosPrefix'] = pv.classPrefix;
+            map['pluginClass'] = pv.pluginClass;
+          }
+        });
+      }
       list.add(map);
     }
 
@@ -238,7 +246,6 @@ class FlutterBuildInfo {
       });
       try {
         if (findTosResp?.body?.isNotEmpty == true) {
-          // TODO @林学彬
           final List list = json.decode(findTosResp.body) as List;
           if (list?.isNotEmpty == true) {
             final Map<String, dynamic> map = list[0] as Map<String, dynamic>;

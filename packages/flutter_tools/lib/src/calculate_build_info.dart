@@ -85,6 +85,9 @@ class FlutterBuildInfo {
     if (frameworkCid != null) {
       frameworkVersion =
           BDGitTagVersion.determine().frameworkVersionFor(frameworkCid);
+      if (frameworkVersion != null && frameworkVersion == '0.0.0-unknown') {
+        frameworkVersion = GitTagVersion.determine().frameworkVersionFor(frameworkCid);
+      }
     }
     engineCid = runSafeCmd(
         <String>['cat', '${Cache.flutterRoot}/bin/internal/ttengine.version']);

@@ -260,7 +260,11 @@ class FlutterBuildInfo {
       }
 
       // upload index
-      await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      http.Response resp = await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      if (resp != null && resp.body != null && resp.body.contains('error')) {
+        tosHost = _kHost;
+        await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      }
       // upload result json
       await _uploadJson(tosHost, jsonResult, fileName, 'application/json');
     }

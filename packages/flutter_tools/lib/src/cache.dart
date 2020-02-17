@@ -1525,7 +1525,8 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
   <String>['android-arm64-release', 'android-arm64-release/artifacts.zip'],
   <String>['android-x64-profile', 'android-x64-profile/artifacts.zip'],
   <String>['android-x64-release', 'android-x64-release/artifacts.zip'],
-  <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],
+  // BD DEL:
+  // <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],
 ];
 
 // BD ADD: START

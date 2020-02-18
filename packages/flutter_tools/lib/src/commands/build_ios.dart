@@ -40,26 +40,6 @@ class BuildIOSCommand extends BuildSubCommand {
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,
       );
-    // TODO @王莹
-//    Invalid argument(s): Duplicate option "lite".
-//    #0      ArgParser._addOption (package:args/src/arg_parser.dart:294:7)
-//    #1      ArgParser.addFlag (package:args/src/arg_parser.dart:132:5)
-//    #2      new BuildIOSCommand (package:flutter_tools/src/commands/build_ios.dart:43:9)
-//    #3      new BuildCommand (package:flutter_tools/src/commands/build.dart:28:19)
-//    #4      main (package:flutter_tools/executable.dart:101:5)
-//    #5      main (file:///Users/sunkun01/WorkCode/flutter/packages/flutter_tools/bin/flutter_tools.dart:8:3)
-//    #6      _startIsolate.<anonymous closure> (dart:isolate-patch/isolate_patch.dart:305:32)
-//    #7      _RawReceivePortImpl._handleMessage (dart:isolate-patch/isolate_patch.dart:174:12)
-//      ..addFlag('lite',
-//        negatable: false,
-//        defaultsTo: false,
-//        help: 'Flutter lite edition to reduce package size',
-//      );
-//    ..addFlag('lite-global',
-//    negatable: false,
-//    defaultsTo: false,
-//    help: 'Flutter lite global edition to reduce package size',
-//    );
       // END
 
   }

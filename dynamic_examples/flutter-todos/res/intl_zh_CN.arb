@@ -1,0 +1,697 @@
+{
+  "@@last_modified": "2019-06-28T15:08:05.980030",
+  "appName": "一日清单",
+  "@appName": {
+    "description": "app的名字",
+    "type": "text",
+    "placeholders": {}
+  },
+  "tryToSearch": "试试搜一下标题、内容吧",
+  "@tryToSearch": {
+    "description": "试试搜一下标题、内容吧",
+    "type": "text",
+    "placeholders": {}
+  },
+  "searchIcon": "搜索图标名字",
+  "@searchIcon": {
+    "description": "搜索图标名字",
+    "type": "text",
+    "placeholders": {}
+  },
+  "doneList": "完成列表",
+  "@doneList": {
+    "description": "完成列表",
+    "type": "text",
+    "placeholders": {}
+  },
+  "toFinishTask": "努力去完成一项任务吧",
+  "@toFinishTask": {
+    "description": "努力去完成一项任务吧!",
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskNum": "任务数",
+  "@taskNum": {
+    "description": "任务数",
+    "type": "text",
+    "placeholders": {}
+  },
+  "createDate": "创建日期",
+  "@createDate": {
+    "description": "创建日期",
+    "type": "text",
+    "placeholders": {}
+  },
+  "completeDate": "完成日期",
+  "@completeDate": {
+    "description": "完成日期",
+    "type": "text",
+    "placeholders": {}
+  },
+  "spendTime": "用时",
+  "@spendTime": {
+    "description": "用时",
+    "type": "text",
+    "placeholders": {}
+  },
+  "changedTimes": "修改次数",
+  "@changedTimes": {
+    "description": "修改次数",
+    "type": "text",
+    "placeholders": {}
+  },
+  "hours": "{hours,plural, =0{太快了!}=1{1 小时}many{{hours} 小时}other{{hours} 小时}}",
+  "@hours": {
+    "type": "text",
+    "placeholders": {
+      "hours": {}
+    }
+  },
+  "days": "{days,plural, =0{太快了!}=1{1 天}many{{days} 天}other{{days} 天}}",
+  "@days": {
+    "type": "text",
+    "placeholders": {
+      "days": {}
+    }
+  },
+  "languageTitle": "切换语言",
+  "@languageTitle": {
+    "description": "Change Language",
+    "type": "text",
+    "placeholders": {}
+  },
+    "changeTheme": "切换主题",
+    "@changeTheme": {
+      "description": "切换主题",
+      "type": "text",
+      "placeholders": {}
+    },
+  "feedback": "意见反馈",
+  "@feedback": {
+    "description": "意见反馈",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackWall": "反馈墙",
+  "@feedbackWall": {
+    "description": "反馈墙",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackCantBeNull": "意见反馈内容不能为空哦",
+  "@feedbackCantBeNull": {
+    "description": "意见反馈内容不能为空哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackIsTooLittle": "意见反馈内容太少了，再加点儿吧",
+  "@feedbackIsTooLittle": {
+    "description": "意见反馈内容太少了，再加点儿吧",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackNeedEmoji": "选个评价表情吧 ",
+  "@feedbackNeedEmoji": {
+    "description": "选个评价表情吧",
+    "type": "text",
+    "placeholders": {}
+  },
+  "feedbackFrequently": "8小时内只能提交一次哦",
+  "@feedbackFrequently": {
+    "description": "8小时内只能提交一次哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "writeYourFeedback": "写下你的意见或是建议吧",
+  "@writeYourFeedback": {
+    "description": "写下你的意见或是建议吧",
+    "type": "text",
+    "placeholders": {}
+  },
+  "writeYourContactInfo": "是否留下你的联系方式",
+  "@writeYourContactInfo": {
+    "description": "是否留下你的联系方式",
+    "type": "text",
+    "placeholders": {}
+  },
+  "waitAMoment": "请稍后...",
+  "@waitAMoment": {
+    "description": "请稍后...",
+    "type": "text",
+    "placeholders": {}
+  },
+  "submitSuccess": "提交成功!",
+  "@submitSuccess": {
+    "description": "提交成功！",
+    "type": "text",
+    "placeholders": {}
+  },
+  "thanksForFeedback": "感谢你的反馈",
+  "@thanksForFeedback": {
+    "description": "感谢你的反馈",
+    "type": "text",
+    "placeholders": {}
+  },
+  "submitAgain": "重新提交",
+  "@submitAgain": {
+    "description": "重新提交",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noName": "无名氏",
+  "@noName": {
+    "description": "无名氏",
+    "type": "text",
+    "placeholders": {}
+  },
+  "appSetting": "设置",
+  "@appSetting": {
+    "description": "app设置",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enableWeatherShow": "开启天气",
+  "@enableWeatherShow": {
+    "description": "开启天气",
+    "type": "text",
+    "placeholders": {}
+  },
+  "inputCurrentCity": "手动输入你的城市",
+  "@inputCurrentCity": {
+    "description": "手动输入你的城市",
+    "type": "text",
+    "placeholders": {}
+  },
+  "weatherGetWrong": "天气获取失败,请重新尝试",
+  "@weatherGetWrong": {
+    "description": "天气获取失败,请重新尝试",
+    "type": "text",
+    "placeholders": {}
+  },
+  "weatherGetting": "天气获取中...",
+  "@weatherGetting": {
+    "description": "天气获取中...",
+    "type": "text",
+    "placeholders": {}
+  },
+  "weatherSuccess": "天气获取成功",
+  "@weatherSuccess": {
+    "description": "天气获取成功...",
+    "type": "text",
+    "placeholders": {}
+  },
+  "aboutApp": "关于",
+  "@aboutApp": {
+    "description": "关于",
+    "type": "text",
+    "placeholders": {}
+  },
+  "versionDescription": "版本描述",
+  "@versionDescription": {
+    "description": "版本描述",
+    "type": "text",
+    "placeholders": {}
+  },
+  "projectLink": "项目地址",
+  "@projectLink": {
+    "description": "项目地址",
+    "type": "text",
+    "placeholders": {}
+  },
+  "myGithub": "作者的github",
+  "@myGithub": {
+    "description": "作者的github",
+    "type": "text",
+    "placeholders": {}
+  },
+  "iconSetting": "图标设置",
+  "@iconSetting": {
+    "description": "图标设置",
+    "type": "text",
+    "placeholders": {}
+  },
+  "navigatorSetting": "导航栏设置",
+  "@navigatorSetting": {
+    "description": "导航栏设置",
+    "type": "text",
+    "placeholders": {}
+  },
+  "meteorShower": "天体流星",
+  "@meteorShower": {
+    "description": "天体流星",
+    "type": "text",
+    "placeholders": {}
+  },
+  "dailyPic": "每日壁纸",
+  "@dailyPic": {
+    "description": "每日壁纸",
+    "type": "text",
+    "placeholders": {}
+  },
+  "netPicture": "网络图片",
+  "@netPicture": {
+    "description": "网络图片",
+    "type": "text",
+    "placeholders": {}
+  },
+  "picture": "图片",
+  "@picture": {
+    "description": "图片",
+    "type": "text",
+    "placeholders": {}
+  },
+  "currentIcons": "当前图标",
+  "@currentIcons": {
+    "description": "当前图标",
+    "type": "text",
+    "placeholders": {}
+  },
+  "game": "打游戏",
+  "@game": {
+    "description": "打游戏",
+    "type": "text",
+    "placeholders": {}
+  },
+  "music": "听歌",
+  "@music": {
+    "description": "听歌",
+    "type": "text",
+    "placeholders": {}
+  },
+  "read": "读书",
+  "@read": {
+    "description": "读书",
+    "type": "text",
+    "placeholders": {}
+  },
+  "sports": "运动",
+  "@sports": {
+    "description": "运动",
+    "type": "text",
+    "placeholders": {}
+  },
+  "travel": "旅行",
+  "@travel": {
+    "description": "旅行",
+    "type": "text",
+    "placeholders": {}
+  },
+  "work": "工作",
+  "@work": {
+    "description": "工作",
+    "type": "text",
+    "placeholders": {}
+  },
+  "defaultIconName": "默认",
+  "@defaultIconName": {
+    "description": "默认",
+    "type": "text",
+    "placeholders": {}
+  },
+  "setIconName": "图标名",
+  "@setIconName": {
+    "description": "给图标设置一个名字吧",
+    "type": "text",
+    "placeholders": {}
+  },
+  "customIcon": "自定义图标",
+  "@customIcon": {
+    "description": "自定义图标",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cancel": "取消",
+  "@cancel": {
+    "description": "取消",
+    "type": "text",
+    "placeholders": {}
+  },
+  "ok": "确定",
+  "@ok": {
+    "description": "确定",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pickAColor": "选择一个颜色吧!",
+  "@pickAColor": {
+    "description": "选择一个颜色吧!",
+    "type": "text",
+    "placeholders": {}
+  },
+  "canNotAddMoreIcon": "最多只能自定义10个图标哦",
+  "@canNotAddMoreIcon": {
+    "description": "最多只能自定义10个图标",
+    "type": "text",
+    "placeholders": {}
+  },
+  "canNotEditDefaultIcon": "默认图标无法编辑哦",
+  "@canNotEditDefaultIcon": {
+    "description": "默认图标无法编辑哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "customTheme": "自定义主题",
+  "@customTheme": {
+    "description": "自定义主题",
+    "type": "text",
+    "placeholders": {}
+  },
+  "canNotAddMoreTheme": "最多只能自定义10个主题哦",
+  "@canNotAddMoreTheme": {
+    "description": "最多只能自定义10个主题哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "writeAtLeastOneTaskItem": "请至少写下一项任务哦",
+  "@writeAtLeastOneTaskItem": {
+    "description": "请至少写下一项任务哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "defaultTitle": "默认标题",
+  "@defaultTitle": {
+    "description": "默认标题",
+    "type": "text",
+    "placeholders": {}
+  },
+  "avatarLocal": "从本地选取头像",
+  "@avatarLocal": {
+    "description": "从本地选取头像",
+    "type": "text",
+    "placeholders": {}
+  },
+  "avatarNet": "从网络选取头像",
+  "@avatarNet": {
+    "description": "从网络选取头像",
+    "type": "text",
+    "placeholders": {}
+  },
+  "avatarHistory": "历史头像记录",
+  "@avatarHistory": {
+    "description": "历史头像记录",
+    "type": "text",
+    "placeholders": {}
+  },
+  "avatar": "头像",
+  "@avatar": {
+    "description": "头像",
+    "type": "text",
+    "placeholders": {}
+  },
+  "save": "保存",
+  "@save": {
+    "description": "保存",
+    "type": "text",
+    "placeholders": {}
+  },
+  "history": "历史",
+  "@history": {
+    "description": "历史",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deniedDes": "权限被拒绝",
+  "@deniedDes": {
+    "description": "权限被拒绝",
+    "type": "text",
+    "placeholders": {}
+  },
+  "disabledDes": "权限不可用",
+  "@disabledDes": {
+    "description": "权限不可用",
+    "type": "text",
+    "placeholders": {}
+  },
+  "restrictedDes": "权限被限制",
+  "@restrictedDes": {
+    "description": "权限被限制",
+    "type": "text",
+    "placeholders": {}
+  },
+  "unknownDes": "未知权限",
+  "@unknownDes": {
+    "description": "未知权限",
+    "type": "text",
+    "placeholders": {}
+  },
+  "openSystemSetting": "打开系统设置",
+  "@openSystemSetting": {
+    "description": "打开系统设置",
+    "type": "text",
+    "placeholders": {}
+  },
+  "checkUpdate": "检查更新",
+  "@checkUpdate": {
+    "description": "检查更新",
+    "type": "text",
+    "placeholders": {}
+  },
+  "update": "升级",
+  "@update": {
+    "description": "升级",
+    "type": "text",
+    "placeholders": {}
+  },
+  "newVersionIsComing": "新版本来啦!",
+  "@newVersionIsComing": {
+    "description": "新版本来啦!",
+    "type": "text",
+    "placeholders": {}
+  },
+  "noUpdate": "已是最新版本",
+  "@noUpdate": {
+    "description": "已是最新版本",
+    "type": "text",
+    "placeholders": {}
+  },
+  "bgChangeWithCard": "背景跟随任务图标颜色",
+  "@bgChangeWithCard": {
+    "description": "背景跟随任务图标颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+  "cardChangeWithBg": "任务图标颜色跟随背景",
+  "@cardChangeWithBg": {
+    "description": "任务图标颜色跟随背景",
+    "type": "text",
+    "placeholders": {}
+  },
+  "backgroundGradient": "背景渐变",
+  "@backgroundGradient": {
+    "description": "app设置",
+    "type": "text",
+    "placeholders": {}
+  },
+  "enableInfiniteScroll": "任务卡片循环滑动",
+  "@enableInfiniteScroll": {
+    "description": "任务卡片循环滑动",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pink": "略施粉黛",
+  "@pink": {
+    "description": "主题颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+    "coffee": "想入啡啡",
+    "@coffee": {
+      "description": "主题颜色",
+      "type": "text",
+      "placeholders": {}
+    },
+  "cyan": "蓝天白云",
+  "@cyan": {
+    "description": "主题颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+  "green": "青青草原",
+  "@green": {
+    "description": "主题颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+  "purple": "紫气东来",
+  "@purple": {
+    "description": "主题颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+  "dark": "不见五指",
+  "@dark": {
+    "description": "主题颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+  "blueGray": "炊烟袅袅",
+  "@blueGray": {
+    "description": "主题颜色",
+    "type": "text",
+    "placeholders": {}
+  },
+  "editTask": "编辑",
+  "@editTask": {
+    "description": "编辑任务",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteTask": "删除",
+  "@deleteTask": {
+    "description": "删除任务",
+    "type": "text",
+    "placeholders": {}
+  },
+  "submit": "提交",
+  "@submit": {
+    "description": "提交任务",
+    "type": "text",
+    "placeholders": {}
+  },
+  "addTask": "添加任务",
+  "@addTask": {
+    "description": "添加任务",
+    "type": "text",
+    "placeholders": {}
+  },
+  "deadline": "截止日期",
+  "@deadline": {
+    "description": "截止日期",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startDate": "开始日期",
+  "@startDate": {
+    "description": "开始日期",
+    "type": "text",
+    "placeholders": {}
+  },
+  "remindMe": "提醒我",
+  "@remindMe": {
+    "description": "提醒我",
+    "type": "text",
+    "placeholders": {}
+  },
+  "repeat": "重复",
+  "@repeat": {
+    "description": "重复",
+    "type": "text",
+    "placeholders": {}
+  },
+  "startAfterEnd": "开始日期要比结束日期小才行哦",
+  "@startAfterEnd": {
+    "description": "开始日期要比结束日期小才行哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "endBeforeStart": "结束日期要比开始日期大才行哦",
+  "@endBeforeStart": {
+    "description": "结束日期要比开始日期大才行哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "welcomeWord": "你好呀! ",
+  "@welcomeWord": {
+    "description": "主页的欢迎词",
+    "type": "text",
+    "placeholders": {}
+  },
+  "customUserName": "昵称设置",
+  "@customUserName": {
+    "description": "昵称设置",
+    "type": "text",
+    "placeholders": {}
+  },
+  "inputUserName": "输入你的昵称吧",
+  "@inputUserName": {
+    "description": "输入你的昵称吧",
+    "type": "text",
+    "placeholders": {}
+  },
+  "userNameCantBeNull": "昵称不能为空哦!",
+  "@userNameCantBeNull": {
+    "description": "昵称不能为空哦!",
+    "type": "text",
+    "placeholders": {}
+  },
+  "taskItems": "{taskNumbers,plural, =0{你还没有写过任务清单呢.\n快快开始吧.}=1{下面你的任务清单,\n今天, 你有 1 项任务尚未完成. }many{下面是你的任务清单,\n今天, 你有 {taskNumbers} 份任务尚未完成. }other{下面是你的任务清单,\n今天, 你有 {taskNumbers} 份任务尚未完成. }}",
+  "@taskItems": {
+    "type": "text",
+    "placeholders": {
+      "taskNumbers": {}
+    }
+  },
+  "itemNumber": "{number,plural, =0{还没有任务详情哦 }=1{1 项 }other{{number} 项 }}",
+  "@itemNumber": {
+    "type": "text",
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "loadingEmpty": "什么都没有哦",
+  "@loadingEmpty": {
+    "description": "什么都没有哦",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loadingIdle": "......",
+  "@loadingIdle": {
+    "description": "......",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loadingError": "加载出错了",
+  "@loadingError": {
+    "description": "加载出错了",
+    "type": "text",
+    "placeholders": {}
+  },
+  "loading": "加载中...",
+  "@loading": {
+    "description": "加载中...",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pullUpToLoadMore": "上拉加载更多",
+  "@pullUpToLoadMore": {
+    "description": "上拉加载更多",
+    "type": "text",
+    "placeholders": {}
+  },
+  "pullDownToRefresh": "下拉刷新",
+  "@pullDownToRefresh": {
+    "description": "下拉刷新",
+    "type": "text",
+    "placeholders": {}
+  },
+ "reLoading": "点击重新加载",
+ "@reLoading": {
+   "description": "点击重新加载",
+   "type": "text",
+   "placeholders": {}
+ },
+  "version100": "版本:1.0.0 \n\n版本 1.0.0 发布啦!",
+  "@version100": {
+    "description": "版本:1.0.0 \n\n版本 1.0.0 发布啦!",
+    "type": "text",
+    "placeholders": {}
+  },
+  "version101": "版本:1.0.1 \n\n1.修复完成列表界面的显示bug\n2.新增编辑任务可以添加起止时间，用作提醒\n",
+  "@version101": {
+    "description": "版本:1.0.1 \n\n1.修复完成列表界面的显示bug\n2.新增编辑任务可以添加起止时间，用作提醒\n",
+    "type": "text",
+    "placeholders": {}
+  },
+  "version102": "版本:1.0.2 \n\n1.修复一些小bug \n2.图标设置界面可以搜索图标了 \n",
+  "@version102": {
+    "description": "版本:1.0.2 \n\n1.修复一些小bug \n2.图标设置界面可以搜索图标了 \n",
+    "type": "text",
+    "placeholders": {}
+  },
+  "version103": "版本:1.0.3 \n\n1.修复：升级弹框的文字颜色错误(夜间模式下) \n2.修复：完成列表显示的的完成用时为负数 \n3.新增：留言展示墙！ \n",
+  "@version103": {
+    "description": "版本:1.0.3 \n\n1.修复：升级弹框的文字颜色错误(夜间模式下) \n2.修复：完成列表显示的的完成用时为负数 \n3.新增：留言展示墙！ \n",
+    "type": "text",
+    "placeholders": {}
+  }
+}

@@ -234,6 +234,10 @@ class KernelSnapshot extends Target {
       fileSystemRoots: fileSystemRoots,
       fileSystemScheme: fileSystemScheme,
       dartDefines: parseDartDefines(environment),
+      // BD ADD: START
+      isDynamicart: buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile,
+      dynamicPlugins: environment.dynamicPlugins,
+      // END
     );
     if (output == null || output.errorCount != 0) {
       throw Exception('Errors during snapshot creation: $output');

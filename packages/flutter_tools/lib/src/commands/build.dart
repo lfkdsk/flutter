@@ -19,6 +19,9 @@ import 'build_ios.dart';
 import 'build_ios_framework.dart';
 import 'build_web.dart';
 
+// BD ADD:
+import 'build_dynamic.dart';
+
 class BuildCommand extends FlutterCommand {
   BuildCommand({bool verboseHelp = false}) {
     addSubcommand(BuildAarCommand());
@@ -33,6 +36,9 @@ class BuildCommand extends FlutterCommand {
     addSubcommand(BuildLinuxCommand());
     addSubcommand(BuildWindowsCommand());
     addSubcommand(BuildFuchsiaCommand(verboseHelp: verboseHelp));
+
+    // BD ADD:
+    addSubcommand(BuildDynamicCommand());
   }
 
   @override

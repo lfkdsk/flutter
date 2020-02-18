@@ -351,7 +351,10 @@ class CachedArtifacts extends Artifacts {
   String _getFlutterPatchedSdkPath(BuildMode mode) {
     final String engineArtifactsPath = cache.getArtifactDirectory('engine').path;
     return fs.path.join(engineArtifactsPath, 'common',
-        mode == BuildMode.release ? 'flutter_patched_sdk_product' : 'flutter_patched_sdk');
+      (mode == BuildMode.release || mode == BuildMode.dynamicartRelease)
+        ? 'flutter_patched_sdk_product'
+        : 'flutter_patched_sdk'
+    );
   }
 
   String _getFlutterWebSdkPath() {
@@ -567,7 +570,9 @@ class LocalEngineArtifacts extends Artifacts {
 
   String _getFlutterPatchedSdkPath(BuildMode buildMode) {
     return fs.path.join(engineOutPath,
-        buildMode == BuildMode.release ? 'flutter_patched_sdk_product' : 'flutter_patched_sdk');
+        buildMode == BuildMode.release || buildMode == BuildMode.dynamicartRelease
+            ? 'flutter_patched_sdk_product'
+            : 'flutter_patched_sdk');
   }
 
   String _getFlutterWebSdkPath() {

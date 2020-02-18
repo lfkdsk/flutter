@@ -69,6 +69,7 @@ class GenSnapshot {
       outputFilter = (String line) => line != kStripWarning ? line : null;
     }
 
+//    print("snapshot==${<String>[snapshotterPath, ...args].join(' ')}");
     return processUtils.stream(
       <String>[snapshotterPath, ...args],
       mapFunction: outputFilter,
@@ -96,6 +97,7 @@ class AOTSnapshotter {
     @required bool bitcode,
     bool quiet = false,
     // BD ADD:
+    bool isMinimumSize = false,
     bool compressSize = false
   }) async {
     if (bitcode && platform != TargetPlatform.ios) {
@@ -139,12 +141,30 @@ class AOTSnapshotter {
     }
     // END
 
+    // BD ADD:
+    if (buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile) {
+      genSnapshotArgs.add('--dynamicart');
+    }
+    // END
+
     final String assembly = fs.path.join(outputDir.path, 'snapshot_assembly.S');
     // BD ADD: START
     String isolateSnapshotData;
     String vmSnapshotData;
     // END
     if (platform == TargetPlatform.ios || platform == TargetPlatform.darwin_x64) {
+
+      // BD ADD:
+      if (isMinimumSize) {
+        final String isolateSnapshotData = fs.path.join(
+            outputDir.path, 'isolate_snapshot_data');
+        final String vmSnapshotData = fs.path.join(
+            outputDir.path, 'vm_snapshot_data');
+        genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
+        genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
+      }
+      // END
+
       // Assembly AOT snapshot.
       outputPaths.add(assembly);
       genSnapshotArgs.add('--snapshot_kind=app-aot-assembly');
@@ -313,7 +333,7 @@ class AOTSnapshotter {
       '-o', appLib,
       assemblyO,
     ];
-    
+
     // BD ADD: START
     if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
         await processUtils.run(<String>['rm', '-f', '$isolateSnapshotData.gz']);
@@ -343,6 +363,10 @@ class AOTSnapshotter {
     @required String outputPath,
     @required bool trackWidgetCreation,
     @required List<String> dartDefines,
+    // BD ADD: START
+    @required bool isDynamicart,
+    List<String> dynamicPlugins,
+    // END
     List<String> extraFrontEndOptions = const <String>[],
     // BD ADD:START
     bool lite = false,
@@ -378,7 +402,9 @@ class AOTSnapshotter {
       buildMode: buildMode,
       trackWidgetCreation: trackWidgetCreation,
       dartDefines: dartDefines,
-      // BD ADD: START
+      // BD ADD:
+      isDynamicart: isDynamicart,
+      dynamicPlugins: dynamicPlugins,
       lite: lite,
       liteGlobal: liteGlobal,
       // END

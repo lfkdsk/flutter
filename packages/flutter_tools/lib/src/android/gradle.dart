@@ -344,6 +344,11 @@ Future<void> buildGradleApp({
     // Don't use settings.gradle from the current project since it includes the plugins as subprojects.
     command.add('--settings-file=settings_aar.gradle');
   }
+  // BD ADD: START
+  if (buildInfo.dynamicPlugins != null) {
+    command.add('-Pdynamic-aot-plugins=${buildInfo.dynamicPlugins}');
+  }
+  // END
   command.add(assembleTask);
 
   // BD ADD: START

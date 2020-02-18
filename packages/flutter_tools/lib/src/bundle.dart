@@ -67,6 +67,10 @@ class BundleBuilder {
     List<String> extraGenSnapshotOptions = const <String>[],
     List<String> fileSystemRoots,
     String fileSystemScheme,
+    // BD ADD: START
+    bool isDynamicart = false,
+    bool isMinimumSize = false
+    // END
   }) async {
     mainPath ??= defaultMainPath;
     depfilePath ??= defaultDepfilePath;
@@ -82,6 +86,10 @@ class BundleBuilder {
       depfilePath: depfilePath,
       precompiled: precompiledSnapshot,
       trackWidgetCreation: trackWidgetCreation,
+      // BD ADD: START
+      isDynamicart : isDynamicart,
+      isMinimumSize : isMinimumSize,
+      // END
     );
     // Work around for flutter_tester placing kernel artifacts in odd places.
     if (applicationKernelFilePath != null) {
@@ -106,6 +114,10 @@ Future<void> buildWithAssemble({
   @required String depfilePath,
   @required bool precompiled,
   bool trackWidgetCreation,
+  // BD ADD: START
+  bool isDynamicart = false,
+  bool isMinimumSize = false
+  // END
 }) async {
   // If the precompiled flag was not passed, force us into debug mode.
   buildMode = precompiled ? buildMode : BuildMode.debug;
@@ -151,6 +163,10 @@ Future<AssetBundle> buildAssets({
   String packagesPath,
   bool includeDefaultFonts = true,
   bool reportLicensedPackages = false,
+  // BD ADD: START
+  bool includeManifest = false,
+  bool isMinimumSize = false
+  // END
 }) async {
   assetDirPath ??= getAssetBuildDirectory();
   packagesPath ??= fs.path.absolute(PackageMap.globalPackagesPath);
@@ -163,6 +179,10 @@ Future<AssetBundle> buildAssets({
     packagesPath: packagesPath,
     includeDefaultFonts: includeDefaultFonts,
     reportLicensedPackages: reportLicensedPackages,
+    // BD ADD: START
+    includeManifest: includeManifest,
+    isMinimumSize: isMinimumSize
+    // END
   );
   if (result != 0) {
     return null;

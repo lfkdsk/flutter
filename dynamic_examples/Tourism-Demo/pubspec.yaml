@@ -1,0 +1,42 @@
+name: tourism_demo
+version: 0.0.1
+description: Flutter demo
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_redux: ^0.5.2
+  intl: ^0.15.2
+  http: ^0.12.0
+
+  cupertino_icons: ^0.1.2
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+   - images/placeholder.png
+   - images/icons/airplane(1).png
+   - images/icons/food.png
+   - images/icons/hotel.png
+   - images/icons/right-arrow.png
+
+
+
+
+  fonts:
+    - family: BJ Regular
+      fonts:
+        - asset: fonts/bahij-janna-regular.ttf
+    - family: BJ Bold
+      fonts:
+        - asset: fonts/bahij-janna-bold.ttf
+

@@ -19,6 +19,8 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     addBuildModeFlags();
     usesPubOption();
     usesDartDefines();
+    // BD ADD:
+    addDynamicartModeFlags();
     argParser
       ..addOption('output-dir', defaultsTo: getAotBuildDirectory())
       ..addOption('target-platform',
@@ -31,6 +33,10 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         defaultsTo: false,
         help: 'Report timing information about build steps in machine readable form,',
       )
+      // BD ADD: START
+      ..addFlag('minimum-size',
+        defaultsTo: false,
+        help: '用于ios的dyamicart模式下减少包体积的参数')
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,)
@@ -81,6 +87,20 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     // TODO 代码移位置，对比154 @王莹@林学彬@谢然
     aotBuilder ??= AotBuilder();
 
+    // BD ADD: START
+    final bool compressSize = buildMode == BuildMode.release &&
+        platform == TargetPlatform.ios
+        ? boolArg('compress-size')
+        : false;
+    List<String> dynamicPlugins;
+    if (boolArg('dynamicart')) {
+      dynamicPlugins = getDynamicPlugins();
+    }
+    final bool isMinimumSize = boolArg('dynamicart') ||
+        buildMode == BuildMode.release
+        ? boolArg('minimum-size') : false;
+    // END
+
     await aotBuilder.build(
       platform: platform,
       outputPath: outputPath,
@@ -98,6 +118,12 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       extraFrontEndOptions: stringsArg(FlutterOptions.kExtraFrontEndOptions),
       extraGenSnapshotOptions: stringsArg(FlutterOptions.kExtraGenSnapshotOptions),
       dartDefines: dartDefines,
+      // BD ADD: START
+      isDynamicart: buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile,
+      dynamicPlugins: dynamicPlugins,
+      compressSize: compressSize,
+      isMinimumSize: isMinimumSize
+      // END
     );
     return null;
   }

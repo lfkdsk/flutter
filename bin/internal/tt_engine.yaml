@@ -5,6 +5,8 @@ artifacts: [
     ios,
     ios-profile,
     ios-release,
+    ios-dynamicart-release,
+    ios-dynamicart-profile,
 
     ios-lite,
     ios-profile-lite,
@@ -28,6 +30,10 @@ artifacts: [
     android-arm-dynamic-release/darwin-x64,
     android-arm64-dynamic-profile/darwin-x64,
     android-arm64-dynamic-release/darwin-x64,
+    android-arm-dynamicart-release/darwin-x64,
+    android-arm64-dynamicart-release/darwin-x64,
+    android-arm-dynamicart-profile/darwin-x64,
+    android-arm64-dynamicart-profile/darwin-x64,
 
     android-arm-profile-lite/darwin-x64,
     android-arm-release-lite/darwin-x64,
@@ -61,6 +67,10 @@ artifacts: [
     android-arm-dynamic-release,
     android-arm64-dynamic-profile,
     android-arm64-dynamic-release,
+    android-arm-dynamicart-release,
+    android-arm64-dynamicart-release,
+    android-arm-dynamicart-profile,
+    android-arm64-dynamicart-profile,
 
     android-x86-lite,
     android-x64-lite,

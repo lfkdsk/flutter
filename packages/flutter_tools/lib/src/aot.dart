@@ -34,6 +34,10 @@ class AotBuilder {
     // BD ADD ：START
     bool trackWidgetCreation = false,
     bool useLite = false,
+    bool isDynamicart = false,
+    bool compressSize = false,
+    bool isMinimumSize = false,
+    List<String> dynamicPlugins = null,
     bool useLiteGlobal = false,
     // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
@@ -93,9 +97,11 @@ class AotBuilder {
         outputPath: outputPath,
         extraFrontEndOptions: extraFrontEndOptions,
         dartDefines: dartDefines,
-        // BD ADD: START : Only for release
-        lite: useLite && buildMode == BuildMode.release,
+        // BD ADD: START
+        lite: useLite,
         liteGlobal: useLiteGlobal && buildMode == BuildMode.release,
+        isDynamicart: isDynamicart,
+        dynamicPlugins: dynamicPlugins,
         // END
       );
       if (kernelOut == null) {
@@ -124,6 +130,10 @@ class AotBuilder {
             extraGenSnapshotOptions: extraGenSnapshotOptions,
             bitcode: bitcode,
             quiet: quiet,
+            // BD ADD: START
+            isMinimumSize: isMinimumSize,
+            compressSize: compressSize,
+            // END
           ).then<int>((int buildExitCode) {
             return buildExitCode;
           });

@@ -41,6 +41,23 @@ BuildApp() {
     project_path="${FLUTTER_APPLICATION_PATH}"
   fi
 
+  # BD ADD: START
+  local dynamicart_flag="NO"
+  if [[ -n "$DYNAMICART" ]]; then
+    dynamicart_flag="${DYNAMICART}"
+  fi
+
+  local minimum_size_flag="NO"
+  if [[ -n "$MINIMUM_SIZE" ]]; then
+    minimum_size_flag="${MINIMUM_SIZE}"
+  fi
+
+  local dynamic_aot_plugins=""
+  if [[ -n "$DYNAMIC_AOT_PLUGINS" ]]; then
+      dynamic_aot_plugins="${DYNAMIC_AOT_PLUGINS}"
+  fi
+  # END
+
   local target_path="lib/main.dart"
   if [[ -n "$FLUTTER_TARGET" ]]; then
     target_path="${FLUTTER_TARGET}"
@@ -122,7 +139,17 @@ BuildApp() {
 
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
 
-  AssertExists "${framework_path}"
+ if [[ "${dynamicart_flag}" == "YES" ]];
+ then
+ framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/ios-dynamicart-${build_mode}"
+ else
+ framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
+ fi
+
+ if [[ ! -n "$LOCAL_ENGINE" ]];then
+   AssertExists "${framework_path}"
+ fi
+
   AssertExists "${project_path}"
 
   RunCommand mkdir -p -- "$derived_dir"
@@ -167,10 +194,16 @@ BuildApp() {
     mkdir "${derived_dir}/engine"
     RunCommand cp -r -- "${flutter_podspec}" "${derived_dir}/engine"
     RunCommand cp -r -- "${flutter_framework}" "${derived_dir}/engine"
+    if [[ "$minimum_size_flag" == "YES" ]]; then
+       RunCommand rm -f -- "${derived_dir}/engine/Flutter.framework/icudtl.dat"
+    fi
   else
     RunCommand rm -rf -- "${derived_dir}/Flutter.framework"
     RunCommand cp -- "${flutter_podspec}" "${derived_dir}"
     RunCommand cp -r -- "${flutter_framework}" "${derived_dir}"
+    if [[ "$minimum_size_flag" == "YES" ]]; then
+      RunCommand rm -f -- "${derived_dir}/Flutter.framework/icudtl.dat"
+    fi
   fi
 
   RunCommand pushd "${project_path}" > /dev/null
@@ -203,6 +236,20 @@ BuildApp() {
       EchoError "========================================================================"
       exit -1
     fi
+    StreamOutput " ├─Building Dart code..."
+    local minimum_size_command=""
+    if [[ "$minimum_size_flag" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$dynamicart_flag" == "YES" ]]); then
+      minimum_size_command="--minimum-size"
+    fi
+    local dynamic_aot_plugins_command=""
+    if [[ "$dynamic_aot_plugins" != "" ]]; then
+     dynamic_aot_plugins_command="--dynamic-aot-plugins=${dynamic_aot_plugins}"
+    fi
+    local dynamicart_command=""
+    if [[ "$dynamicart_flag" == "YES" ]]; then
+     dynamicart_command="--dynamicart"
+    fi
+    EchoError "========================================================================${dynamic_aot_plugins_command}"
 
     RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics           \
       ${verbose_flag}                                                       \
@@ -214,7 +261,10 @@ BuildApp() {
       --ios-arch="${archs}"                                                 \
       ${flutter_engine_flag}                                                \
       ${local_engine_flag}                                                  \
-      ${bitcode_flag}                                         \
+      ${bitcode_flag}                                                       \
+      ${dynamicart_command}                                                 \
+      ${dynamic_aot_plugins_command}                                        \
+      ${minimum_size_command}                                               \
       ${compress_size_flag}                                                 \
       ${lite_flag}
 
@@ -288,7 +338,12 @@ BuildApp() {
   local asset_dir="${app_framework_dir}/${assets_path}"
 
   StreamOutput " ├─Assembling Flutter resources..."
-  RunCommand "${FLUTTER_ROOT}/bin/flutter"     \
+    local asset_dir_command="${derived_dir}/App.framework/${assets_path}"
+
+  if [[ "$minimum_size_flag" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$dynamicart_flag" == "YES" ]]); then
+    asset_dir_command="${build_dir}/aot/${assets_path}"
+  fi
+  RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics             \
     ${verbose_flag}                                                         \
     build bundle                                                            \
     --target-platform=ios                                                   \
@@ -299,8 +354,47 @@ BuildApp() {
     ${precompilation_flag}                                                  \
     ${flutter_engine_flag}                                                  \
     ${local_engine_flag}                                                    \
-    ${track_widget_creation_flag}
+    ${track_widget_creation_flag}                                           \
+    ${dynamicart_command}                                                   \
+    ${minimum_size_command}                                                 \
     ${lite_flag}
+
+  if [[ "$minimum_size_flag" == "YES" ]] || [[ "$dynamicart_flag" == "YES" ]]; then
+    local host_manifest="${asset_dir_command}/host_manifest.json"
+    if [[ -f "$host_manifest" ]]; then
+      RunCommand cp -f --  "${host_manifest}" "${derived_dir}/App.framework/host_manifest.json"
+      RunCommand rm -rf -- "${host_manifest}"
+    fi
+  fi
+
+  local dart_bin="${FLUTTER_ROOT}/bin/cache/dart-sdk/bin/dart"
+  local dart_path="${FLUTTER_ROOT}/packages/flutter_tools/bin/md5_sum.dart"
+  if [[ "$minimum_size_flag" == "YES" ]]; then
+    local _archs=(${archs//,/ })
+    if [[ -d "${build_dir}/patch/" ]]; then
+        RunCommand rm -rf -- "${build_dir}/patch/"
+    fi
+    for arch in ${_archs[@]}; do
+      local path="engine_armv7"
+      if [[ "$arch" == "arm64" ]]; then
+        path="engine_arm64"
+      fi
+
+      RunCommand mkdir -p -- "${build_dir}/patch/"
+      RunCommand mkdir -p -- "${build_dir}/patch/${path}/"
+      RunCommand cp -Rv -- "${build_dir}/aot/${assets_path}" "${build_dir}/patch/${path}/${assets_path}"
+      RunCommand cp -f --  "${build_dir}/aot/${arch}/isolate_snapshot_data" "${build_dir}/patch/${path}/isolate_snapshot_data"
+      RunCommand cp -f --  "${build_dir}/aot/${arch}/vm_snapshot_data" "${build_dir}/patch/${path}/vm_snapshot_data"
+      RunCommand cp -f --   "${flutter_framework}/icudtl.dat" "${build_dir}/patch/${path}/icudtl.dat"
+      local md5_file="${build_dir}/patch/${path}/${path}.txt"
+      ${dart_bin} ${dart_path} "${build_dir}/patch/${path}/" > "${md5_file}"
+      RunCommand cp --  "${md5_file}" "${derived_dir}/App.framework/${path}.txt"
+      local current_path=`pwd`
+      RunCommand cd ${build_dir}/patch/${path}
+      zip -q -r ./../${path}.zip ./*
+      RunCommand cd ${current_path}
+    done
+  fi
 
   # BD ADD:START
   if [[ "$compress_size_flag" != "" ]]; then

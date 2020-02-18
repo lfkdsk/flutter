@@ -285,6 +285,9 @@ class Environment {
     @required Directory projectDir,
     @required Directory outputDir,
     Directory buildDir,
+    // BD ADD: START
+    List<String>dynamicPlugins,
+    // END
     Map<String, String> defines = const <String, String>{},
   }) {
     // Compute a unique hash of this build's particular environment.
@@ -312,6 +315,9 @@ class Environment {
       cacheDir: Cache.instance.getRoot(),
       defines: defines,
       flutterRootDir: fs.directory(Cache.flutterRoot),
+      // BD ADD: START
+      dynamicPlugins: dynamicPlugins,
+      // END
     );
   }
 
@@ -323,6 +329,9 @@ class Environment {
     @required this.cacheDir,
     @required this.defines,
     @required this.flutterRootDir,
+    // BD ADD: START
+    this.dynamicPlugins
+    // END
   });
 
   /// The [Source] value which is substituted with the path to [projectDir].
@@ -376,6 +385,10 @@ class Environment {
 
   /// The root build directory shared by all builds.
   final Directory rootBuildDir;
+
+  // BD ADD: START
+  final List<String>dynamicPlugins;
+  // END
 }
 
 /// The result information from the build system.

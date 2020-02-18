@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter_tools/src/version.dart';
 import 'dart:async';
 
 import 'package:yaml/yaml.dart';
@@ -21,6 +22,12 @@ import 'globals.dart';
 const AssetBundleFactory _kManifestFactory = _ManifestAssetBundleFactory();
 
 const String defaultManifestPath = 'pubspec.yaml';
+
+const String assetManifestJson = 'AssetManifest.json';
+const String fontManifestJson = 'FontManifest.json';
+const String _fontSetMaterial = 'material';
+const String license = 'LICENSE';
+const String hostManifest = 'host_manifest.json';
 
 /// Injected factory class for spawning [AssetBundle] instances.
 abstract class AssetBundleFactory {
@@ -47,6 +54,8 @@ abstract class AssetBundle {
     String packagesPath,
     bool includeDefaultFonts = true,
     bool reportLicensedPackages = false,
+    bool includeManifest = false,
+    bool isMinimumSize = false,
   });
 }
 
@@ -117,6 +126,8 @@ class _ManifestAssetBundle implements AssetBundle {
     String packagesPath,
     bool includeDefaultFonts = true,
     bool reportLicensedPackages = false,
+    bool includeManifest = false,
+    bool isMinimumSize = false,
   }) async {
     assetDirPath ??= getAssetBuildDirectory();
     packagesPath ??= fs.path.absolute(PackageMap.globalPackagesPath);
@@ -246,13 +257,97 @@ class _ManifestAssetBundle implements AssetBundle {
     entries[_assetManifestJson] = _createAssetManifest(assetVariants);
 
     entries[_fontManifestJson] = DevFSStringContent(json.encode(fonts));
+    if (includeManifest) {
+      entries[hostManifest] = await _parseManifest(
+          packagesPath,
+          manifestPath,
+          fs.path.join(fs.file(manifestPath).parent.path, 'pubspec.lock'),
+          isMinimumSize);
+    }
 
     // TODO(ianh): Only do the following line if we've changed packages or if our LICENSE file changed
-    entries[_license] = _obtainLicenses(packageMap, assetBasePath, reportPackages: reportLicensedPackages);
+    //删除license
+    //entries[_license] = _obtainLicenses(packageMap, assetBasePath, reportPackages: reportLicensedPackages);
     entries[_KFlutterVersion] = DevFSFileContent(fs.file(fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
 
     return 0;
   }
+
+  Future<DevFSByteContent> _parseManifest(String packagesPath, String manifest,
+      String pubspecLock, bool isMinimumSize) async {
+    final FlutterManifest flutterManifest =
+        await FlutterManifest.createFromPath(manifest);
+    final String packageName = flutterManifest.appName;
+    final String versionCode = flutterManifest.appVersion;
+    final Map<String, Map<String, String>> versionMap = <String, Map<String, String>>{};
+    versionMap['dynamicart'] = {'version': Cache.instance.dynamicartRevision};
+    final Map<String, String>pluginVersion = getPluginVersion(packagesPath);
+    for (String key in pluginVersion.keys) {
+      versionMap[key] = {'version': pluginVersion[key]};
+    }
+
+    final Map<String, dynamic> jsonObject = <String, dynamic>{};
+    jsonObject['packageName'] = packageName == null ? '' : packageName;
+    if (isMinimumSize) {
+      jsonObject['mode'] = 'minimum-size';
+    } else {
+      jsonObject['mode'] = 'full';
+    }
+
+    jsonObject['version'] = versionCode == null ? '' : versionCode;
+    jsonObject['dependencies'] = versionMap;
+    return DevFSStringContent(json.encode(jsonObject));
+  }
+}
+
+///获得工程依赖的plugin的版本号,[packagesPath]:.package文件路径，返回值的key为plugin的名称，value为版本号
+Map<String,String> getPluginVersion(String packagesPath){
+  final Map<String, String> map = _parsePackage(packagesPath);
+  final Map<String,String>versionMap =  Map();
+  for (String key in map.keys) {
+    final Directory directory = fs.directory(map[key]).parent;
+    final dynamic pubspec = loadYaml(fs
+        .file(fs.path.absolute(directory.path, 'pubspec.yaml'))
+        .readAsStringSync());
+    final dynamic flutterConfig = pubspec['flutter'];
+    if (flutterConfig == null || !(flutterConfig.containsKey('plugin') as bool)) {
+      continue;
+    }
+    versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+  }
+  return versionMap;
+}
+
+/// 解析.packages文件
+Map<String, String> _parsePackage(String packagesPath) {
+  final Map<String, String> map = Map();
+  final File dotPackages = fs.file(packagesPath);
+  final Directory directory = dotPackages.parent;
+  if (dotPackages.existsSync()) {
+    final Iterable<String> lines = dotPackages
+        .readAsStringSync()
+        .split('\n')
+        .where((String line) => !line.startsWith(RegExp(r'^ *#')));
+    for (String line in lines) {
+      final int colon = line.indexOf(':');
+      if (colon > 0) {
+        final String packageName = line.substring(0, colon);
+        final String package = line.substring(colon + 1);
+        String packagePath;
+        if (package.startsWith('file:')) {
+          packagePath = fs.path.fromUri(line.substring(colon + 1));
+          map[packageName] =
+              fs.path.normalize(
+                  fs.path.absolute(directory.path, packagePath));
+        } else {
+          map[packageName] =
+              fs.path.normalize(
+                  fs.path.absolute(directory.path, package));
+        }
+      }
+    }
+  }
+  return map;
 }
 
 class _Asset {

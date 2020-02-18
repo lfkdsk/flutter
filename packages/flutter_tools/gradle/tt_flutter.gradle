@@ -1,4 +1,13 @@
 import org.apache.commons.io.FileUtils
+// TODO(@xieran): 干掉这个文件的逻辑
+
+import java.lang.reflect.Field
+import java.nio.file.Path
+import java.nio.file.Paths
+
+import com.android.builder.model.AndroidProject
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -31,6 +40,8 @@ class FlutterPatchPlugin implements Plugin<Project> {
     private File debugFlutterJar
     private File profileFlutterJar
     private File releaseFlutterJar
+    private File dynamicartReleaseFlutterJar
+    private File dynamicartProfileFlutterJar
     private String targetArch
     static final String flutterBuildPrefix = "flutterBuild"
 
@@ -61,6 +72,8 @@ class FlutterPatchPlugin implements Plugin<Project> {
         debugFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}").resolve("flutter.jar").toFile()
         profileFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-profile").resolve("flutter.jar").toFile()
         releaseFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-release").resolve("flutter.jar").toFile()
+        dynamicartReleaseFlutterJar = baseEnginePath.resolve("android-${targetArch}-dynamicart-release").resolve("flutter.jar").toFile()
+        dynamicartProfileFlutterJar = baseEnginePath.resolve("android-${targetArch}-dynamicart-profile").resolve("flutter.jar").toFile()
 
         File pluginsFile = new File(project.projectDir.parentFile.parentFile, '.flutter-plugins')
         Properties plugins = readPropertiesIfExist(pluginsFile)
@@ -79,9 +92,11 @@ class FlutterPatchPlugin implements Plugin<Project> {
             createJarContainsArmeabi(flutterJar)
         }
 
-        createJarContainsArmeabi(debugFlutterJar)
-        createJarContainsArmeabi(profileFlutterJar)
-        createJarContainsArmeabi(releaseFlutterJar)
+        createJarContainsArmeabi(debugFlutterJar, excludesFiles)
+        createJarContainsArmeabi(profileFlutterJar, excludesFiles)
+        createJarContainsArmeabi(releaseFlutterJar, excludesFiles)
+        createJarContainsArmeabi(dynamicartReleaseFlutterJar, excludesFiles)
+        createJarContainsArmeabi(dynamicartProfileFlutterJar, excludesFiles)
     }
 
     private void createJarContainsArmeabi(File file) {
@@ -89,6 +104,9 @@ class FlutterPatchPlugin implements Plugin<Project> {
         File originFile = new File(file.getParent() + File.separator + "flutter_origin.jar")
 
         JarFile flutterJarFile = new JarFile(file)
+        if (flutterJarFile.getJarEntry("lib/armeabi-v7a/libflutter.so") == null) {
+            return
+        }
         // 说明是新的flutter.jar，需要重新复制flutter_origin.jar
         if (flutterJarFile.getJarEntry("lib/armeabi/libflutter.so") == null) {
             FileUtils.copyFile(file, originFile)

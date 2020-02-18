@@ -21,12 +21,16 @@ class BuildInfo {
     this.buildNumber,
     this.buildName,
     // BD ADD: START
+    this.dynamicPlugins,
     this.lite = false,
     this.liteGlobal = false
     // END
   });
 
   final BuildMode mode;
+
+  // BD ADD:
+  final String dynamicPlugins;
 
   /// Represents a custom Android product flavor or an Xcode scheme, null for
   /// using the default.
@@ -79,13 +83,13 @@ class BuildInfo {
   ///
   /// Exactly one of [isDebug], [isProfile], [isJitRelease],
   /// or [isRelease] is true.
-  bool get isProfile => mode == BuildMode.profile;
+  bool get isProfile => mode == BuildMode.profile || mode == BuildMode.dynamicartProfile;
 
   /// Returns whether a release build is requested.
   ///
   /// Exactly one of [isDebug], [isProfile], [isJitRelease],
   /// or [isRelease] is true.
-  bool get isRelease => mode == BuildMode.release;
+  bool get isRelease => mode == BuildMode.release || mode == BuildMode.dynamicartRelease;
 
   /// Returns whether a JIT release build is requested.
   ///
@@ -157,6 +161,12 @@ class BuildMode {
         return BuildMode.release;
       case 'jit_release':
         return BuildMode.jitRelease;
+    // BD ADD START:
+      case 'dynamicart_release':
+        return BuildMode.dynamicartRelease;
+      case 'dynamicart_profile':
+        return BuildMode.dynamicartProfile;
+    // END
     }
     throw ArgumentError('$value is not a supported build mode');
   }
@@ -173,15 +183,27 @@ class BuildMode {
   /// Built in JIT mode with all optimizations and no observatory.
   static const BuildMode jitRelease = BuildMode._('jit_release');
 
+  // BD ADD START:
+  static const BuildMode dynamicartRelease = BuildMode._('dynamicart_release');
+  static const BuildMode dynamicartProfile = BuildMode._('dynamicart_profile');
+  // END
+
   static const List<BuildMode> values = <BuildMode>[
     debug,
     profile,
     release,
     jitRelease,
+    // BD ADD START:
+    dynamicartRelease,
+    dynamicartProfile
+    // END
   ];
   static const Set<BuildMode> releaseModes = <BuildMode>{
     release,
     jitRelease,
+    // BD ADD START:
+    dynamicartRelease,
+    // END
   };
   static const Set<BuildMode> jitModes = <BuildMode>{
     debug,
@@ -566,9 +588,21 @@ String getAotBuildDirectory() {
   return fs.path.join(getBuildDirectory(), 'aot');
 }
 
+String getPatchBuildDirectory() {
+  return fs.path.join(getBuildDirectory(), 'dynamic');
+}
+
 /// Returns the asset build output directory.
 String getAssetBuildDirectory() {
   return fs.path.join(getBuildDirectory(), 'flutter_assets');
+}
+
+String getPatchAssetBuildDirectory() {
+  return fs.path.join(getPatchBuildDirectory(), 'flutter_assets');
+}
+
+String getAssetRelativePath(){
+  return 'flutter_assets';
 }
 
 /// Returns the iOS build output directory.

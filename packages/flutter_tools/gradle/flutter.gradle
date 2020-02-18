@@ -181,6 +181,22 @@ class FlutterPlugin implements Plugin<Project> {
                     matchingFallbacks = ["debug", "release"]
                 }
             }
+
+            // BD ADD: START
+            // flutter run/build aot命令都是执行的gradle命令的--dynamicart参数映射到gradle命令上
+            dynamicartProfile {
+                initWith debug
+                if (it.hasProperty('matchingFallbacks')) {
+                    matchingFallbacks = ['debug', 'release']
+                }
+            }
+            dynamicartRelease {
+                initWith debug
+                if (it.hasProperty('matchingFallbacks')) {
+                    matchingFallbacks = ['debug', 'release']
+                }
+            }
+            // END
         }
 
         if (shouldShrinkResources(project)) {
@@ -362,6 +378,15 @@ class FlutterPlugin implements Plugin<Project> {
                 profile {
                     initWith debug
                 }
+                // BD ADD:
+                // 上面的buildTypes是给主工程加的，Android插件模块打包的话需要在这里重新加一次
+                dynamicartRelease {
+                    initWith debug
+                }
+                dynamicartProfile {
+                    initWith debug
+                }
+                // END
             }
             pluginProject.android.buildTypes.each addEmbeddingCompileOnlyDependency
             pluginProject.android.buildTypes.whenObjectAdded addEmbeddingCompileOnlyDependency
@@ -589,6 +614,12 @@ class FlutterPlugin implements Plugin<Project> {
     private static String buildModeFor(buildType) {
         if (buildType.name == "profile") {
             return "profile"
+        // BD ADD: START
+        } else if (buildType.name == "dynamicartRelease") {
+            return "dynamicart_release"
+        } else if (buildType.name == "dynamicartProfile") {
+            return "dynamicart_profile"
+        // END
         } else if (buildType.debuggable) {
             return "debug"
         }
@@ -634,6 +665,10 @@ class FlutterPlugin implements Plugin<Project> {
         Boolean liteValue = false
         if (project.hasProperty('lite')) {
             liteValue = project.property('lite').toBoolean()
+        }
+        String dynamicPluginValue = ""
+        if (project.hasProperty('dynamic-aot-plugins')) {
+            dynamicPluginValue = project.property('dynamic-aot-plugins')
         }
         Boolean liteGlobalValue = false
         if (project.hasProperty('lite-global')) {
@@ -682,6 +717,7 @@ class FlutterPlugin implements Plugin<Project> {
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
                 // BD ADD: START
+                dynamicPlugins dynamicPluginValue
                 useLite liteValue
                 useLiteGlobal liteGlobalValue
                 // END
@@ -838,6 +874,11 @@ abstract class BaseFlutterTask extends DefaultTask {
     @Optional @Input
     String extraGenSnapshotOptions
 
+    // BD ADD: START
+    @Optional @Input
+    String dynamicPlugins
+    // END
+
     @OutputFiles
     FileCollection getDependenciesFiles() {
         FileCollection depfiles = project.files()
@@ -886,6 +927,13 @@ abstract class BaseFlutterTask extends DefaultTask {
             if (useLite) {
                 args "--lite"
             }
+
+            if (buildMode == "dynamicart_release" || buildMode == "dynamicart_profile") {
+                args "--dynamicart"
+                if (dynamicPlugins != null) {
+                    args "--dynamic-aot-plugins", dynamicPlugins
+                }
+            }
             if (useLiteGlobal) {
                 args "--lite-global"
             }
@@ -917,8 +965,9 @@ class FlutterTask extends BaseFlutterTask {
     CopySpec getSnapshots() {
         return project.copySpec {
             from "${intermediateDir}"
-
-            if (buildMode == 'release' || buildMode == 'profile') {
+            // BD MOD:
+            // BEFORE: if (buildMode == 'release' || buildMode == 'profile') {
+            if (buildMode == 'release' || buildMode == 'profile' || buildMode == 'dynamicartRelease' || buildMode == 'dynamicartProfile') {
                 targetPlatformValues.each {
                     include "${PLATFORM_ARCH_MAP[targetArch]}/app.so"
                 }

@@ -52,7 +52,12 @@ Future<void> updateGeneratedXcodeProperties({
   bool useMacOSConfig = false,
   bool setSymroot = true,
   String buildDirOverride,
+  // BD ADD: START
+  bool isDynamicart = false,
+  bool isMinimumSize = false,
+  List<String> dynamicPlugins,
   bool compressSize = false,
+  // END
 }) async {
   final List<String> xcodeBuildSettings = _xcodeBuildSettingsLines(
     project: project,
@@ -154,6 +159,11 @@ List<String> _xcodeBuildSettingsLines({
   bool useMacOSConfig = false,
   bool setSymroot = true,
   String buildDirOverride,
+  // BD ADD: START
+  bool isDynamicart = false,
+  bool isMinimumSize = false,
+  List<String> dynamicPlugins,
+  // END
   bool compressSize = false,
 }) {
   final List<String> xcodeBuildSettings = <String>[];
@@ -175,6 +185,15 @@ List<String> _xcodeBuildSettingsLines({
   if (setSymroot) {
     xcodeBuildSettings.add('SYMROOT=\${SOURCE_ROOT}/../${getIosBuildDirectory()}');
   }
+
+  // BD ADD: START
+  if (isDynamicart) {
+    xcodeBuildSettings.add('DYNAMICART=YES');
+  }
+  if (isMinimumSize) {
+    xcodeBuildSettings.add('MINIMUM_SIZE=YES');
+  }
+  // END
 
   if (!project.isModule) {
     // For module projects we do not want to write the FLUTTER_FRAMEWORK_DIR
@@ -220,6 +239,18 @@ List<String> _xcodeBuildSettingsLines({
   // BD ADD: START
   if (compressSize) {
     xcodeBuildSettings.add('COMPRESS_SIZE=true');
+  }
+
+  // 传给IOS xcode_backend.sh的dynamic_aot_plugins参数，注意：因为格式的最后一个为/，所以这个要写在最后面
+  if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
+    final StringBuffer buffer = StringBuffer();
+    for (int i = 0; i < dynamicPlugins.length; i++) {
+      buffer.write(dynamicPlugins[i]);
+      if (i != dynamicPlugins.length - 1) {
+        buffer.write(',');
+      }
+    }
+    xcodeBuildSettings.add('DYNAMIC_AOT_PLUGINS=${buffer.toString()}');
   }
 
   if (buildInfo.lite) {

@@ -27,6 +27,8 @@ class BuildIOSCommand extends BuildSubCommand {
     usesPubOption();
     usesBuildNumberOption();
     usesBuildNameOption();
+    // BD ADD:
+    addDynamicartModeFlags();
     argParser
       ..addFlag('simulator',
         help: 'Build for the iOS simulator instead of the device.',
@@ -36,6 +38,10 @@ class BuildIOSCommand extends BuildSubCommand {
         help: 'Codesign the application bundle (only available on device builds).',
       )
       // BD ADD: START
+      ..addFlag('minimum-size',
+          defaultsTo: false,
+          help: '用于ios的dyamicart模式下减少包体积的参数'
+      )
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,
@@ -129,6 +135,16 @@ class BuildIOSCommand extends BuildSubCommand {
       throwToolExit('${toTitleCase(buildInfo.friendlyModeName)} mode is not supported for simulators.');
     }
 
+    // BD ADD:
+    final bool isMinimumSize = (buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.release)
+        ? boolArg('minimum-size')
+        : false;
+    List<String> dynamicPlugins;
+    if (boolArg('dynamicart')) {
+      dynamicPlugins = getDynamicPlugins();
+    }
+    // END
+
     final String logTarget = forSimulator ? 'simulator' : 'device';
 
     final String typeName = artifacts.getEngineType(TargetPlatform.ios, buildInfo.mode);
@@ -149,7 +165,12 @@ class BuildIOSCommand extends BuildSubCommand {
       targetOverride: targetFile,
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
+      // BD ADD START:
+      isDynamicart: buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.dynamicartProfile,
+      isMinimumSize: isMinimumSize,
+      dynamicPlugins: dynamicPlugins,
       compressSize: compressSize
+      // END
     );
 
     if (!result.success) {

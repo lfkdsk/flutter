@@ -264,6 +264,20 @@ List<String> _buildModeOptions(BuildMode mode) {
         '-Ddart.vm.product=true',
         '--bytecode-options=source-positions',
       ];
+    // BD ADD:
+    case BuildMode.dynamicartProfile:
+      return <String>[
+        '-Ddart.vm.profile=true',
+        '-Ddart.vm.product=false',
+        '--bytecode-options=source-positions',
+      ];
+    case BuildMode.dynamicartRelease:
+      return <String>[
+        '-Ddart.vm.profile=false',
+        '-Ddart.vm.product=true',
+        '--bytecode-options=source-positions',
+      ];
+    // END
   }
   throw Exception('Unknown BuildMode: $mode');
 }
@@ -290,6 +304,8 @@ class KernelCompiler {
     String platformDill,
     @required List<String> dartDefines,
     // BD ADD: START
+    bool isDynamicart = false,
+    List<String>dynamicPlugins,
     bool lite = false,
     bool liteGlobal = false,
     // END
@@ -334,6 +350,9 @@ class KernelCompiler {
         '--aot',
         '--tfa',
       ],
+      // BD ADD: START
+      if (isDynamicart) '--dynamicart',
+      // END
       if (packagesPath != null) ...<String>[
         '--packages',
         packagesPath,
@@ -366,7 +385,18 @@ class KernelCompiler {
       ...?extraFrontEndOptions,
       mainUri?.toString() ?? mainPath,
     ];
-
+    // BD ADD: START
+    if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
+      final StringBuffer buffer = StringBuffer();
+      for (int i = 0; i < dynamicPlugins.length; i++) {
+        buffer.write(dynamicPlugins[i]);
+        if (i != dynamicPlugins.length - 1) {
+          buffer.write(',');
+        }
+      }
+      command.addAll(['--dynamic-aot-plugins', buffer.toString()]);
+    }
+    // END
     printTrace(command.join(' '));
     final Process server = await processManager
       .start(command)

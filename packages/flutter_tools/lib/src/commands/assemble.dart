@@ -50,6 +50,14 @@ const List<Target> _kDefaultTargets = <Target>[
   androidArmReleaseBundle,
   androidArm64ReleaseBundle,
   androidx64ReleaseBundle,
+  // BD ADD: START
+  androidArmDynamicartProfileBundle,
+  androidArm64DynamicartProfileBundle,
+  androidx64DynamicartProfileBundle,
+  androidArmDynamicartReleaseBundle,
+  androidArm64DynamicartReleaseBundle,
+  androidx64DynamicartReleaseBundle,
+  // END
 ];
 
 /// Assemble provides a low level API to interact with the flutter tool build
@@ -89,6 +97,7 @@ class AssembleCommand extends FlutterCommand {
         negatable: false,
         defaultsTo: false,
         help: 'Flutter lite edition to reduce package size, with global langage');
+    addDynamicartModeFlags();
     // END
   }
 
@@ -154,6 +163,9 @@ class AssembleCommand extends FlutterCommand {
           .childDirectory('.dart_tool')
           .childDirectory('flutter_build'),
       projectDir: flutterProject.directory,
+      // BD ADD: START
+      dynamicPlugins: getDynamicPlugins(),
+      // END
       defines: _parseDefines(stringsArg('define')),
     );
     return result;

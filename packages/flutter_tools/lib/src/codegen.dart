@@ -111,6 +111,9 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     String platformDill,
     List<String> dartDefines,
     // BD ADD: START
+    // 父类加了这两个参数, 子类也必须加，不加就编译不通过
+    bool isDynamicart = false,
+    List<String> dynamicPlugins,
     bool lite = false,
     bool liteGlobal = false,
     // END
@@ -153,6 +156,8 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
       targetModel: targetModel,
       initializeFromDill: initializeFromDill,
       dartDefines: dartDefines,
+      // BD ADD:
+      isDynamicart: isDynamicart
     );
   }
 }

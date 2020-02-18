@@ -57,6 +57,12 @@ class BuildBundleCommand extends BuildSubCommand {
         hide: true,
       )
       ..addOption('asset-dir', defaultsTo: getAssetBuildDirectory())
+      // BD ADD:
+      ..addFlag('minimum-size',
+        defaultsTo: false,
+        help: '用于ios的dyamicart模式下减少包体积的参数',
+        hide: true)
+      // END
       ..addFlag('report-licensed-packages',
         help: 'Whether to report the names of all the packages that are included '
               'in the application\'s LICENSE file.',
@@ -138,6 +144,10 @@ class BuildBundleCommand extends BuildSubCommand {
       extraGenSnapshotOptions: stringsArg(FlutterOptions.kExtraGenSnapshotOptions),
       fileSystemScheme: stringArg('filesystem-scheme'),
       fileSystemRoots: stringsArg('filesystem-root'),
+      // BD ADD:
+      isDynamicart: boolArg('dynamicart'),
+      isMinimumSize: boolArg('minimum-size')
+      // END
     );
     return null;
   }

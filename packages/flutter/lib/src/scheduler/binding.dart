@@ -7,7 +7,7 @@ import 'dart:collection';
 import 'dart:developer' show Flow, Timeline;
 import 'dart:ui' show AppLifecycleState, FramePhase, FrameTiming, TimingsCallback;
 
-import 'package:collection/collection.dart' show PriorityQueue, HeapPriorityQueue;
+import 'queue/priority_queue.dart' show PriorityQueue2, HeapPriorityQueue2;
 // BD ADD:
 import 'package:flutter/boost.dart';
 import 'package:flutter/foundation.dart';
@@ -369,7 +369,7 @@ mixin SchedulerBinding on BindingBase, ServicesBinding {
   static int _taskSorter (_TaskEntry<dynamic> e1, _TaskEntry<dynamic> e2) {
     return -e1.priority.compareTo(e2.priority);
   }
-  final PriorityQueue<_TaskEntry<dynamic>> _taskQueue = HeapPriorityQueue<_TaskEntry<dynamic>>(_taskSorter);
+  final PriorityQueue2<_TaskEntry<dynamic>> _taskQueue = HeapPriorityQueue2<_TaskEntry<dynamic>>(_taskSorter);
 
   /// Schedules the given `task` with the given `priority` and returns a
   /// [Future] that completes to the `task`'s eventual return value.

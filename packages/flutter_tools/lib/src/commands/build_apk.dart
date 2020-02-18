@@ -25,6 +25,9 @@ class BuildApkCommand extends BuildSubCommand {
     usesBuildNameOption();
     addShrinkingFlag();
 
+    // BD ADD:
+    addDynamicartModeFlags();
+
     argParser
       ..addFlag('split-per-abi',
         negatable: false,

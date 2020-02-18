@@ -61,6 +61,7 @@ import 'src/calculate_build_info.dart';
 ///
 /// This function is intended to be used from the `flutter` command line tool.
 Future<void> main(List<String> args) async {
+//  print("exec==${args.join(' ')}");
   final bool verbose = args.contains('-v') || args.contains('--verbose');
 
   final bool doctor = (args.isNotEmpty && args.first == 'doctor') ||

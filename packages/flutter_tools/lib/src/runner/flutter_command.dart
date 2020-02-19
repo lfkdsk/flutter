@@ -381,7 +381,7 @@ abstract class FlutterCommand extends Command<void> {
     // 两层含义：
     // 1. dynamic + art = 动态化的艺术
     // 2. d(ynamic)art = 动态化的Dart
-    argParser.addFlag('dynamicart',
+    argParser..addFlag('dynamicart',
         negatable: false,
         help: '开启动态化, 目前只支持release模式.');
     argParser..addOption('dynamic-aot-plugins',

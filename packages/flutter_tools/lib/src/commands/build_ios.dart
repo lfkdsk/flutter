@@ -135,16 +135,6 @@ class BuildIOSCommand extends BuildSubCommand {
       throwToolExit('${toTitleCase(buildInfo.friendlyModeName)} mode is not supported for simulators.');
     }
 
-    // BD ADD:
-    final bool isMinimumSize = (buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.release)
-        ? boolArg('minimum-size')
-        : false;
-    List<String> dynamicPlugins;
-    if (boolArg('dynamicart')) {
-      dynamicPlugins = getDynamicPlugins();
-    }
-    // END
-
     final String logTarget = forSimulator ? 'simulator' : 'device';
 
     final String typeName = artifacts.getEngineType(TargetPlatform.ios, buildInfo.mode);
@@ -154,11 +144,22 @@ class BuildIOSCommand extends BuildSubCommand {
     if (app != null) {
       FlutterBuildInfo.instance.pkgName = app.toString();
     }
-    await FlutterBuildInfo.instance.reportInfo();
-    // END
-    final bool compressSize = buildInfo.mode == BuildMode.release
+
+    final bool isMinimumSize = (buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.release)
+        ? boolArg('minimum-size')
+        : false;
+    List<String> dynamicPlugins;
+    if (boolArg('dynamicart')) {
+      dynamicPlugins = getDynamicPlugins();
+    }
+
+    // compressSize与minimums-ize互斥，优先minimum-size
+    final bool compressSize = (!isMinimumSize && (buildInfo.mode == BuildMode.release || buildInfo.mode == BuildMode.dynamicartRelease))
         ? boolArg('compress-size')
         : false;
+    await FlutterBuildInfo.instance.reportInfo();
+    // END
+
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,

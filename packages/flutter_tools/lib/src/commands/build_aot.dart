@@ -88,11 +88,12 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     aotBuilder ??= AotBuilder();
 
     // BD ADD: START
-    final bool compressSize = buildMode == BuildMode.release &&
+    final bool compressSize = (buildMode == BuildMode.release || buildMode == BuildMode.dynamicartRelease) &&
         platform == TargetPlatform.ios
-        ? boolArg('compress-size')
+        ? boolArg('compress-size') && !boolArg('minimum-size')
         : false;
     List<String> dynamicPlugins;
+
     if (boolArg('dynamicart')) {
       dynamicPlugins = getDynamicPlugins();
     }

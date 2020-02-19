@@ -66,7 +66,12 @@ Future<void> updateGeneratedXcodeProperties({
     useMacOSConfig: useMacOSConfig,
     setSymroot: setSymroot,
     buildDirOverride: buildDirOverride,
+    // BD ADD: START
+    isDynamicart: isDynamicart,
+    isMinimumSize: isMinimumSize,
+    dynamicPlugins: dynamicPlugins,
     compressSize:compressSize,
+    // END
   );
 
   _updateGeneratedXcodePropertiesFile(
@@ -163,8 +168,8 @@ List<String> _xcodeBuildSettingsLines({
   bool isDynamicart = false,
   bool isMinimumSize = false,
   List<String> dynamicPlugins,
-  // END
   bool compressSize = false,
+  // END
 }) {
   final List<String> xcodeBuildSettings = <String>[];
 
@@ -185,15 +190,6 @@ List<String> _xcodeBuildSettingsLines({
   if (setSymroot) {
     xcodeBuildSettings.add('SYMROOT=\${SOURCE_ROOT}/../${getIosBuildDirectory()}');
   }
-
-  // BD ADD: START
-  if (isDynamicart) {
-    xcodeBuildSettings.add('DYNAMICART=YES');
-  }
-  if (isMinimumSize) {
-    xcodeBuildSettings.add('MINIMUM_SIZE=YES');
-  }
-  // END
 
   if (!project.isModule) {
     // For module projects we do not want to write the FLUTTER_FRAMEWORK_DIR
@@ -237,6 +233,13 @@ List<String> _xcodeBuildSettingsLines({
     xcodeBuildSettings.add('TRACK_WIDGET_CREATION=true');
   }
   // BD ADD: START
+  if (isDynamicart) {
+    xcodeBuildSettings.add('DYNAMICART=YES');
+  }
+  if (isMinimumSize) {
+    xcodeBuildSettings.add('MINIMUM_SIZE=YES');
+  }
+
   if (compressSize) {
     xcodeBuildSettings.add('COMPRESS_SIZE=true');
   }

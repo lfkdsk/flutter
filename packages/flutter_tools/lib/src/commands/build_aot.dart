@@ -109,7 +109,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       bitcode: boolArg('bitcode'),
       quiet: boolArg('quiet'),
       // BD ADD: START
-      compressSize: boolArg('compress-size'),
       trackWidgetCreation: boolArg('track-widget-creation'),
       useLite: boolArg('lite'),
       useLiteGlobal: boolArg('lite-global'),

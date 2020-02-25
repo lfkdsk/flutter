@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_tools/src/platform_plugins.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_tools/src/android/android_sdk.dart';
@@ -84,6 +85,9 @@ class FlutterBuildInfo {
     if (frameworkCid != null) {
       frameworkVersion =
           BDGitTagVersion.determine().frameworkVersionFor(frameworkCid);
+      if (frameworkVersion != null && frameworkVersion == '0.0.0-unknown') {
+        frameworkVersion = GitTagVersion.determine().frameworkVersionFor(frameworkCid);
+      }
     }
     engineCid = runSafeCmd(
         <String>['cat', '${Cache.flutterRoot}/bin/internal/ttengine.version']);
@@ -188,10 +192,17 @@ class FlutterBuildInfo {
       final Map<String, String> map = new Map<String, String>();
       map['name'] = plugin.name;
       map['path'] = plugin.path;
-      // TODO @林学彬
-//      map['androidPackage'] = plugin.androidPackage;
-//      map['iosPrefix'] = plugin.iosPrefix;
-//      map['pluginClass'] = plugin.pluginClass;
+      if (plugin.platforms != null) {
+        plugin.platforms.values.forEach((pv){
+          if (pv is AndroidPlugin) {
+            map['androidPackage'] = pv.package;
+            map['pluginClass'] = pv.pluginClass;
+          } else if (pv is IOSPlugin ) {
+            map['iosPrefix'] = pv.classPrefix;
+            map['pluginClass'] = pv.pluginClass;
+          }
+        });
+      }
       list.add(map);
     }
 
@@ -238,7 +249,6 @@ class FlutterBuildInfo {
       });
       try {
         if (findTosResp?.body?.isNotEmpty == true) {
-          // TODO @林学彬
           final List list = json.decode(findTosResp.body) as List;
           if (list?.isNotEmpty == true) {
             final Map<String, dynamic> map = list[0] as Map<String, dynamic>;
@@ -253,7 +263,11 @@ class FlutterBuildInfo {
       }
 
       // upload index
-      await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      http.Response resp = await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      if (resp != null && resp.body != null && resp.body.contains('error')) {
+        tosHost = _kHost;
+        await _uploadJson(tosHost, indexStr, 'index', 'application/text');
+      }
       // upload result json
       await _uploadJson(tosHost, jsonResult, fileName, 'application/json');
     }

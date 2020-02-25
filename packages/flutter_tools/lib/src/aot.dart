@@ -32,6 +32,7 @@ class AotBuilder {
     bool quiet = true,
     bool reportTimings = false,
     // BD ADD ：START
+    bool compressSize = false,
     bool trackWidgetCreation = false,
     bool useLite = false,
     bool isDynamicart = false,
@@ -48,7 +49,7 @@ class AotBuilder {
     if (platform == null) {
       throwToolExit('No AOT build platform specified');
     }
-    // BD ADD: START Wangying
+    // BD ADD: START
     if (useLite) {
       print('Build with lite edition...');
     }

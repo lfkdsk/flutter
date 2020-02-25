@@ -1554,6 +1554,8 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
 //  <String>['android-arm-dynamicart-profile', 'android-arm-dynamicart-profile/artifacts.zip'],
 //  <String>['android-arm64-dynamicart-profile', 'android-arm64-dynamicart-profile/artifacts.zip'],
   // END
+  // BD DEL:
+  // <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],
 ];
 
 // BD ADD: START

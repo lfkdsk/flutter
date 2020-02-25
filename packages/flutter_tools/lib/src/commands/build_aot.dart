@@ -84,7 +84,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       throwToolExit('Unknown platform: $targetPlatform');
     }
 
-    // TODO 代码移位置，对比154 @王莹@林学彬@谢然
     aotBuilder ??= AotBuilder();
 
     // BD ADD: START
@@ -110,6 +109,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       bitcode: boolArg('bitcode'),
       quiet: boolArg('quiet'),
       // BD ADD: START
+      compressSize: boolArg('compress-size'),
       trackWidgetCreation: boolArg('track-widget-creation'),
       useLite: boolArg('lite'),
       useLiteGlobal: boolArg('lite-global'),

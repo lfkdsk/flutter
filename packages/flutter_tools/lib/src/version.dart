@@ -702,31 +702,36 @@ class BDGitTagVersion {
   }
 
   String frameworkVersionFor(String revision) {
-    if (x == null || y == null || z == null || !revision.startsWith(hash))
+    if (x == null || y == null || z == null || !revision.startsWith(hash)) {
       return '0.0.0-unknown';
+    }
     if (commits == 0) {
-      if (hotfix != null)
+      if (hotfix != null) {
         return '$x.$y.$z-$hotfix';
+      }
       return '$x.$y.$z';
     }
-    if (hotfix != null)
+    if (hotfix != null) {
       return '$x.$y.$z-${hotfix + 1}-pre.$commits';
+    }
     return '$x.$y.${z + 1}-pre.$commits';
   }
 
   String nextVersion() {
-    if (hotfix != null)
+    if (hotfix != null) {
       return '$x.$y.$z-${hotfix + 1}';
-    else
+    } else {
       return '$x.$y.$z-1';
+    }
   }
 
   @override
   String toString() {
-    if (hotfix != null)
+    if (hotfix != null) {
       return '$x.$y.$z-$hotfix';
-    else
+    } else {
       return '$x.$y.$z';
+    }
   }
 }
 // END

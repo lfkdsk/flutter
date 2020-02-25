@@ -133,18 +133,6 @@ class AndroidBuildInfo {
   /// The target platforms for the build.
   final Iterable<AndroidArch> targetArchs;
 
-  // TODO 全部使用了官方的，154上该逻辑被删除 @王莹
-//  BuildInfo withTargetPlatform(TargetPlatform targetPlatform) =>
-//      BuildInfo(mode, flavor,
-//          trackWidgetCreation: trackWidgetCreation,
-//          compilationTraceFilePath: compilationTraceFilePath,
-//          createPatch: createPatch,
-//          extraFrontEndOptions: extraFrontEndOptions,
-//          extraGenSnapshotOptions: extraGenSnapshotOptions,
-//          buildSharedLibrary: buildSharedLibrary,
-//          // BD ADD:
-//          lite: lite,
-//          targetPlatform: targetPlatform);
 }
 
 /// A summary of the compilation strategy used for Dart.

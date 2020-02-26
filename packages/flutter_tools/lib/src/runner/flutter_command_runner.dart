@@ -474,9 +474,10 @@ class FlutterCommandRunner extends CommandRunner<void> {
       // 但新加dynamicart之后架构字符串就不在最后面了导致正则匹配不上，需要兼容一下
       // ORIGIN: tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
       if(tmpBasename.endsWith(suffix)){
-        tmpBasename = tmpBasename.replaceFirst(RegExp('_$suffix\$'), '');
+        tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
       }else{
-        tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix(\$|_)'), '');
+        suffix = suffix.substring(1);
+        tmpBasename = tmpBasename.replaceFirst(RegExp('${suffix}_'), '');
       }
     }
     return 'host_' + tmpBasename;

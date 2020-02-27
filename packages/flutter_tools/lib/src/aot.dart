@@ -65,6 +65,10 @@ class AotBuilder {
         targetPlatform: platform,
         buildMode: buildMode,
         quiet: quiet,
+        // BD ADD: START
+        isMinimumSize: isMinimumSize,
+        isDynamicart: isDynamicart,
+        // END
       );
       return;
     }
@@ -222,6 +226,10 @@ class AotBuilder {
     BuildMode buildMode,
     String targetFile,
     String outputDir,
+    // BD ADD: START
+    bool isDynamicart = false,
+    bool isMinimumSize = false,
+    // END
     bool quiet
   }) async {
     Status status;
@@ -248,6 +256,10 @@ class AotBuilder {
       buildDir: flutterProject.directory
         .childDirectory('.dart_tool')
         .childDirectory('flutter_build'),
+      // BD ADD: START
+      isDynamicart: isDynamicart,
+      isMinimumSize: isMinimumSize,
+      // END
       defines: <String, String>{
         kBuildMode: getNameForBuildMode(buildMode),
         kTargetPlatform: getNameForTargetPlatform(targetPlatform),

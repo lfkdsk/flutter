@@ -287,6 +287,8 @@ class Environment {
     Directory buildDir,
     // BD ADD: START
     List<String>dynamicPlugins,
+    bool isDynamicart,
+    bool isMinimumSize,
     // END
     Map<String, String> defines = const <String, String>{},
   }) {
@@ -317,6 +319,8 @@ class Environment {
       flutterRootDir: fs.directory(Cache.flutterRoot),
       // BD ADD: START
       dynamicPlugins: dynamicPlugins,
+      isDynamicart: isDynamicart ?? false,
+      isMinimumSize: isMinimumSize ?? false,
       // END
     );
   }
@@ -330,6 +334,8 @@ class Environment {
     @required this.defines,
     @required this.flutterRootDir,
     // BD ADD: START
+    @required this.isDynamicart,
+    @required this.isMinimumSize,
     this.dynamicPlugins
     // END
   });
@@ -388,6 +394,8 @@ class Environment {
 
   // BD ADD: START
   final List<String>dynamicPlugins;
+  final bool isDynamicart;
+  final bool isMinimumSize;
   // END
 }
 

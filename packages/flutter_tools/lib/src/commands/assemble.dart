@@ -165,6 +165,7 @@ class AssembleCommand extends FlutterCommand {
       projectDir: flutterProject.directory,
       // BD ADD: START
       dynamicPlugins: getDynamicPlugins(),
+      isDynamicart: boolArg('dynamicart'),
       // END
       defines: _parseDefines(stringsArg('define')),
     );

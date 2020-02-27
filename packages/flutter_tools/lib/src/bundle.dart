@@ -131,6 +131,10 @@ Future<void> buildWithAssemble({
       kTargetPlatform: getNameForTargetPlatform(targetPlatform),
       kTrackWidgetCreation: trackWidgetCreation?.toString(),
     },
+    // BD ADD: START
+    isDynamicart: isDynamicart,
+    isMinimumSize: isMinimumSize,
+    // END
   );
   final Target target = buildMode == BuildMode.debug
     ? const CopyFlutterBundle()

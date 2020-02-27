@@ -1121,7 +1121,8 @@ class IOSEngineLiteArtifacts extends EngineCachedArtifact {
   List<String> getLicenseDirs() {
     if (cache.includeAllPlatforms || platform.isMacOS) {
       return const <String>['ios-lite', 'ios-profile-lite', 'ios-release-lite',
-        'ios-liteg', 'ios-profile-liteg', 'ios-release-liteg'];
+        'ios-liteg', 'ios-profile-liteg', 'ios-release-liteg',
+        'ios-release-lites'];
     }
     return const <String>[];
   }
@@ -1511,6 +1512,7 @@ const List<List<String>> _iosBinaryLiteDirs = <List<String>>[
   <String>['ios-liteg', 'ios-liteg/artifacts.zip'],
   <String>['ios-profile-liteg', 'ios-profile-liteg/artifacts.zip'],
   <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
+  <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
 ];
 // END
 

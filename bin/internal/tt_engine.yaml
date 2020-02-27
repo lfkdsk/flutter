@@ -14,6 +14,8 @@ artifacts: [
     ios-profile-liteg,
     ios-release-liteg,
 
+    ios-release-lites,
+
     common,
     sky_engine,
     darwin-x64,

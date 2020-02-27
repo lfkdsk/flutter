@@ -353,6 +353,9 @@ Future<void> buildGradleApp({
   if (buildInfo.liteGlobal) {
     command.add('-Plite-global=true');
   }
+  if (buildInfo.liteShareSkia) {
+    command.add('-Plite-share-skia=true');
+  }
   // END
 
   GradleHandledError detectedGradleError;
@@ -572,6 +575,9 @@ Future<void> buildGradleAar({
   }
   if (androidBuildInfo.buildInfo.liteGlobal) {
     command.add('-Plite-global=true');
+  }
+  if (androidBuildInfo.buildInfo.liteShareSkia) {
+    command.add('-Plite-share-skia=true');
   }
   // END
 

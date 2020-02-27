@@ -292,6 +292,7 @@ class KernelCompiler {
     // BD ADD: START
     bool lite = false,
     bool liteGlobal = false,
+    bool liteShareSkia = false,
     // END
   }) async {
     final String frontendServer = artifacts.getArtifactPath(
@@ -328,6 +329,7 @@ class KernelCompiler {
       // BD ADD: START
       if (lite) '--lite',
       if (liteGlobal) '--lite-global',
+      if (liteShareSkia) '--lite-share-skia',
     // END
       if (!linkPlatformKernelIn) '--no-link-platform',
       if (aot) ...<String>[

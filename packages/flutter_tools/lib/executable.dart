@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/globals.dart';
+
 import 'runner.dart' as runner;
 import 'src/base/context.dart';
 // The build_runner code generation is provided here to make it easier to
@@ -72,14 +74,18 @@ Future<void> main(List<String> args) async {
   // BD ADD: START
   final bool lite = args.contains('--lite');
   final bool liteGlobal = args.contains('--lite-global');
+  final bool liteShareSkia = args.contains('--lite-share-skia');
+
   EngineMode engineMode = EngineMode.normal;
   if (lite) {
     engineMode = EngineMode.lite;
     print('Currently in lite mode...');
-  }
-  if (liteGlobal) {
+  } else if (liteGlobal) {
     engineMode = EngineMode.lite_global;
     print('Currently in lite global mode...');
+  } else if (liteShareSkia) {
+      engineMode = EngineMode.lite_share_skia;
+      print('Currently in lite & share skia mode...');
   }
   setEngineMode(engineMode);
 
@@ -97,8 +103,14 @@ Future<void> main(List<String> args) async {
     if (args.contains('--compress-size')) {
       FlutterBuildInfo.instance.useCompressSize = true;
     }
-    FlutterBuildInfo.instance.isLite = lite || liteGlobal;
+    FlutterBuildInfo.instance.isLite = lite || liteGlobal || liteShareSkia;
   }
+  // print current command
+  String cmdStr = '';
+  for (String cmd in args) {
+    cmdStr += ' ' + cmd;
+  }
+  print('current cmd: flutter $cmdStr');
   // END
 
   await runner.run(

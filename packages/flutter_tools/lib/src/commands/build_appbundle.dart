@@ -54,6 +54,9 @@ class BuildAppBundleCommand extends BuildSubCommand {
     if (argParser.options.containsKey('lite-global')) {
       liteMode = liteMode | boolArg('lite-global');
     }
+    if (argParser.options.containsKey('lite-share-skia')) {
+      liteMode = liteMode | boolArg('lite-share-skia');
+    }
     if (liteMode) {
       return const <DevelopmentArtifact>{
         DevelopmentArtifact.androidGenSnapshotLite,

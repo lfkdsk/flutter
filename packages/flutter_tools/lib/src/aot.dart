@@ -36,6 +36,7 @@ class AotBuilder {
     bool trackWidgetCreation = false,
     bool useLite = false,
     bool useLiteGlobal = false,
+    bool useLiteShareSkia = false,
     // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     List<String> extraFrontEndOptions,
@@ -97,6 +98,7 @@ class AotBuilder {
         // BD ADD: START : Only for release
         lite: useLite && buildMode == BuildMode.release,
         liteGlobal: useLiteGlobal && buildMode == BuildMode.release,
+        liteShareSkia: useLiteShareSkia && buildMode == BuildMode.release,
         // END
       );
       if (kernelOut == null) {

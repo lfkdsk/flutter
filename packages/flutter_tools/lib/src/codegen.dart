@@ -113,6 +113,7 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     // BD ADD: START
     bool lite = false,
     bool liteGlobal = false,
+    bool liteShareSkia = false,
     // END
   }) async {
     if (fileSystemRoots != null || fileSystemScheme != null || depFilePath != null || targetModel != null || sdkRoot != null || packagesPath != null) {

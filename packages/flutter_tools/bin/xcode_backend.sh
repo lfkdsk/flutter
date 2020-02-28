@@ -215,7 +215,7 @@ BuildApp() {
     verbose_flag="--verbose"
   fi
 
-  local build_dir="${FLUTTER_BUILD_DIR:-build}"
+  local build_dir="${FLUTTER_APPLICATION_PATH}/${FLUTTER_BUILD_DIR}"
 
   local track_widget_creation_flag=""
   if [[ -n "$TRACK_WIDGET_CREATION" ]]; then
@@ -338,11 +338,6 @@ BuildApp() {
   local asset_dir="${app_framework_dir}/${assets_path}"
 
   StreamOutput " ├─Assembling Flutter resources..."
-    local asset_dir_command="${derived_dir}/App.framework/${assets_path}"
-
-  if [[ "$minimum_size_flag" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$dynamicart_flag" == "YES" ]]); then
-    asset_dir_command="${build_dir}/aot/${assets_path}"
-  fi
   RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics             \
     ${verbose_flag}                                                         \
     build bundle                                                            \
@@ -359,11 +354,13 @@ BuildApp() {
     ${minimum_size_command}                                                 \
     ${lite_flag}
 
+  # BD ADD:START
   if [[ "$minimum_size_flag" == "YES" ]] || [[ "$dynamicart_flag" == "YES" ]]; then
-    local host_manifest="${asset_dir_command}/host_manifest.json"
+    local host_manifest="${derived_dir}/App.framework/flutter_assets/host_manifest.json"
     if [[ -f "$host_manifest" ]]; then
-      RunCommand cp -f --  "${host_manifest}" "${derived_dir}/App.framework/host_manifest.json"
-      RunCommand rm -rf -- "${host_manifest}"
+      RunCommand mv -f --  "${host_manifest}" "${derived_dir}/App.framework/host_manifest.json"
+    else
+      StreamOutput " ├───host_manifest.json not found at ${host_manifest}"
     fi
   fi
 
@@ -382,7 +379,7 @@ BuildApp() {
 
       RunCommand mkdir -p -- "${build_dir}/patch/"
       RunCommand mkdir -p -- "${build_dir}/patch/${path}/"
-      RunCommand cp -Rv -- "${build_dir}/aot/${assets_path}" "${build_dir}/patch/${path}/${assets_path}"
+      RunCommand cp -Rv -- "${asset_dir}" "${build_dir}/patch/${path}/${assets_path}"
       RunCommand cp -f --  "${build_dir}/aot/${arch}/isolate_snapshot_data" "${build_dir}/patch/${path}/isolate_snapshot_data"
       RunCommand cp -f --  "${build_dir}/aot/${arch}/vm_snapshot_data" "${build_dir}/patch/${path}/vm_snapshot_data"
       RunCommand cp -f --   "${flutter_framework}/icudtl.dat" "${build_dir}/patch/${path}/icudtl.dat"
@@ -394,9 +391,9 @@ BuildApp() {
       zip -q -r ./../${path}.zip ./*
       RunCommand cd ${current_path}
     done
+    RunCommand rm -rf -- "${asset_dir}"
   fi
 
-  # BD ADD:START
   if [[ "$compress_size_flag" != "" ]]; then
     RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${app_framework_dir}/icudtl.dat"
     if [[ -e "${project_path}/.ios" ]]; then

@@ -437,7 +437,8 @@ class CachedArtifacts extends Artifacts {
           && platform == TargetPlatform.ios) {
         liteSuffix = '-lites';
       } else {
-        throwToolExit('Now, --lite-share-skia now only support for ios-release !');
+        printError('Now, --lite-share-skia now only support for ios-release !\nFallback to lite mode.');
+        liteSuffix = '-lite';
       }
     }
     // END

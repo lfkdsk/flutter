@@ -8,7 +8,7 @@
 
 #import "DynamicRouteProtocolImplement.h"
 #import <BDPackageManagerService/BDPackageManagerService.h>
-#import <BDFlutterDynamic/BDFlutterDynamicManager.h>
+#import <BDFlutterPackageManager/BDFlutterPackageManager.h>
 
 @implementation DynamicRouteProtocolImplement
 
@@ -18,17 +18,17 @@
 
 - (void)validPackageWithName:(NSString *)name completion:(void(^)(id<DynamicRoutePackageProtocol> _Nullable package))completion {
     if (completion) {
-        id<DynamicRoutePackageProtocol> package = (id<DynamicRoutePackageProtocol>)[[BDFlutterDynamicManager sharedInstance] validPackageWithName:name];
+        id<DynamicRoutePackageProtocol> package = (id<DynamicRoutePackageProtocol>)[[BDFlutterPackageManager sharedInstance] validPackageWithName:name];
         completion(package);
     }
 }
 
 - (BOOL)isDynamicEngine {
-    return [BDFlutterDynamicManager sharedInstance].isDynamicEngine;
+    return [BDFlutterPackageManager sharedInstance].isDynamicEngine;
 }
 
 - (NSString *)dynamicEnginePath {
-    return [BDFlutterDynamicManager sharedInstance].dynamicEnginePath;
+    return [BDFlutterPackageManager sharedInstance].dynamicEnginePath;
 }
 
 @end

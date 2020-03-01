@@ -1,18 +1,18 @@
 //
-//  BDFlutterDynamicManager+Custom.m
+//  BDFlutterPackageManager+Custom.m
 //  Runner
 //
 //  Created by 白昆仑 on 2019/8/23.
 //  Copyright © 2019 The Chromium Authors. All rights reserved.
 //
 
-#import "BDFlutterDynamicManager+Custom.h"
+#import "BDFlutterPackageManager+Custom.h"
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
 #import "DemoViewController.h"
 
 
-@implementation BDFlutterDynamicManager (Custom)
+@implementation BDFlutterPackageManager (Custom)
 
 + (void)load {
     [self swapMethod:[self class]

@@ -1,5 +1,5 @@
 //
-//  BDFlutterDynamicManager+Custom.h
+//  BDFlutterPackageManager+Custom.h
 //  Runner
 //
 //  Created by 白昆仑 on 2019/8/23.
@@ -9,11 +9,11 @@
 #import <Foundation/Foundation.h>
 
 
-#import "BDFlutterDynamicManager.h"
+#import <BDFlutterPackageManager/BDFlutterPackageManager.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BDFlutterDynamicManager (Custom)
+@interface BDFlutterPackageManager (Custom)
 
 @end
 

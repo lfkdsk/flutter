@@ -2,7 +2,7 @@
 #include "GeneratedPluginRegistrant.h"
 #import "DemoViewController.h"
 #import <BDPackageManagerService/BDPackageManagerService.h>
-#import <BDFlutterDynamic/BDFlutterDynamicManager.h>
+#import <BDFlutterPackageManager/BDFlutterPackageManager.h>
 #import "TTNetworkManager.h"
 #import "RoutePluginProtocolImplement.h"
 #import "DynamicRouteProtocolImplement.h"
@@ -136,7 +136,9 @@ extern BOOL FlutterRecreateSurfaceWhenReceiveMemorying;
     config.channel = @"local_test";
     config.deviceId = @"12345678900";
     [[BDPMSManager sharedInstance] setConfig:config];
-    [[BDFlutterDynamicManager sharedInstance] syncInit];
+    [[BDFlutterPackageManager sharedInstance] asyncInitWithCallback:^(BOOL success) {
+        NSLog(@"BDFlutterPackageManager初始化%@", success ? @"成功" : @"失败");
+    }];
 }
 
 - (void)initRouteApp {

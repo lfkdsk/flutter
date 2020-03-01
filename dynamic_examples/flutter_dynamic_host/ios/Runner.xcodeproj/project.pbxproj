@@ -12,7 +12,7 @@
 		101095D422EEC8B4009EC844 /* FlutterAppModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 101095D322EEC8B4009EC844 /* FlutterAppModel.m */; };
 		10236589230D6A30009BD1CB /* DynamicRouteProtocolImplement.m in Sources */ = {isa = PBXBuildFile; fileRef = 10236588230D6A30009BD1CB /* DynamicRouteProtocolImplement.m */; };
 		1023658C230D769C009BD1CB /* RoutePluginProtocolImplement.m in Sources */ = {isa = PBXBuildFile; fileRef = 1023658B230D769C009BD1CB /* RoutePluginProtocolImplement.m */; };
-		103C1799230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.m in Sources */ = {isa = PBXBuildFile; fileRef = 103C1798230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.m */; };
+		103C1799230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.m in Sources */ = {isa = PBXBuildFile; fileRef = 103C1798230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.m */; };
 		10A7CA9722E16F45004CE3FB /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10A7CA9622E16F45004CE3FB /* WebKit.framework */; };
 		10DE55232313F0C900D04503 /* BDSFlutterBridgePlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 10DE55222313F0C900D04503 /* BDSFlutterBridgePlugin.m */; };
 		2D9222451EC1E1BA007564B0 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D9222441EC1E1BA007564B0 /* GeneratedPluginRegistrant.m */; };
@@ -56,8 +56,8 @@
 		10236588230D6A30009BD1CB /* DynamicRouteProtocolImplement.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DynamicRouteProtocolImplement.m; sourceTree = "<group>"; };
 		1023658A230D769C009BD1CB /* RoutePluginProtocolImplement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoutePluginProtocolImplement.h; sourceTree = "<group>"; };
 		1023658B230D769C009BD1CB /* RoutePluginProtocolImplement.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RoutePluginProtocolImplement.m; sourceTree = "<group>"; };
-		103C1797230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BDFlutterDynamicManager+Custom.h"; sourceTree = "<group>"; };
-		103C1798230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "BDFlutterDynamicManager+Custom.m"; sourceTree = "<group>"; };
+		103C1797230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BDFlutterPackageManager+Custom.h"; sourceTree = "<group>"; };
+		103C1798230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "BDFlutterPackageManager+Custom.m"; sourceTree = "<group>"; };
 		10A7CA9622E16F45004CE3FB /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		10DE55212313F0C900D04503 /* BDSFlutterBridgePlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BDSFlutterBridgePlugin.h; sourceTree = "<group>"; };
 		10DE55222313F0C900D04503 /* BDSFlutterBridgePlugin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BDSFlutterBridgePlugin.m; sourceTree = "<group>"; };
@@ -147,8 +147,8 @@
 				1023658B230D769C009BD1CB /* RoutePluginProtocolImplement.m */,
 				10236587230D6A30009BD1CB /* DynamicRouteProtocolImplement.h */,
 				10236588230D6A30009BD1CB /* DynamicRouteProtocolImplement.m */,
-				103C1797230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.h */,
-				103C1798230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.m */,
+				103C1797230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.h */,
+				103C1798230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.m */,
 				10DE55212313F0C900D04503 /* BDSFlutterBridgePlugin.h */,
 				10DE55222313F0C900D04503 /* BDSFlutterBridgePlugin.m */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
@@ -224,7 +224,7 @@
 				TargetAttributes = {
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 7SSCMQ9R9M;
+						DevelopmentTeam = H7W77QXGX2;
 						LastSwiftMigration = 1100;
 						ProvisioningStyle = Manual;
 					};
@@ -368,7 +368,7 @@
 				1023658C230D769C009BD1CB /* RoutePluginProtocolImplement.m in Sources */,
 				2D9222451EC1E1BA007564B0 /* GeneratedPluginRegistrant.m in Sources */,
 				101095D122EEC563009EC844 /* FlutterAppTableViewCell.m in Sources */,
-				103C1799230FEDB2004B9E21 /* BDFlutterDynamicManager+Custom.m in Sources */,
+				103C1799230FEDB2004B9E21 /* BDFlutterPackageManager+Custom.m in Sources */,
 				101095CE22EEC414009EC844 /* DemoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -584,9 +584,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = XXHND5J98K;
+				DEVELOPMENT_TEAM = H7W77QXGX2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -601,7 +601,7 @@
 				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.flutter.examples.dynamic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = WildcardInHouseDist;
+				PROVISIONING_PROFILE_SPECIFIER = Zhuoli_Li_Wildcard_HMKJ87UDPX;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -616,7 +616,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 7SSCMQ9R9M;
+				DEVELOPMENT_TEAM = H7W77QXGX2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -633,7 +633,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = io.flutter.examples.dynamic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = YimingZhang_Wildcard;
+				PROVISIONING_PROFILE_SPECIFIER = Zhuoli_Li_Wildcard_HMKJ87UDPX;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VALIDATE_PRODUCT = NO;

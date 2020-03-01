@@ -7,7 +7,7 @@
 //
 
 #import "DemoViewController.h"
-#import <BDFlutterDynamic/BDFlutterDynamicManager.h>
+#import <BDFlutterPackageManager/BDFlutterPackageManager.h>
 #import "FlutterAppTableViewCell.h"
 #import "FlutterAppModel.h"
 #import <Flutter/Flutter.h>
@@ -66,7 +66,7 @@ static NSInteger const kFooterBtnNumber = 3;
     _tableView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:_tableView];
     
-    if ([BDFlutterDynamicManager sharedInstance].isReady) {
+    if ([BDFlutterPackageManager sharedInstance].isReady) {
         [self onFlutterManagerInitFinished];
     } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onFlutterManagerInitFinished) name:BDFlutterPackageReadyNotification object:nil];
@@ -286,8 +286,8 @@ static NSInteger const kFooterBtnNumber = 3;
 
 - (void)nativePushFlutterVCWithDillPath:(NSString *)path {
     FlutterDartProject *config = [[FlutterDartProject alloc] init];
-    if ([BDFlutterDynamicManager sharedInstance].isDynamicEngine) {
-        [config setDynamicEnginePath:[BDFlutterDynamicManager sharedInstance].dynamicEnginePath];
+    if ([BDFlutterPackageManager sharedInstance].isDynamicEngine) {
+        [config setDynamicEnginePath:[BDFlutterPackageManager sharedInstance].dynamicEnginePath];
     }
     
     if (path) {
@@ -300,7 +300,7 @@ static NSInteger const kFooterBtnNumber = 3;
 }
 
 - (BOOL)checkEngine {
-    if ([BDFlutterDynamicManager sharedInstance].isDynamicEngine && ![BDFlutterDynamicManager sharedInstance].dynamicEnginePath) {
+    if ([BDFlutterPackageManager sharedInstance].isDynamicEngine && ![BDFlutterPackageManager sharedInstance].dynamicEnginePath) {
         [self alertWithMessage:@"本地无动态Engine包，无法启动该App"];
         return NO;
     }
@@ -318,7 +318,7 @@ static NSInteger const kFooterBtnNumber = 3;
 }
 
 - (void)onFlutterManagerInitFinished {
-    NSArray *packageArray = [[BDFlutterDynamicManager sharedInstance] allValidPackages];
+    NSArray *packageArray = [[BDFlutterPackageManager sharedInstance] allValidPackages];
     for (BDPMSPackage *package in packageArray) {
         [self findAndCreateModelWithPackage:package];
     }

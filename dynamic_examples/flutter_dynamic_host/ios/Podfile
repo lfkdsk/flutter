@@ -2,9 +2,6 @@
 # platform :ios, '9.0'
 gem 'bd_pod_extentions'
 require 'bd_pod_extentions'
-# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
-gem 'bd_pod_extentions'
-require 'bd_pod_extentions'
 bd_use_app("thirdParty", "public", "toutiao", "zhibozhongtai")
 platform :ios, '9.0'
 bytedanceAnalyzeSpeed(true)
@@ -73,10 +70,10 @@ target 'Runner' do
   }
   
   # Bytedance Pods
-  pod_source 'BDPackageManagerService', '1.1.0-rc.12'
-  pod_source 'BDFlutterDynamic', '1.1.0-rc.10'
-  #pod 'BDPackageManagerService', :path => '/Users/baikunlun/Documents/Git/Project_2/BDPackageManagerService'
-  #pod 'BDFlutterDynamic', :path => '/Users/baikunlun/Documents/Git/Project_2/BDFlutterDynamic'
+  # pod_source 'BDPackageManagerService', '1.1.0-rc.12'
+  # pod_source 'BDFlutterDynamic', '1.1.0-rc.10'
+  pod 'BDPackageManagerService', :path => '/Users/baikunlun/Documents/Git/Project_2/BDPackageManagerService'
+  pod 'BDFlutterDynamic', :path => '/Users/baikunlun/Documents/Git/Project_2/BDFlutterDynamic'
   pod_binary 'AFgzipRequestSerializer','0.0.3'
   pod_binary 'AFNetworking','2.5.4'
   pod_binary 'AWEVideoPlayer', '0.5.4'

@@ -66,7 +66,7 @@ static NSInteger const kFooterBtnNumber = 3;
     _tableView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:_tableView];
     
-    if ([BDFlutterPackageManager sharedInstance].isReady) {
+    if ([BDFlutterPackageManager sharedInstance].isFlutterAppValid) {
         [self onFlutterManagerInitFinished];
     } else {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onFlutterManagerInitFinished) name:BDFlutterPackageReadyNotification object:nil];
@@ -285,9 +285,13 @@ static NSInteger const kFooterBtnNumber = 3;
 }
 
 - (void)nativePushFlutterVCWithDillPath:(NSString *)path {
+    if (![BDFlutterPackageManager sharedInstance].isFlutterAppValid) {
+        return;
+    }
+    
     FlutterDartProject *config = [[FlutterDartProject alloc] init];
-    if ([BDFlutterPackageManager sharedInstance].isDynamicEngine) {
-        [config setDynamicEnginePath:[BDFlutterPackageManager sharedInstance].dynamicEnginePath];
+    if ([BDFlutterPackageManager sharedInstance].isEnginePackageMode) {
+        [config setDynamicEnginePath:[BDFlutterPackageManager sharedInstance].enginePackagePath];
     }
     
     if (path) {
@@ -300,7 +304,7 @@ static NSInteger const kFooterBtnNumber = 3;
 }
 
 - (BOOL)checkEngine {
-    if ([BDFlutterPackageManager sharedInstance].isDynamicEngine && ![BDFlutterPackageManager sharedInstance].dynamicEnginePath) {
+    if (![BDFlutterPackageManager sharedInstance].isEngineValid) {
         [self alertWithMessage:@"本地无动态Engine包，无法启动该App"];
         return NO;
     }

@@ -136,7 +136,7 @@ extern BOOL FlutterRecreateSurfaceWhenReceiveMemorying;
     config.channel = @"local_test";
     config.deviceId = @"12345678900";
     [[BDPMSManager sharedInstance] setConfig:config];
-    [[BDFlutterPackageManager sharedInstance] asyncInitWithCallback:^(BOOL success) {
+    [[BDFlutterPackageManager sharedInstance] loadPackagesWithCallback:^(BOOL success) {
         NSLog(@"BDFlutterPackageManager初始化%@", success ? @"成功" : @"失败");
     }];
 }

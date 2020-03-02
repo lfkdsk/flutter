@@ -24,11 +24,11 @@
 }
 
 - (BOOL)isDynamicEngine {
-    return [BDFlutterPackageManager sharedInstance].isDynamicEngine;
+    return [BDFlutterPackageManager sharedInstance].isEnginePackageMode;
 }
 
 - (NSString *)dynamicEnginePath {
-    return [BDFlutterPackageManager sharedInstance].dynamicEnginePath;
+    return [BDFlutterPackageManager sharedInstance].enginePackagePath;
 }
 
 @end

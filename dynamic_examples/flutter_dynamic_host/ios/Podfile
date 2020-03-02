@@ -71,9 +71,9 @@ target 'Runner' do
   
   # Bytedance Pods
   pod_source 'BDPackageManagerService', '1.1.0-rc.13'
-  pod_source 'BDFlutterPackageManager', '0.0.2-rc.0'
+  pod_source 'BDFlutterPackageManager', '0.0.2-rc.3'
   #pod 'BDPackageManagerService', :path => '/Users/baikunlun/Documents/Git/Project_2/BDPackageManagerService'
-  #pod 'BDFlutterPackageManager', :path => '/Users/baikunlun/Documents/Git/Project_2/BDFlutterPackageManager'
+  # pod 'BDFlutterPackageManager', :path => '/Users/baikunlun/Documents/Git/Project_2/BDFlutterPackageManager'
   pod_binary 'AFgzipRequestSerializer','0.0.3'
   pod_binary 'AFNetworking','2.5.4'
   pod_binary 'AWEVideoPlayer', '0.5.4'

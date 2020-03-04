@@ -98,6 +98,10 @@ class AssembleCommand extends FlutterCommand {
         defaultsTo: false,
         help: 'Flutter lite edition to reduce package size, with global langage');
     addDynamicartModeFlags();
+    argParser.addFlag('lite-share-skia',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite & share skia edition to reduce package size');
     // END
   }
 

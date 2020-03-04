@@ -23,7 +23,8 @@ class BuildInfo {
     // BD ADD: START
     this.dynamicPlugins,
     this.lite = false,
-    this.liteGlobal = false
+    this.liteGlobal = false,
+    this.liteShareSkia = false
     // END
   });
 
@@ -67,6 +68,7 @@ class BuildInfo {
   // BD ADD:START
   final bool lite;
   final bool liteGlobal;
+  final bool liteShareSkia;
   // END
 
   static const BuildInfo debug = BuildInfo(BuildMode.debug, null);

@@ -4,6 +4,8 @@
 
 import 'package:meta/meta.dart';
 
+// BD ADD:
+import 'base/common.dart';
 import 'base/context.dart';
 import 'base/file_system.dart';
 import 'base/platform.dart';
@@ -17,7 +19,8 @@ import 'globals.dart';
 enum EngineMode {
   normal,
   lite,
-  lite_global
+  lite_global,
+  lite_share_skia
 }
 // END
 enum Artifact {
@@ -432,6 +435,14 @@ class CachedArtifacts extends Artifacts {
       liteSuffix = '-lite';
     } else if (engineMode == EngineMode.lite_global) {
       liteSuffix = '-liteg';
+    } else if (engineMode == EngineMode.lite_share_skia) {
+      if (mode == BuildMode.release
+          && platform == TargetPlatform.ios) {
+        liteSuffix = '-lites';
+      } else {
+        printError('Now, --lite-share-skia now only support for ios-release !\nFallback to lite mode.');
+        liteSuffix = '-lite';
+      }
     }
     // END
     switch (platform) {

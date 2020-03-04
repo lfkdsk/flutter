@@ -263,6 +263,10 @@ List<String> _xcodeBuildSettingsLines({
   if (buildInfo.liteGlobal) {
     xcodeBuildSettings.add('LITE_GLOBAL=true');
   }
+
+  if (buildInfo.liteShareSkia) {
+    xcodeBuildSettings.add('LITE_SHARE_SKIA=true');
+  }
   // END
   return xcodeBuildSettings;
 }

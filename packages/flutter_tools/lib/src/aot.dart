@@ -39,6 +39,7 @@ class AotBuilder {
     bool isMinimumSize = false,
     List<String> dynamicPlugins = null,
     bool useLiteGlobal = false,
+    bool useLiteShareSkia = false,
     // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     List<String> extraFrontEndOptions,
@@ -106,6 +107,7 @@ class AotBuilder {
         liteGlobal: useLiteGlobal && buildMode == BuildMode.release,
         isDynamicart: isDynamicart,
         dynamicPlugins: dynamicPlugins,
+        liteShareSkia: useLiteShareSkia && buildMode == BuildMode.release,
         // END
       );
       if (kernelOut == null) {

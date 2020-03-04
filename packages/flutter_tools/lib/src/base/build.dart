@@ -370,7 +370,8 @@ class AOTSnapshotter {
     List<String> extraFrontEndOptions = const <String>[],
     // BD ADD:START
     bool lite = false,
-    bool liteGlobal = false
+    bool liteGlobal = false,
+    bool liteShareSkia = false
     // END
   }) async {
     final FlutterProject flutterProject = FlutterProject.current();
@@ -407,6 +408,7 @@ class AOTSnapshotter {
       dynamicPlugins: dynamicPlugins,
       lite: lite,
       liteGlobal: liteGlobal,
+      liteShareSkia: liteShareSkia,
       // END
     ));
 

@@ -467,7 +467,7 @@ class FlutterCommandRunner extends CommandRunner<void> {
     // Strip suffix for various archs.
     // BD MOD:
     // final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64'];
-    final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64', '_lite', '_liteg'];
+    final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64', '_lite', '_liteg', '_lites'];
     for (String suffix in suffixes) {
       // 这个函数的逻辑是根据指定的--local-engine=android_release_unopt参数去查找对应的host目录逻辑
       // 例如指定android_release_unopt_arm时查找的host为截取第一个_后的的字符串然后把架构相关的字符给即为host_release_unopt

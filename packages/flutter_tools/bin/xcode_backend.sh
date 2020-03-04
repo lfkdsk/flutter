@@ -88,6 +88,10 @@ BuildApp() {
       lite_flag="--lite-global"
       lite_suffix="-liteg"
   fi
+  if [[  -n "$LITE_SHARE_SKIA" ]]; then
+      lite_flag="--lite-share-skia"
+      lite_suffix="-lites"
+  fi
   # END
 
   # Use FLUTTER_BUILD_MODE if it's set, otherwise use the Xcode build configuration name
@@ -95,6 +99,12 @@ BuildApp() {
   # they _must_ set FLUTTER_BUILD_MODE so we know what type of artifact to build.
   local build_mode="$(echo "${FLUTTER_BUILD_MODE:-${CONFIGURATION}}" | tr "[:upper:]" "[:lower:]")"
   local artifact_variant="unknown"
+  # BD ADD: START
+  if [  $lite_suffix == '-lites' -a  $build_mode != "release" ]; then
+     echo "Current share skia only support for release"
+     lite_suffix="-lite"
+  fi
+  # END
   case "$build_mode" in
     # BD MOD: START
     # *release*) build_mode="release"; artifact_variant="ios-release";;

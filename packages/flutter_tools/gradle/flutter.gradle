@@ -541,6 +541,13 @@ class FlutterPlugin implements Plugin<Project> {
         }
         return false
     }
+
+    private Boolean useLiteShareSkia() {
+        if (project.hasProperty('lite-share-skia')) {
+            return project.property('lite-share-skia').toBoolean()
+        }
+        return false
+    }
     // END
 
     private Boolean isVerbose() {
@@ -674,6 +681,10 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('lite-global')) {
             liteGlobalValue = project.property('lite-global').toBoolean()
         }
+        Boolean liteShareSkiaValue = false
+        if (project.hasProperty('lite-share-skia')) {
+            liteShareSkiaValue = project.property('lite-share-skia').toBoolean()
+        }
         // END
         String extraFrontEndOptionsValue = null
         if (project.hasProperty('extra-front-end-options')) {
@@ -720,6 +731,7 @@ class FlutterPlugin implements Plugin<Project> {
                 dynamicPlugins dynamicPluginValue
                 useLite liteValue
                 useLiteGlobal liteGlobalValue
+                useLiteShareSkia liteShareSkiaValue
                 // END
             }
             File libJar = project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/libs.jar")
@@ -864,6 +876,7 @@ abstract class BaseFlutterTask extends DefaultTask {
     Boolean useLite
     @Optional @Input
     Boolean useLiteGlobal
+    Boolean useLiteShareSkia
     // END
     @Optional @Input
     List<String> targetPlatformValues
@@ -936,6 +949,9 @@ abstract class BaseFlutterTask extends DefaultTask {
             }
             if (useLiteGlobal) {
                 args "--lite-global"
+            }
+            if (useLiteShareSkia) {
+                args "--lite-share-skia"
             }
             // END
             if (extraFrontEndOptions != null) {

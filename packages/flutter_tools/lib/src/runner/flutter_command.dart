@@ -346,6 +346,10 @@ abstract class FlutterCommand extends Command<void> {
         negatable: false,
         defaultsTo: false,
         help: 'Flutter lite edition to reduce package size, with global langage');
+    argParser.addFlag('lite-share-skia',
+        negatable: false,
+        defaultsTo: false,
+        help: 'Flutter lite & share skia edition to reduce package size, with global langage');
     // END
     argParser.addFlag('jit-release',
       negatable: false,
@@ -542,6 +546,9 @@ abstract class FlutterCommand extends Command<void> {
           : false,
       liteGlobal: argParser.options.containsKey('lite-global')
           ? boolArg('lite-global')
+          : false,
+      liteShareSkia: argParser.options.containsKey('lite-share-skia')
+          ? boolArg('lite-share-skia')
           : false,
       // END
     );
@@ -810,7 +817,7 @@ mixin DeviceBasedDevelopmentArtifacts on FlutterCommand {
       DevelopmentArtifact.universal,
     };
     // BD ADD
-    final bool isLite = boolArg('lite') | boolArg('lite-global');
+    final bool isLite = boolArg('lite') | boolArg('lite-global') | boolArg('lite-share-skia');
     for (Device device in devices) {
       final TargetPlatform targetPlatform = await device.targetPlatform;
       // BD MOD：
@@ -841,7 +848,7 @@ mixin TargetPlatformBasedDevelopmentArtifacts on FlutterCommand {
       DevelopmentArtifact.universal,
     };
     // BD ADD
-    final bool isLite = boolArg('lite') | boolArg('lite-global');
+    final bool isLite = boolArg('lite') | boolArg('lite-global') | boolArg('lite-share-skia');
     // BD MOD:
     // final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform);
     final DevelopmentArtifact developmentArtifact = _artifactFromTargetPlatform(targetPlatform, isLite: isLite);

@@ -4,6 +4,7 @@
 
 
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 
@@ -421,7 +422,15 @@ class _BoxDecorationPainter extends BoxPainter {
         break;
       case BoxShape.rectangle:
         if (_decoration.borderRadius == null) {
+          // BD ADD: START
+          bool oldValue = paint.isAntiAlias;
+          if (!canvas.isSkewOrRotate()) {
+            paint.isAntiAlias = false;
+          }
+          // END
           canvas.drawRect(rect, paint);
+          // BD ADD:
+          paint.isAntiAlias =  oldValue;
         } else {
           canvas.drawRRect(_decoration.borderRadius!.resolve(textDirection).toRRect(rect), paint);
         }

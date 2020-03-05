@@ -284,6 +284,13 @@ class _MulticastCanvas implements Canvas {
     _main.translate(dx, dy);
     _screenshot.translate(dx, dy);
   }
+
+  // BD ADD: START
+  @override
+  bool isSkewOrRotate() {
+    return _main.isSkewOrRotate();
+  }
+  // END
 }
 
 Rect _calculateSubtreeBoundsHelper(RenderObject object, Matrix4 transform) {

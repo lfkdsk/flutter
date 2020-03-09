@@ -469,7 +469,7 @@ class CachedArtifacts extends Artifacts {
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
         assert(mode != null, 'Need to specify a build mode for platform $platform.');
-        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-').replaceAll('_', '-')}' : '';
         // BD MOD:
         // return fs.path.join(engineDir, platformName + suffix);
         return fs.path.join(engineDir, platformName + suffix + liteSuffix);

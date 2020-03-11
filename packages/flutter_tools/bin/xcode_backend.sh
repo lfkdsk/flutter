@@ -36,6 +36,7 @@ AssertExists() {
 }
 
 BuildApp() {
+  RunCommand env
   local project_path="${SOURCE_ROOT}/.."
   if [[ -n "$FLUTTER_APPLICATION_PATH" ]]; then
     project_path="${FLUTTER_APPLICATION_PATH}"
@@ -227,7 +228,7 @@ BuildApp() {
     verbose_flag="--verbose"
   fi
 
-  local build_dir="${FLUTTER_APPLICATION_PATH}/${FLUTTER_BUILD_DIR}"
+  local build_dir="${FLUTTER_BUILD_DIR:-build}"
 
   local track_widget_creation_flag=""
   if [[ -n "$TRACK_WIDGET_CREATION" ]]; then

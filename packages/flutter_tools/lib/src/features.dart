@@ -154,8 +154,12 @@ const Feature flutterAndroidEmbeddingV2Feature = Feature(
     enabledByDefault: true,
   ),
   master: FeatureChannelSetting(
-    available: true,
-    enabledByDefault: true,
+    // BD MOD: START
+//    available: true,
+//    enabledByDefault: true,
+    available: false,
+    enabledByDefault: false,
+    // END
   ),
   stable: FeatureChannelSetting(
     available: true,

@@ -533,6 +533,16 @@ class FlutterPlugin implements Plugin<Project> {
     }
     // END
 
+    // BD ADD: START
+    private String getMainModule() {
+        String appName = ''
+        if (project.hasProperty('main-module-name')) {
+             appName = project.property('main-module-name')
+        }
+        return appName ? appName : 'app'
+    }
+    // END
+
     private Boolean isVerbose() {
         if (project.hasProperty('verbose')) {
             return project.property('verbose').toBoolean()
@@ -778,7 +788,11 @@ class FlutterPlugin implements Plugin<Project> {
                 return
             }
             // Flutter module included as a subproject in add to app.
-            Project appProject = project.rootProject.findProject(':app')
+            // BD MOD: START
+            // Project appProject = project.rootProject.findProject(':app')
+            String mainModule = getMainModule()
+            Project appProject = project.rootProject.findProject(":${mainModule}")
+            // END
             assert appProject != null
             appProject.afterEvaluate {
                 assert appProject.android != null
@@ -807,7 +821,9 @@ class FlutterPlugin implements Plugin<Project> {
                     }
                     Task mergeAssets = project
                         .tasks
-                        .findByPath(":app:merge${appProjectVariant.name.capitalize()}Assets")
+                        // BD MOD
+                        // .findByPath(":app:merge${appProjectVariant.name.capitalize()}Assets")
+                        .findByPath(":${mainModule}:merge${appProjectVariant.name.capitalize()}Assets")
                     assert mergeAssets
                     mergeAssets.dependsOn(copyFlutterAssetsTask)
                 }

@@ -211,11 +211,11 @@ class CachedArtifacts extends Artifacts {
     switch (platform) {
       case TargetPlatform.android_arm:
       case TargetPlatform.android_arm64:
+        // BD ADD
+        return _getAndroidArtifactPath(artifact, platform, mode, engineMode: kEngineMode);
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
-        // BD MOD:
-        // return _getAndroidArtifactPath(artifact, platform, mode);
-        return _getAndroidArtifactPath(artifact, platform, mode, kEngineMode);
+         return _getAndroidArtifactPath(artifact, platform, mode);
       case TargetPlatform.ios:
         // BD MOD:
         // return _getIosArtifactPath(artifact, platform, mode);
@@ -236,7 +236,7 @@ class CachedArtifacts extends Artifacts {
       default: // could be null, but that can't be specified as a case.
         // BD MOD:
         //return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform, mode);
-        return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform, mode, kEngineMode);
+        return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform, mode, engineMode: kEngineMode);
     }
   }
 
@@ -260,12 +260,12 @@ class CachedArtifacts extends Artifacts {
     }
     // BD MOD:
     // return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform, mode);
-    return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform, mode, engineMode);
+    return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform, mode, engineMode: engineMode);
   }
 
   // BD MOD:
   // String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
-  String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, EngineMode engineMode) {
+  String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, { EngineMode engineMode = EngineMode.normal }) {
     final String engineDir = _getEngineArtifactsPath(platform, engineMode, mode);
     switch (artifact) {
       case Artifact.frontendServerSnapshotForEngineDartSdk:
@@ -278,7 +278,7 @@ class CachedArtifacts extends Artifacts {
       default:
         // BD MOD:
         // return _getHostArtifactPath(artifact, platform, mode);
-        return _getHostArtifactPath(artifact, platform, mode, engineMode);
+        return _getHostArtifactPath(artifact, platform, mode, engineMode: engineMode);
     }
   }
 
@@ -314,7 +314,7 @@ class CachedArtifacts extends Artifacts {
       default:
         // BD MOD:
         // return _getHostArtifactPath(artifact, platform, mode);
-        return _getHostArtifactPath(artifact, platform, mode, engineMode);
+        return _getHostArtifactPath(artifact, platform, mode, engineMode: engineMode);
     }
   }
 
@@ -347,7 +347,7 @@ class CachedArtifacts extends Artifacts {
       default:
         // BD MOD:
         // return _getHostArtifactPath(artifact, platform, mode);
-        return _getHostArtifactPath(artifact, platform, mode, engineMode);
+        return _getHostArtifactPath(artifact, platform, mode, engineMode: engineMode);
     }
   }
 
@@ -363,15 +363,13 @@ class CachedArtifacts extends Artifacts {
 
   // BD MOD:
   // String _getHostArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
-  String _getHostArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, EngineMode engineMode) {
+  String _getHostArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, { EngineMode engineMode = EngineMode.normal }) {
     assert(platform != null);
     switch (artifact) {
       case Artifact.genSnapshot:
         // For script snapshots any gen_snapshot binary will do. Returning gen_snapshot for
         // android_arm in profile mode because it is available on all supported host platforms.
-        // BD MOD:
-        // return _getAndroidArtifactPath(artifact, TargetPlatform.android_arm, BuildMode.profile);
-        return _getAndroidArtifactPath(artifact, TargetPlatform.android_arm, BuildMode.profile, engineMode);
+        return _getAndroidArtifactPath(artifact, TargetPlatform.android_arm, BuildMode.profile);
       case Artifact.flutterTester:
       case Artifact.vmSnapshotData:
       case Artifact.isolateSnapshotData:
@@ -426,22 +424,6 @@ class CachedArtifacts extends Artifacts {
   String _getEngineArtifactsPath(TargetPlatform platform, EngineMode engineMode, [ BuildMode mode ]) {
     final String engineDir = cache.getArtifactDirectory('engine').path;
     final String platformName = getNameForTargetPlatform(platform);
-    // BD ADD: START
-    String liteSuffix = '';
-    if ( engineMode == EngineMode.lite ) {
-      liteSuffix = '-lite';
-    } else if (engineMode == EngineMode.lite_global) {
-      liteSuffix = '-liteg';
-    } else if (engineMode == EngineMode.lite_share_skia) {
-      if (mode == BuildMode.release
-          && platform == TargetPlatform.ios) {
-        liteSuffix = '-lites';
-      } else {
-        printError('Now, --lite-share-skia now only support for ios-release !\nFallback to lite mode.');
-        liteSuffix = '-lite';
-      }
-    }
-    // END
     switch (platform) {
       case TargetPlatform.linux_x64:
       case TargetPlatform.darwin_x64:
@@ -463,13 +445,39 @@ class CachedArtifacts extends Artifacts {
       case TargetPlatform.ios:
       case TargetPlatform.android_arm:
       case TargetPlatform.android_arm64:
+        // BD MOD: START
+        //  assert(mode != null, 'Need to specify a build mode for platform $platform.');
+        //  final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+        // return fs.path.join(engineDir, platformName + suffix);
+        String liteSuffix = '';
+        if ( engineMode == EngineMode.lite ) {
+          liteSuffix = '-lite';
+        } else if (engineMode == EngineMode.lite_global) {
+          liteSuffix = '-liteg';
+        } else if (engineMode == EngineMode.lite_share_skia) {
+          if (mode == BuildMode.release
+              && platform == TargetPlatform.ios) {
+            liteSuffix = '-lites';
+          } else {
+            liteSuffix = '';
+            printError(
+                'Now, --lite-share-skia now only support for ios-release !\nOtherwise we will fall back to lite mode.');
+          }
+        }
+        if (liteSuffix != '' && mode != BuildMode.release) {
+          printError(
+              'Now, --lite or --lite-global now only support for release mode !\nOtherwise we will fall to normal mode.');
+          liteSuffix = '';
+        }
+        assert(mode != null, 'Need to specify a build mode for platform $platform.');
+        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+        return fs.path.join(engineDir, platformName + suffix + liteSuffix);
+        // END
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
         assert(mode != null, 'Need to specify a build mode for platform $platform.');
         final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
-        // BD MOD:
-        // return fs.path.join(engineDir, platformName + suffix);
-        return fs.path.join(engineDir, platformName + suffix + liteSuffix);
+        return fs.path.join(engineDir, platformName + suffix);
       case TargetPlatform.android:
         assert(false, 'cannot use TargetPlatform.android to look up artifacts');
         return null;

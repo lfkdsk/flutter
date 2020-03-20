@@ -237,8 +237,12 @@ class FlutterPlugin implements Plugin<Project> {
                 }
             }
         }
-        // BD ADD
+        // BD ADD: START
         String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
+        if (flutterBuildMode != "release") {
+            liteSuffix=''
+        }
+        // END
         // Add the embedding dependency.
         addApiDependencies(project, buildType.name,
                 "io.flutter:flutter_embedding_${flutterBuildMode}${liteSuffix}:$engineVersion")
@@ -346,8 +350,12 @@ class FlutterPlugin implements Plugin<Project> {
             if (!supportsBuildMode(flutterBuildMode)) {
                 return
             }
-            // BD ADD
+            // BD ADD START
             String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
+            if (flutterBuildMode != "release") {
+                liteSuffix=''
+            }
+            // END
             // BD MOD: START
             // addApiDependencies(project, buildType.name, "io.flutter:${arch}_$flutterBuildMode:$engineVersion")
             addApiDependencies(

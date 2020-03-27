@@ -228,7 +228,7 @@ class FlutterPlugin implements Plugin<Project> {
         }
         String repository = useLocalEngine()
             ? project.property('local-engine-repo')
-            : MAVEN_REPO + engineCid
+            : MAVEN_REPO
 
         project.rootProject.allprojects {
             repositories {

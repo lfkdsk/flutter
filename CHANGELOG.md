@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-2](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-1...bd1.12.13-2) (2020-03-27)
+
+
+### Bug Fixes
+
+* **android:** roll engine to a5378b27ff3deec9ac98e0892785d21086f5a7fb:去除jar包目录中的cid ([10279ad](https://code.byted.org/tech_client/flutter/commit/10279ad))
+
+
+### Features
+
+* lite and lite-global only support for release mode ([fab5c83](https://code.byted.org/tech_client/flutter/commit/fab5c83))
+
 ### [1.5.4-8](https://code.byted.org/tech_client/flutter/compare/bd1.5.4-7...bd1.5.4-8) (2020-01-20)
 
 

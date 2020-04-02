@@ -1442,7 +1442,10 @@ mixin WidgetInspectorService {
     final String file = Uri.parse(location.file).path;
 
     // By default check whether the creation location was within package:flutter.
-    if (_pubRootDirectories == null) {
+    // if use flutterw, can't judge by _pubRootDirectories
+    // BD MOD
+    // if (_pubRootDirectories == null) {
+    if (_pubRootDirectories == null || file.contains('.flutterw/cache/dist')) {
       // TODO(chunhtai): Make it more robust once
       // https://github.com/flutter/flutter/issues/32660 is fixed.
       return !file.contains('packages/flutter/');
@@ -1466,7 +1469,8 @@ mixin WidgetInspectorService {
     final String file = Uri.parse(creationLocation.file).path;
 
     // By default check whether the creation location was within package:flutter.
-    if (_pubRootDirectories == null) {
+    // if use flutterw, can't judge by _pubRootDirectories
+    if (_pubRootDirectories == null || file.contains('.flutterw/cache/dist')) {
       return file.contains('packages/flutter/') ? null : creationLocation.toString();
     }
     for (String directory in _pubRootDirectories) {

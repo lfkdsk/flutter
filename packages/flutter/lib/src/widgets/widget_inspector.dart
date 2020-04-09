@@ -1471,10 +1471,11 @@ mixin WidgetInspectorService {
     // By default check whether the creation location was within package:flutter.
     // if use flutterw, can't judge by _pubRootDirectories
     if (_pubRootDirectories == null || file.contains('.flutterw/cache/dist')) {
-      return file.contains('packages/flutter/') ? null : creationLocation.toString();
+      return (file.contains('packages/flutter/') ||
+          file.contains('.pub-cache/')) ? null : creationLocation.toString();
     }
     for (String directory in _pubRootDirectories) {
-      if (file.startsWith(directory)) {
+      if (file.startsWith(directory) && !(file.contains('.pub-cache/'))) {
         return creationLocation.toString();
       }
     }

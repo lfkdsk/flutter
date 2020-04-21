@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-4](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-3...bd1.12.13-4) (2020-04-21)
+
+
+### Bug Fixes
+
+* 修复用户杀进程时icu umutex崩溃问题 ([9f26a51](https://code.byted.org/tech_client/flutter/commit/9f26a51))
+* revert PR #34474,防止release模式下不显示异常信息 ([72949cb](https://code.byted.org/tech_client/flutter/commit/72949cb))
+
+
+### Features
+
+* flutter build/run 新增了 --bundler 参数来执行 bundle exec pod install ([32613f0](https://code.byted.org/tech_client/flutter/commit/32613f0))
+
 ### [1.12.13-3](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-2...bd1.12.13-3) (2020-03-27)
 
 

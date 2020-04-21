@@ -366,10 +366,12 @@ class FlutterErrorDetails extends Diagnosticable {
   /// In release mode, this always returns a [DiagnosticsNode.message] with a
   /// formatted version of the exception.
   DiagnosticsNode get summary {
-    String formatException() => exceptionAsString().split('\n')[0].trimLeft();
-    if (kReleaseMode) {
-      return DiagnosticsNode.message(formatException());
-    }
+    // BD DELETE:START
+    // String formatException() => exceptionAsString().split('\n')[0].trimLeft();
+    // if (kReleaseMode) {
+    //   return DiagnosticsNode.message(formatException());
+    // }
+    // END
     final Diagnosticable diagnosticable = _exceptionToDiagnosticable();
     DiagnosticsNode summary;
     if (diagnosticable != null) {
@@ -377,7 +379,9 @@ class FlutterErrorDetails extends Diagnosticable {
       debugFillProperties(builder);
       summary = builder.properties.firstWhere((DiagnosticsNode node) => node.level == DiagnosticLevel.summary, orElse: () => null);
     }
-    return summary ?? ErrorSummary('${formatException()}');
+    // BD MOD
+    // return summary ?? ErrorSummary('${formatException()}');
+    return summary ?? ErrorSummary('${exceptionAsString().split("\n")[0].trimLeft()}');
   }
 
   @override

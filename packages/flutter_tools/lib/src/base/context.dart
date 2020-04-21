@@ -199,6 +199,10 @@ class _BoxedNull {
 class Bundler {
   static bool _isBundled = false;
 
+  static void commandUsedBundler(){
+    _isBundled = true;
+  }
+
   static bool get_isBundled(){
     return _isBundled;
   }

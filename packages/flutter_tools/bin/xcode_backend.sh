@@ -385,9 +385,9 @@ BuildApp() {
         RunCommand rm -rf -- "${build_dir}/patch/"
     fi
     for arch in ${_archs[@]}; do
-      local path="engine_armv7"
+      local path="engine_v1"
       if [[ "$arch" == "arm64" ]]; then
-        path="engine_arm64"
+        path="engine_v2"
       fi
 
       RunCommand mkdir -p -- "${build_dir}/patch/"

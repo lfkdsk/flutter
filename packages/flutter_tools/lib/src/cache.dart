@@ -1132,8 +1132,8 @@ class IOSEngineLiteArtifacts extends EngineCachedArtifact {
   @override
   List<String> getLicenseDirs() {
 //    if (cache.includeAllPlatforms || platform.isMacOS) {
-//      return const <String>['ios-lite', 'ios-profile-lite', 'ios-release-lite',
-//        'ios-liteg', 'ios-profile-liteg', 'ios-release-liteg',
+//      return const <String>['ios-release-lite',
+//        'ios-release-liteg',
 //        'ios-release-lites'];
 //    }
     return const <String>[];
@@ -1481,19 +1481,10 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
 
 // BD ADD: START
 const List<List<String>> _osxLiteBinaryDirs = <List<String>>[
-//  <String>['android-arm-profile-lite/darwin-x64', 'android-arm-profile-lite/darwin-x64.zip'],
 //  <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
-//  <String>['android-arm64-profile-lite/darwin-x64', 'android-arm64-profile-lite/darwin-x64.zip'],
 //  <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
-//  <String>['android-x64-profile-lite/darwin-x64', 'android-x64-profile-lite/darwin-x64.zip'],
-//  <String>['android-x64-release-lite/darwin-x64', 'android-x64-release-lite/darwin-x64.zip'],
-
-//  <String>['android-arm-profile-liteg/darwin-x64', 'android-arm-profile-liteg/darwin-x64.zip'],
 //  <String>['android-arm-release-liteg/darwin-x64', 'android-arm-release-liteg/darwin-x64.zip'],
-//  <String>['android-arm64-profile-liteg/darwin-x64', 'android-arm64-profile-liteg/darwin-x64.zip'],
 //  <String>['android-arm64-release-liteg/darwin-x64', 'android-arm64-release-liteg/darwin-x64.zip'],
-//  <String>['android-x64-profile-liteg/darwin-x64', 'android-x64-profile-liteg/darwin-x64.zip'],
-//  <String>['android-x64-release-liteg/darwin-x64', 'android-x64-release-liteg/darwin-x64.zip'],
 ];
 // END
 
@@ -1527,12 +1518,7 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
 
 // BD ADD: START
 const List<List<String>> _iosBinaryLiteDirs = <List<String>>[
-//  <String>['ios-lite', 'ios-lite/artifacts.zip'],
-//  <String>['ios-profile-lite', 'ios-profile-lite/artifacts.zip'],
 //  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
-
-//  <String>['ios-liteg', 'ios-liteg/artifacts.zip'],
-//  <String>['ios-profile-liteg', 'ios-profile-liteg/artifacts.zip'],
 //  <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
 //  <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
 ];
@@ -1562,27 +1548,10 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
 
 // BD ADD: START
 const List<List<String>> _androidLiteBinaryDirs = <List<String>>[
-//  <String>['android-x86-lite', 'android-x86-lite/artifacts.zip'],
-//  <String>['android-x64-lite', 'android-x64-lite/artifacts.zip'],
-//  <String>['android-arm-lite', 'android-arm-lite/artifacts.zip'],
-//  <String>['android-arm-profile-lite', 'android-arm-profile-lite/artifacts.zip'],
 //  <String>['android-arm-release-lite', 'android-arm-release-lite/artifacts.zip'],
-//  <String>['android-arm64-lite', 'android-arm64-lite/artifacts.zip'],
-//  <String>['android-arm64-profile-lite', 'android-arm64-profile-lite/artifacts.zip'],
 //  <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
-//  <String>['android-x64-profile-lite', 'android-x64-profile-lite/artifacts.zip'],
-//  <String>['android-x64-release-lite', 'android-x64-release-lite/artifacts.zip'],
-
-//  <String>['android-x86-liteg', 'android-x86-liteg/artifacts.zip'],
-//  <String>['android-x64-liteg', 'android-x64-liteg/artifacts.zip'],
-//  <String>['android-arm-liteg', 'android-arm-liteg/artifacts.zip'],
-//  <String>['android-arm-profile-liteg', 'android-arm-profile-liteg/artifacts.zip'],
 //  <String>['android-arm-release-liteg', 'android-arm-release-liteg/artifacts.zip'],
-//  <String>['android-arm64-liteg', 'android-arm64-liteg/artifacts.zip'],
-//  <String>['android-arm64-profile-liteg', 'android-arm64-profile-liteg/artifacts.zip'],
 //  <String>['android-arm64-release-liteg', 'android-arm64-release-liteg/artifacts.zip'],
-//  <String>['android-x64-profile-liteg', 'android-x64-profile-liteg/artifacts.zip'],
-//  <String>['android-x64-release-liteg', 'android-x64-release-liteg/artifacts.zip'],
 ];
 // END
 

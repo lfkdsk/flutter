@@ -69,8 +69,8 @@ class FlutterPatchPlugin implements Plugin<Project> {
         } else if (project.hasProperty('lite-global') && project.property('lite-global').toBoolean()) {
             liteSuffix = '-liteg'
         }
-        debugFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}").resolve("flutter.jar").toFile()
-        profileFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-profile").resolve("flutter.jar").toFile()
+        debugFlutterJar = baseEnginePath.resolve("android-${targetArch}").resolve("flutter.jar").toFile()
+        profileFlutterJar = baseEnginePath.resolve("android-${targetArch}-profile").resolve("flutter.jar").toFile()
         releaseFlutterJar = baseEnginePath.resolve("android-${targetArch}${liteSuffix}-release").resolve("flutter.jar").toFile()
         dynamicartReleaseFlutterJar = baseEnginePath.resolve("android-${targetArch}-dynamicart-release").resolve("flutter.jar").toFile()
         dynamicartProfileFlutterJar = baseEnginePath.resolve("android-${targetArch}-dynamicart-profile").resolve("flutter.jar").toFile()

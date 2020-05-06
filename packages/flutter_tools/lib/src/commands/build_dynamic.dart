@@ -41,6 +41,7 @@ class BuildDynamicCommand extends BuildSubCommand {
           defaultsTo: '', help: 'aot模式下的资源的目录，文件目录组织形式和flutter_assets目录相同')
       ..addFlag('verbose', defaultsTo: false)
       ..addFlag('verify', defaultsTo: true)
+      ..addFlag('encrypt', defaultsTo: true)
       ..addOption('manifest', defaultsTo: defaultManifestPath);
   }
 
@@ -57,6 +58,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     final String manifestPath = stringArg('manifest') ?? defaultManifestPath;
     final bool verbose = boolArg('verbose') ?? false;
     final bool verify = boolArg('verify') ?? true;
+    final bool encrypt = boolArg('encrypt') ?? true;
 
     FlutterManifest flutterManifest;
     try {
@@ -96,7 +98,8 @@ class BuildDynamicCommand extends BuildSubCommand {
         trackWidgetCreation: false,
         dynamicPlugins: dynamicPlugins,
         verbose: verbose,
-        hostDillPath: hostDillPath);
+        hostDillPath: hostDillPath,
+        encrypt: encrypt);
 
     final AssetBundle assets = await buildAssets(
       manifestPath: manifestPath,
@@ -193,6 +196,7 @@ Future<bool> compileKernel({
   List<String> dynamicPlugins,
   bool verbose: false,
   String hostDillPath,
+  bool encrypt: true
 }) async {
   final Directory outputDir = fs.directory(outputPath);
   outputDir.createSync(recursive: true);
@@ -248,9 +252,14 @@ Future<bool> compileKernel({
     outputDir.createSync(recursive: true);
 
     final File file =
-        fs.file(fs.path.join(flutterAssetPath.path, 'kernel_blob.bin'));
+        fs.file(fs.path.join(flutterAssetPath.path, 'kb'));
     file.parent.createSync(recursive: true);
-    await file.writeAsBytes(await kernelContent.contentsAsBytes());
+    final List<int> kernelBlobContent = await kernelContent.contentsAsBytes();
+    //异或加密
+    if (encrypt) {
+      _encrypt(kernelBlobContent);
+    }
+    await file.writeAsBytes(kernelBlobContent);
   }
   print('Compiling Dart to kernel Success');
   return true;
@@ -569,4 +578,18 @@ Future<CompilerOutput> compile({
     return _stdoutHandler.compilerOutput.future;
   }
   return null;
+}
+
+void _encrypt(List<int> data) {
+  const int space = 4;
+  final int spaceCount = data.length ~/ space;
+  for (int i = 0; i < spaceCount; i++) {
+    data[i * space] = data[i * space] ^ (i % space);
+    data[i * space + 1] = data[i * space + 1] ^ (i % space);
+    data[i * space + 2] = data[i * space + 2] ^ (i % space);
+    data[i * space + 3] = data[i * space + 3] ^ (i % space);
+  }
+  for (int i = spaceCount * space; i < data.length; i++) {
+    data[i] = data[i] ^ 2;
+  }
 }

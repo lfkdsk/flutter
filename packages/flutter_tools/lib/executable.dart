@@ -114,6 +114,17 @@ Future<void> main(List<String> args) async {
   print('current cmd: flutter $cmdStr');
   // END
 
+  /**
+   * BD ADD: START
+   *    add bundle exec for pod install
+   */
+  if(args.contains('--bundler')){
+    args = List<String>.from(args); // dart didn't support this command
+    args.removeWhere((String option) => option == '--bundler');
+    Bundler.commandUsedBundler(); // we just need to know if exists
+  }
+  // END
+
   await runner.run(
       args,
       <FlutterCommand>[

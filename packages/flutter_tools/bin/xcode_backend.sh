@@ -114,8 +114,8 @@ BuildApp() {
     # *profile*) build_mode="profile"; artifact_variant="ios-profile";;
     # *debug*) build_mode="debug"; artifact_variant="ios";;
     *release*) build_mode="release"; artifact_variant="ios-release"${lite_suffix};;
-    *profile*) build_mode="profile"; artifact_variant="ios-profile"${lite_suffix};;
-    *debug*) build_mode="debug"; artifact_variant="ios"${lite_suffix};;
+    *profile*) build_mode="profile"; artifact_variant="ios-profile";;
+    *debug*) build_mode="debug"; artifact_variant="ios";;
     # END
     *)
       EchoError "========================================================================"

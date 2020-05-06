@@ -581,13 +581,12 @@ Future<CompilerOutput> compile({
 }
 
 void _encrypt(List<int> data) {
-  const int space = 4;
+  const int space = 8;
   final int spaceCount = data.length ~/ space;
   for (int i = 0; i < spaceCount; i++) {
-    data[i * space] = data[i * space] ^ (i % space);
-    data[i * space + 1] = data[i * space + 1] ^ (i % space);
-    data[i * space + 2] = data[i * space + 2] ^ (i % space);
-    data[i * space + 3] = data[i * space + 3] ^ (i % space);
+    for (int j = 0; j < space; j++) {
+      data[i * space + j] = data[i * space + j] ^ (i % space);
+    }
   }
   for (int i = spaceCount * space; i < data.length; i++) {
     data[i] = data[i] ^ 2;

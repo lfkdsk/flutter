@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 
+import 'trans_support.dart';
 import 'base/build.dart';
 import 'base/common.dart';
 import 'base/file_system.dart';
@@ -84,6 +85,10 @@ class AotBuilder {
       if (kernelOut == null) {
         throwToolExit('Compiler terminated unexpectedly.');
         return;
+      } else if (await TransformerHooks.isEnabled()) {
+        await TransformerHooks().runBuildAOTDillCommand(platform, outputPath, buildMode, extraFrontEndOptions, dartDefines);
+      } else {
+        await TransformerHooks().justTransformDill(buildMode, outputPath);
       }
 
       // Build AOT snapshot.

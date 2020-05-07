@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 import '../../artifacts.dart';
+import '../../trans_support.dart';
+import '../../asset.dart';
 import '../../base/build.dart';
 import '../../base/file_system.dart';
 import '../../build_info.dart';
@@ -235,6 +237,12 @@ class KernelSnapshot extends Target {
     );
     if (output == null || output.errorCount != 0) {
       throw Exception('Errors during snapshot creation: $output');
+    } else {
+      if (await TransformerHooks.isEnabled()) {
+        await TransformerHooks().runKernelDillSnapshotCommand(this, environment, output.outputFilename);
+      } else {
+        await TransformerHooks().justTransformDill(buildMode, output.outputFilename);
+      }
     }
   }
 }

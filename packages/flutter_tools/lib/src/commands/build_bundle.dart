@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import '../trans_support.dart';
 import '../base/common.dart';
 import '../base/file_system.dart';
 import '../build_info.dart';
@@ -139,6 +140,11 @@ class BuildBundleCommand extends BuildSubCommand {
       fileSystemScheme: stringArg('filesystem-scheme'),
       fileSystemRoots: stringsArg('filesystem-root'),
     );
+
+    if (await TransformerHooks.isEnabled()) {
+      await TransformerHooks().runBuildBundleDillCommand(this);
+    }
+
     return null;
   }
 }

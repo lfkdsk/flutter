@@ -18,6 +18,7 @@ import 'compile.dart';
 import 'convert.dart' show base64, utf8;
 import 'dart/package_map.dart';
 import 'globals.dart';
+import 'trans_support.dart';
 import 'vmservice.dart';
 
 class DevFSConfig {

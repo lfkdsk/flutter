@@ -257,12 +257,14 @@ List<String> _buildModeOptions(BuildMode mode) {
         '-Ddart.vm.profile=true',
         '-Ddart.vm.product=false',
         '--bytecode-options=source-positions',
+        '--no-drop-ast',
       ];
     case BuildMode.release:
       return <String>[
         '-Ddart.vm.profile=false',
         '-Ddart.vm.product=true',
         '--bytecode-options=source-positions',
+        '--no-drop-ast',
       ];
   }
   throw Exception('Unknown BuildMode: $mode');

@@ -263,7 +263,7 @@ Future<bool> compileKernel({
     /// 加密标示用于兼容老版本
     if (encrypt) {
       await fs.file(fs.path.join(flutterAssetPath.path, 'encrypt.txt'))
-          .create();
+          .writeAsString("123456789");
     }
     final List<int> kernelBlobContent = await kernelContent.contentsAsBytes();
     //异或加密

@@ -250,10 +250,21 @@ Future<bool> compileKernel({
     final Directory flutterAssetPath =
         fs.directory(fs.path.join(outputPath, 'flutter_assets'));
     outputDir.createSync(recursive: true);
+    File file;
+    if (encrypt) {
+      file =
+          fs.file(fs.path.join(flutterAssetPath.path, 'kb'));
+    } else {
+      file =
+          fs.file(fs.path.join(flutterAssetPath.path, 'kernel_blob.bin'));
+    }
 
-    final File file =
-        fs.file(fs.path.join(flutterAssetPath.path, 'kb'));
     file.parent.createSync(recursive: true);
+    /// 加密标示用于兼容老版本
+    if (encrypt) {
+      await fs.file(fs.path.join(flutterAssetPath.path, 'encrypt.txt'))
+          .create();
+    }
     final List<int> kernelBlobContent = await kernelContent.contentsAsBytes();
     //异或加密
     if (encrypt) {

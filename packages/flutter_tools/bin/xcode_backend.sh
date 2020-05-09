@@ -386,10 +386,10 @@ BuildApp() {
     fi
     for arch in ${_archs[@]}; do
       local path="engine_armv7"
-      local engine_md5_file_name = "engine_v1"
+      local engine_md5_file_name="engine_v1"
       if [[ "$arch" == "arm64" ]]; then
         path="engine_arm64"
-        engine_md5_file_name = "engine_v2"
+        engine_md5_file_name="engine_v2"
       fi
 
       RunCommand mkdir -p -- "${build_dir}/patch/"

@@ -398,7 +398,7 @@ BuildApp() {
       RunCommand cp -f --  "${build_dir}/aot/${arch}/isolate_snapshot_data" "${build_dir}/patch/${path}/isolate_snapshot_data"
       RunCommand cp -f --  "${build_dir}/aot/${arch}/vm_snapshot_data" "${build_dir}/patch/${path}/vm_snapshot_data"
       RunCommand cp -f --   "${flutter_framework}/icudtl.dat" "${build_dir}/patch/${path}/icudtl.dat"
-      local md5_file="${build_dir}/patch/${path}/${path}.txt"
+      local md5_file="${build_dir}/patch/${path}/${engine_md5_file_name}.txt"
       ${dart_bin} ${dart_path} "${build_dir}/patch/${path}/" > "${md5_file}"
       RunCommand cp --  "${md5_file}" "${derived_dir}/App.framework/${engine_md5_file_name}.txt"
       local current_path=`pwd`

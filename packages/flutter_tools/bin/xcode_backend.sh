@@ -385,9 +385,11 @@ BuildApp() {
         RunCommand rm -rf -- "${build_dir}/patch/"
     fi
     for arch in ${_archs[@]}; do
-      local path="engine_v1"
+      local path="engine_armv7"
+      local engine_md5_file_name = "engine_v1"
       if [[ "$arch" == "arm64" ]]; then
-        path="engine_v2"
+        path="engine_arm64"
+        engine_md5_file_name = "engine_v2"
       fi
 
       RunCommand mkdir -p -- "${build_dir}/patch/"
@@ -398,7 +400,7 @@ BuildApp() {
       RunCommand cp -f --   "${flutter_framework}/icudtl.dat" "${build_dir}/patch/${path}/icudtl.dat"
       local md5_file="${build_dir}/patch/${path}/${path}.txt"
       ${dart_bin} ${dart_path} "${build_dir}/patch/${path}/" > "${md5_file}"
-      RunCommand cp --  "${md5_file}" "${derived_dir}/App.framework/${path}.txt"
+      RunCommand cp --  "${md5_file}" "${derived_dir}/App.framework/${engine_md5_file_name}.txt"
       local current_path=`pwd`
       RunCommand cd ${build_dir}/patch/${path}
       zip -q -r ./../${path}.zip ./*

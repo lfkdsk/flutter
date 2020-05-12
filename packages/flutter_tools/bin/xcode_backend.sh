@@ -101,11 +101,9 @@ BuildApp() {
   local build_mode="$(echo "${FLUTTER_BUILD_MODE:-${CONFIGURATION}}" | tr "[:upper:]" "[:lower:]")"
   local artifact_variant="unknown"
   # BD ADD: START
-  if [  "$lite_suffix" == "-lites" ]; then
-    if [ "$build_mode" != "release" ]; then
-      echo "Current share skia only support for release"
-      lite_suffix="-lite"
-    fi
+  if [  "$lite_suffix" == "-lites" -a  "$build_mode" != "release" ]; then
+     echo "Current share skia only support for release"
+     lite_suffix="-lite"
   fi
   # END
   case "$build_mode" in

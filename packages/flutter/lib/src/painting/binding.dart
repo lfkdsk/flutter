@@ -7,7 +7,7 @@
 import 'dart:typed_data' show Uint8List;
 // BD MOD:
 // import 'dart:ui' as ui show instantiateImageCodec, Codec;
-import 'dart:ui' as ui show instantiateImageCodec, Codec, getNativeImage, Image;
+import 'dart:ui' as ui show instantiateImageCodec, Codec, getNativeImage, Image, instantiateNativeImageCodec;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show ServicesBinding;
 
@@ -105,6 +105,11 @@ mixin PaintingBinding on BindingBase, ServicesBinding {
       targetHeight: cacheHeight,
       allowUpscaling: allowUpscaling,
     );
+  }
+
+  /// BD ADD:
+  Future<ui.Codec> instantiateNativeImageCodec(String url, {int width: 0, int height: 0, double scale: 1.0}) {
+    return ui.instantiateNativeImageCodec(url, width: width, height: height, scale: scale);
   }
 
   /// BD ADD:

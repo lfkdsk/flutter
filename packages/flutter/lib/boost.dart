@@ -232,7 +232,7 @@ class Boost {
   /// Disable mipmaps, save 1/4 GPU memory, used by image.
   static void disableMips(bool disable) {
     _disableMipmaps = disable;
-//    performance.disableMips(disable);
+    performance.disableMips(disable);
   }
 
   /// Get disable mipmaps state.

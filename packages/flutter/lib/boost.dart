@@ -60,6 +60,13 @@ class Boost {
   static bool get ignoreTransitionsFirstFrameTimeCost =>
       _ignoreTransitionsFirstFrameTimeCost;
 
+  /// if true, will disable mipmaps, save 1/4 GPU memory.
+  static bool _disableMipmaps = false;
+
+  /// return disable mipmaps status
+  static bool get disableMipmaps => _disableMipmaps;
+
+
   /// enable or disable semantics, reuseWidget and so on.
   static void enable(
       {bool disableSemantics = true,
@@ -216,5 +223,16 @@ class Boost {
   static void resetIdleCallbacks() {
     localNotifyIdleCallbackScrolling = null;
     localNotifyIdleCallbackScrollEnd = null;
+  }
+
+  /// Disable mipmaps, save 1/4 GPU memory, used by image.
+  static void disableMips(bool disable) {
+    _disableMipmaps = disable;
+    engine.disableMips(disable);
+  }
+
+  /// Get disable mipmaps state.
+  static bool IsDisableMips() {
+    return _disableMipmaps;
   }
 }

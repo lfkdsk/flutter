@@ -359,6 +359,7 @@ Future<void> buildGradleApp({
     command.add('-Plite-share-skia=true');
   }
   // END
+  print("gradle==${command.join(" ")}");
 
   GradleHandledError detectedGradleError;
   String detectedGradleErrorLine;

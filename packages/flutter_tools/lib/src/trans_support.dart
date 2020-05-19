@@ -5,6 +5,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:yaml/yaml.dart';
 
 import 'artifacts.dart';
 import 'base/build.dart';
@@ -206,7 +207,7 @@ class TransformerHooks {
     final String mainPath = fs.path.join(
         transLibrary.path, 'lib', transformerTemplatePackageName + '.dart');
     final String transformedKernelFilePath =
-        fs.path.join(assetsDir, 'app.trans.dill');
+        fs.path.join(assetsDir, 'app.dill.trans.dill');
     fs.currentDirectory = transLibrary;
 
     await BundleBuilder().build(
@@ -435,6 +436,20 @@ class TransformerHooks {
       originalDillFile.renameSync(outputFilename + '.origin.dill');
     }
     fs.file(transDill).copySync(originDill);
+    fs.directory(getDillBuildDirectory()).createSync(recursive: true);
+    fs.file(originDill).copySync(getDillPath());
+  }
+
+  static String getDillBuildDirectory() {
+    return fs.path.join(getBuildDirectory(), 'dill');
+  }
+
+  static String getDillPath() =>
+      '${getDillBuildDirectory()}${fs.path.separator}app.dill';
+
+  static bool hasTransformer() {
+    final YamlMap yaml = loadYaml(FlutterProject.current().pubspecFile.readAsStringSync()) as YamlMap;
+    return yaml['transformers'] != null;
   }
 
   static Future<ProcessResult> transformDill(
@@ -456,7 +471,9 @@ class TransformerHooks {
             fs.path.separator
       ],
       '--output',
-      outputDill
+      outputDill,
+      '--pubspec',
+      FlutterProject.current().pubspecFile.path,
     ];
 
     return processManager.run(command);

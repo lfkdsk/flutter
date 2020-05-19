@@ -489,6 +489,9 @@ class DevFS {
       generator.reset();
     }
     printTrace('Compiling dart to kernel with ${invalidatedFiles.length} updated files');
+    if (TransformerHooks.hasTransformer()) {
+      dillOutputPath = TransformerHooks.getDillPath();
+    }
     final CompilerOutput compilerOutput = await generator.recompile(
       mainPath,
       invalidatedFiles,

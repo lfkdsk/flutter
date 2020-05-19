@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-5](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-4...bd1.12.13-5) (2020-05-19)
+
+
+### Bug Fixes
+
+* Reland "Do not rebuild Routes when a new opaque Route is pushed on top" ([#49376](https://jira.bytedance.com/browse/49376)) ([b9ac304](https://code.byted.org/tech_client/flutter/commit/b9ac304))
+* enable soft_rendering ([c5350d8](https://code.byted.org/tech_client/flutter/commit/c5350d8))
+* 修复脚本报错 ([8150f1b](https://code.byted.org/tech_client/flutter/commit/8150f1b))
+* Cleanup the IO thread GrContext ([e16ad29](https://code.byted.org/tech_client/flutter/commit/e16ad29))
+
+
+### Features
+
+* Add switch in boost to disable mipmaps to save 1/4 GPU memory, used by image ([e16ad29](https://code.byted.org/tech_client/flutter/commit/e16ad29))
+* 添加后台渲染能力 ([e16ad29](https://code.byted.org/tech_client/flutter/commit/e16ad29))
+
 ### [1.12.13-4](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-3...bd1.12.13-4) (2020-04-21)
 
 

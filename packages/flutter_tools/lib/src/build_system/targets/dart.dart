@@ -10,6 +10,7 @@ import '../../compile.dart';
 import '../../convert.dart';
 import '../../globals.dart';
 import '../../project.dart';
+import '../../trans_support.dart';
 import '../build_system.dart';
 import '../depfile.dart';
 import '../exceptions.dart';
@@ -242,6 +243,17 @@ class KernelSnapshot extends Target {
     if (output == null || output.errorCount != 0) {
       throw Exception('Errors during snapshot creation: $output');
     }
+    // BD ADD
+    else {
+      if (await TransformerHooks.isAopEnabled()) {
+        await TransformerHooks().runKernelDillSnapshotCommand(
+            this, environment, output.outputFilename);
+      } else {
+        await TransformerHooks().justTransformDill(
+            buildMode, output.outputFilename);
+      }
+    }
+    // END
   }
 }
 

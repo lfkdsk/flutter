@@ -18,6 +18,7 @@ import 'compile.dart';
 import 'convert.dart' show base64, utf8;
 import 'dart/package_map.dart';
 import 'globals.dart';
+import 'trans_support.dart';
 import 'vmservice.dart';
 
 class DevFSConfig {
@@ -488,6 +489,14 @@ class DevFS {
       generator.reset();
     }
     printTrace('Compiling dart to kernel with ${invalidatedFiles.length} updated files');
+    // BD ADD
+    if (TransformerHooks.hasTransformer()) {
+      final String dillPath = TransformerHooks.getDillPath();
+      if (fs.file(dillPath).existsSync()) {
+        dillOutputPath = dillPath;
+      }
+    }
+    // END
     final CompilerOutput compilerOutput = await generator.recompile(
       mainPath,
       invalidatedFiles,

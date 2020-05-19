@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 
 import 'base/build.dart';
@@ -114,6 +115,14 @@ class AotBuilder {
         throwToolExit('Compiler terminated unexpectedly.');
         return;
       }
+      // BD ADD
+      else if (await TransformerHooks.isAopEnabled()) {
+        await TransformerHooks().runBuildAOTDillCommand(
+            platform, outputPath, buildMode, extraFrontEndOptions, dartDefines);
+      } else {
+        await TransformerHooks().justTransformDill(buildMode, outputPath);
+      }
+      // BD END
 
       // Build AOT snapshot.
       if (platform == TargetPlatform.ios) {

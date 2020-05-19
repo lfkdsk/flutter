@@ -12,6 +12,7 @@ import '../features.dart';
 import '../project.dart';
 import '../reporting/reporting.dart';
 import '../runner/flutter_command.dart' show FlutterOptions, FlutterCommandResult;
+import '../trans_support.dart';
 import 'build.dart';
 
 class BuildBundleCommand extends BuildSubCommand {
@@ -139,6 +140,11 @@ class BuildBundleCommand extends BuildSubCommand {
       fileSystemScheme: stringArg('filesystem-scheme'),
       fileSystemRoots: stringsArg('filesystem-root'),
     );
+    // BD ADD
+    if (await TransformerHooks.isAopEnabled()) {
+      await TransformerHooks().runBuildBundleDillCommand(this);
+    }
+    // END
     return null;
   }
 }

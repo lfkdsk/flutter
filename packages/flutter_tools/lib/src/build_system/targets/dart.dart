@@ -238,7 +238,7 @@ class KernelSnapshot extends Target {
     if (output == null || output.errorCount != 0) {
       throw Exception('Errors during snapshot creation: $output');
     } else {
-      if (await TransformerHooks.isEnabled()) {
+      if (await TransformerHooks.isAopEnabled()) {
         await TransformerHooks().runKernelDillSnapshotCommand(this, environment, output.outputFilename);
       } else {
         await TransformerHooks().justTransformDill(buildMode, output.outputFilename);

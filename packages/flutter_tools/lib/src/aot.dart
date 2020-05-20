@@ -85,7 +85,7 @@ class AotBuilder {
       if (kernelOut == null) {
         throwToolExit('Compiler terminated unexpectedly.');
         return;
-      } else if (await TransformerHooks.isEnabled()) {
+      } else if (await TransformerHooks.isAopEnabled()) {
         await TransformerHooks().runBuildAOTDillCommand(platform, outputPath, buildMode, extraFrontEndOptions, dartDefines);
       } else {
         await TransformerHooks().justTransformDill(buildMode, outputPath);

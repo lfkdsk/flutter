@@ -156,18 +156,15 @@ class TransformerHooks {
     );
   }
 
-  static Future<bool> isEnabled() async {
+  static Future<bool> isAopEnabled() async {
     final Directory transDirectory = getTransDirectory(fs.currentDirectory);
     if (!(transDirectory.existsSync() &&
-        fs
-            .file(fs.path.join(transDirectory.path, 'pubspec.yaml'))
+        fs.file(fs.path.join(transDirectory.path, 'pubspec.yaml'))
             .existsSync() &&
-        fs
-            .file(fs.path
+        fs.file(fs.path
                 .join(transDirectory.path, PackageMap.globalPackagesPath))
             .existsSync() &&
-        fs
-            .file(fs.path.join(transDirectory.path, 'lib',
+        fs.file(fs.path.join(transDirectory.path, 'lib',
                 transformerTemplatePackageName + '.dart'))
             .existsSync())) {
       return false;
@@ -464,8 +461,7 @@ class TransformerHooks {
       inputDill,
       if (buildMode != BuildMode.release) ...<String>[
         '--sdk-root',
-        fs
-                .file(artifacts.getArtifactPath(Artifact.platformKernelDill))
+        fs.file(artifacts.getArtifactPath(Artifact.platformKernelDill))
                 .parent
                 .path +
             fs.path.separator

@@ -152,7 +152,7 @@ BuildApp() {
 
  if [[ "${dynamicart_flag}" == "YES" ]];
  then
- framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/ios-dynamicart-${build_mode}"
+ framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/ios-dynamicart-${build_mode}${lite_suffix}"
  else
  framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
  fi

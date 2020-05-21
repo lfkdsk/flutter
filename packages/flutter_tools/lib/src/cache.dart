@@ -1131,11 +1131,13 @@ class IOSEngineLiteArtifacts extends EngineCachedArtifact {
 
   @override
   List<String> getLicenseDirs() {
-//    if (cache.includeAllPlatforms || platform.isMacOS) {
-//      return const <String>['ios-release-lite',
+    if (cache.includeAllPlatforms || platform.isMacOS) {
+      return const <String>[
+//        'ios-release-lite',
 //        'ios-release-liteg',
-//        'ios-release-lites'];
-//    }
+        'ios-release-lites',
+        'ios-dynamicart-release-lites'];
+    }
     return const <String>[];
   }
 
@@ -1520,7 +1522,8 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
 const List<List<String>> _iosBinaryLiteDirs = <List<String>>[
 //  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
 //  <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
-//  <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
+  <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
+  <String>['ios-dynamicart-release-lites', 'ios-dynamicart-release-lites/artifacts.zip'],
 ];
 // END
 

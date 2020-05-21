@@ -458,16 +458,17 @@ class CachedArtifacts extends Artifacts {
         } else if (engineMode == EngineMode.lite_global) {
           liteSuffix = '-liteg';
         } else if (engineMode == EngineMode.lite_share_skia) {
-          if (mode == BuildMode.release
+          if ((mode == BuildMode.release || mode == BuildMode.dynamicartRelease)
               && platform == TargetPlatform.ios) {
             liteSuffix = '-lites';
           } else {
             liteSuffix = '';
             printError(
-                'Now, --lite-share-skia now only support for ios-release !\nOtherwise we will fall back to lite mode.');
+                'Now, --lite-share-skia now only support for ios-release !\nOtherwise we will fall back to normal mode.');
           }
         }
-        if (liteSuffix != '' && mode != BuildMode.release) {
+        if ((liteSuffix != '' && mode != BuildMode.release)
+            && !(liteSuffix == '-lites' && mode == BuildMode.dynamicartRelease)) {
           printError(
               'Now, --lite or --lite-global now only support for release mode !\nOtherwise we will fall to normal mode.');
           liteSuffix = '';

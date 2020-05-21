@@ -18,6 +18,8 @@ artifacts: [
 
     ios-release-lites,
 
+    ios-dynamicart-release-lites,
+
     common,
     sky_engine,
     darwin-x64,

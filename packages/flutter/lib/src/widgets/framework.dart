@@ -4588,38 +4588,39 @@ class ParentDataElement<T extends RenderObjectWidget> extends ProxyElement {
   @override
   ParentDataWidget<T> get widget => super.widget;
 
-  @override
-  void mount(Element parent, dynamic newSlot) {
-    assert(() {
-      final List<Widget> badAncestors = <Widget>[];
-      Element ancestor = parent;
-      while (ancestor != null) {
-        if (ancestor is ParentDataElement<RenderObjectWidget>) {
-          badAncestors.add(ancestor.widget);
-        } else if (ancestor is RenderObjectElement) {
-          if (widget.debugIsValidAncestor(ancestor.widget))
-            break;
-          badAncestors.add(ancestor.widget);
-        }
-        ancestor = ancestor._parent;
-      }
-      if (ancestor != null && badAncestors.isEmpty)
-        return true;
-      // TODO(jacobr): switch to describing the invalid parent chain in terms
-      // of DiagnosticsNode objects when possible.
-      throw FlutterError.fromParts(<DiagnosticsNode>[
-        ErrorSummary('Incorrect use of ParentDataWidget.'),
-        // TODO(jacobr): fix this constructor call to use FlutterErrorBuilder.
-        ...widget.debugDescribeInvalidAncestorChain(
-          description: '$this',
-          ownershipChain: ErrorDescription(parent.debugGetCreatorChain(10)),
-          foundValidAncestor: ancestor != null,
-          badAncestors: badAncestors,
-        ),
-      ]);
-    }());
-    super.mount(parent, newSlot);
-  }
+/// BD DEL
+//  @override
+//  void mount(Element parent, dynamic newSlot) {
+//    assert(() {
+//      final List<Widget> badAncestors = <Widget>[];
+//      Element ancestor = parent;
+//      while (ancestor != null) {
+//        if (ancestor is ParentDataElement<RenderObjectWidget>) {
+//          badAncestors.add(ancestor.widget);
+//        } else if (ancestor is RenderObjectElement) {
+//          if (widget.debugIsValidAncestor(ancestor.widget))
+//            break;
+//          badAncestors.add(ancestor.widget);
+//        }
+//        ancestor = ancestor._parent;
+//      }
+//      if (ancestor != null && badAncestors.isEmpty)
+//        return true;
+//      // TODO(jacobr): switch to describing the invalid parent chain in terms
+//      // of DiagnosticsNode objects when possible.
+//      throw FlutterError.fromParts(<DiagnosticsNode>[
+//        ErrorSummary('Incorrect use of ParentDataWidget.'),
+//        // TODO(jacobr): fix this constructor call to use FlutterErrorBuilder.
+//        ...widget.debugDescribeInvalidAncestorChain(
+//          description: '$this',
+//          ownershipChain: ErrorDescription(parent.debugGetCreatorChain(10)),
+//          foundValidAncestor: ancestor != null,
+//          badAncestors: badAncestors,
+//        ),
+//      ]);
+//    }());
+//    super.mount(parent, newSlot);
+//  }
 
   void _applyParentData(ParentDataWidget<T> widget) {
     void applyParentDataToChild(Element child) {

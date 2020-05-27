@@ -1,4 +1,7 @@
-// BD ADD
+// Copyright 2018 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'dart:io';
 
 import 'package:args/args.dart';
@@ -22,13 +25,14 @@ import 'globals.dart';
 import 'project.dart';
 import 'runner/flutter_command.dart';
 
-class TransformerHooks {
-  static String unmatchDartKernelBinaryErrMsg =
-      "Can't load Kernel binary: Invalid kernel binary format version.";
-  static String transformerTemplatePackageRelPath = '.';
-  static String transformerTemplatePackageName = 'transformer_impl';
+const String unmatchDartKernelBinaryErrMsg =
+    "Can't load Kernel binary: Invalid kernel binary format version.";
+const String transformerTemplatePackageRelPath = '.';
 
+class TransformerHooks {
   static String transformerSnapshot;
+  static String transformerTemplatePackageName = 'transformer_impl';
+  static String transformerTemplateEntryName = 'transformer_impl';
 
   static Directory getTransDirectory(Directory rootProjectDir) {
     return fs.directory(
@@ -36,7 +40,7 @@ class TransformerHooks {
         fs.path.join(
           rootProjectDir.path,
           transformerTemplatePackageRelPath,
-          transformerTemplatePackageName,
+          getTemplatePkgName() ?? transformerTemplatePackageName,
         ),
       ),
     );
@@ -55,7 +59,7 @@ class TransformerHooks {
       return;
     }
     final String transLibPath =
-        packageMap.map['transformer_template']?.toFilePath();
+    packageMap.map['transformer_template']?.toFilePath();
     if (transLibPath == null) {
       return;
     }
@@ -64,7 +68,7 @@ class TransformerHooks {
         'snapshot',
         'transformer_template.dart.snapshot');
     final File expectedTransformerSnapshot =
-        fs.file(expectedTransformerSnapshotPath);
+    fs.file(expectedTransformerSnapshotPath);
     final String expectedDartSha = getExpectedDartSha();
     final String transPubspecPath = fs.path.join(
       fs.directory(transLibPath).parent.path,
@@ -154,15 +158,18 @@ class TransformerHooks {
   }
 
   static Future<bool> isAopEnabled() async {
-    final Directory transDirectory = getTransDirectory(fs.currentDirectory);
+    final Directory transDirectory = getTransDirectory(
+      fs.currentDirectory,
+    );
+
     if (!(transDirectory.existsSync() &&
         fs.file(fs.path.join(transDirectory.path, 'pubspec.yaml'))
             .existsSync() &&
         fs.file(fs.path
-                .join(transDirectory.path, PackageMap.globalPackagesPath))
+            .join(transDirectory.path, PackageMap.globalPackagesPath))
             .existsSync() &&
         fs.file(fs.path.join(transDirectory.path, 'lib',
-                transformerTemplatePackageName + '.dart'))
+            transformerTemplateEntryName + '.dart'))
             .existsSync())) {
       return false;
     }
@@ -176,8 +183,8 @@ class TransformerHooks {
   }
 
   Future<FlutterCommandResult> runBuildBundleDillCommand(
-    FlutterCommand flutterCommand,
-  ) async {
+      FlutterCommand flutterCommand,
+      ) async {
     final ArgResults argResults = flutterCommand.argResults;
     final String targetPlatform = argResults['target-platform'] as String;
     final TargetPlatform platform = getTargetPlatformForName(targetPlatform);
@@ -190,18 +197,18 @@ class TransformerHooks {
     final Directory transLibrary = getTransDirectory(fs.currentDirectory);
     final String origAssetsDir = argResults['asset-dir'] as String;
     final String originKernelBlob =
-        fs.path.join(origAssetsDir, 'kernel_blob.bin');
+    fs.path.join(origAssetsDir, 'kernel_blob.bin');
     if (!fs.file(originKernelBlob).existsSync()) {
       return null;
     }
 
     final String assetsDir =
-        origAssetsDir.replaceAll(mainDirectory.path, transLibrary.path);
+    origAssetsDir.replaceAll(mainDirectory.path, transLibrary.path);
     final String assetKernelBlob = fs.path.join(assetsDir, 'kernel_blob.bin');
-    final String mainPath = fs.path.join(
-        transLibrary.path, 'lib', transformerTemplatePackageName + '.dart');
+    final String mainPath = fs.path
+        .join(transLibrary.path, 'lib', transformerTemplateEntryName + '.dart');
     final String transformedKernelFilePath =
-        fs.path.join(assetsDir, 'app.dill.trans.dill');
+    fs.path.join(assetsDir, 'app.dill.trans.dill');
     fs.currentDirectory = transLibrary;
 
     await BundleBuilder().build(
@@ -216,9 +223,9 @@ class TransformerHooks {
       reportLicensedPackages: argResults['report-licensed-packages'] as bool,
       trackWidgetCreation: argResults['track-widget-creation'] as bool,
       extraFrontEndOptions:
-          argResults[FlutterOptions.kExtraFrontEndOptions] as List<String>,
+      argResults[FlutterOptions.kExtraFrontEndOptions] as List<String>,
       extraGenSnapshotOptions:
-          argResults[FlutterOptions.kExtraGenSnapshotOptions] as List<String>,
+      argResults[FlutterOptions.kExtraGenSnapshotOptions] as List<String>,
       fileSystemScheme: argResults['filesystem-scheme'] as String,
       fileSystemRoots: argResults['filesystem-root'] as List<String>,
     );
@@ -234,6 +241,8 @@ class TransformerHooks {
       fs.currentDirectory = mainDirectory;
       throwToolExit('Transformer terminated unexpectedly.');
       return null;
+    } else {
+      print(result.stdout.toString());
     }
 
     final File originKernelFile = fs.file(originKernelBlob);
@@ -259,7 +268,7 @@ class TransformerHooks {
     final Directory mainDirectory = fs.currentDirectory;
     final Directory transDirectory = getTransDirectory(mainDirectory);
     String mainPath = fs.path.join(
-        transDirectory.path, 'lib', transformerTemplatePackageName + '.dart');
+        transDirectory.path, 'lib', transformerTemplateEntryName + '.dart');
     fs.currentDirectory = transDirectory;
     final AOTSnapshotter snapshotter = AOTSnapshotter();
     final String outputPath = (outputDir ?? getAotBuildDirectory())
@@ -288,7 +297,7 @@ class TransformerHooks {
 
     final String transformedKernelFilePath = mainPath + '.trans.dill';
     final String defaultKernelFilePath =
-        mainPath.replaceAll(transDirectory.path, mainDirectory.path);
+    mainPath.replaceAll(transDirectory.path, mainDirectory.path);
 
     final ProcessResult result = await transformDill(
       buildMode,
@@ -299,6 +308,8 @@ class TransformerHooks {
       fs.currentDirectory = mainDirectory;
       throwToolExit('Transformer terminated unexpectedly.');
       return null;
+    } else {
+      print(result.stdout.toString());
     }
 
     final File defaultKernelFile = fs.file(defaultKernelFilePath);
@@ -307,21 +318,24 @@ class TransformerHooks {
     }
     fs.file(transformedKernelFilePath).copySync(defaultKernelFilePath);
     fs.currentDirectory = mainDirectory;
+    fs.directory(getDillBuildDirectory()).createSync(recursive: true);
+    printStatus('Copy def: $defaultKernelFile to ${getDillPath()}');
+    fs.file(defaultKernelFilePath).copySync(getDillPath());
     return null;
   }
 
   Future<void> runKernelDillSnapshotCommand(
-    KernelSnapshot kernelSnapshot,
-    Environment originalEnvironment,
-    String originalDill,
-  ) async {
+      KernelSnapshot kernelSnapshot,
+      Environment originalEnvironment,
+      String originalDill,
+      ) async {
     final Directory mainDirectory = fs.currentDirectory;
     final Directory transDirectory = getTransDirectory(mainDirectory);
     fs.currentDirectory = transDirectory;
 
     final String outputDir =
-        (originalEnvironment.outputDir.absolute.path ?? getAotBuildDirectory())
-            .replaceAll(mainDirectory.path, transDirectory.path);
+    (originalEnvironment.outputDir.absolute.path ?? getAotBuildDirectory())
+        .replaceAll(mainDirectory.path, transDirectory.path);
 
     final FlutterProject flutterProject = FlutterProject.current();
     final Environment environment = Environment(
@@ -342,16 +356,16 @@ class TransformerHooks {
       throw MissingDefineException(kTargetPlatform, 'kernel_snapshot');
     }
     final BuildMode buildMode =
-        getBuildModeForName(environment.defines[kBuildMode]);
+    getBuildModeForName(environment.defines[kBuildMode]);
     final String targetFile = fs.path.join(
-        transDirectory.path, 'lib', transformerTemplatePackageName + '.dart');
+        transDirectory.path, 'lib', transformerTemplateEntryName + '.dart');
     final String packagesPath = transDirectory.childFile('.packages').path;
     final String targetFileAbsolute = fs.file(targetFile).absolute.path;
     // everything besides 'false' is considered to be enabled.
     final bool trackWidgetCreation =
         environment.defines[kTrackWidgetCreation] != 'false';
     final TargetPlatform targetPlatform =
-        getTargetPlatformForName(environment.defines[kTargetPlatform]);
+    getTargetPlatformForName(environment.defines[kTargetPlatform]);
 
     TargetModel targetModel = TargetModel.flutter;
     if (targetPlatform == TargetPlatform.fuchsia_x64 ||
@@ -401,14 +415,17 @@ class TransformerHooks {
       originalDillFile.renameSync(originalDill + '.origin.dill');
     }
     fs.file(transformedKernelFilePath).copySync(originalDill);
-
     fs.currentDirectory = mainDirectory;
+
+    fs.directory(getDillBuildDirectory()).createSync(recursive: true);
+    printStatus('Copy debug $transformedKernelFilePath to ${getDillPath()}');
+    fs.file(transformedKernelFilePath).copySync(getDillPath());
   }
 
   Future<void> justTransformDill(
-    BuildMode buildMode,
-    String outputFilename,
-  ) async {
+      BuildMode buildMode,
+      String outputFilename,
+      ) async {
     await checkTransformerSnapshot(hasAop: false);
     final String originDill = outputFilename;
     final String transDill = '$outputFilename.trans.dill';
@@ -431,6 +448,7 @@ class TransformerHooks {
     }
     fs.file(transDill).copySync(originDill);
     fs.directory(getDillBuildDirectory()).createSync(recursive: true);
+    printStatus('Copy $originDill to $getDillPath}');
     fs.file(originDill).copySync(getDillPath());
   }
 
@@ -442,15 +460,24 @@ class TransformerHooks {
       '${getDillBuildDirectory()}${fs.path.separator}app.dill';
 
   static bool hasTransformer() {
-    final YamlMap yaml = loadYaml(FlutterProject.current().pubspecFile.readAsStringSync()) as YamlMap;
+    final YamlMap yaml =
+    loadYaml(FlutterProject.current().pubspecFile.readAsStringSync())
+    as YamlMap;
     return yaml['transformers'] != null;
   }
 
+  static String getTemplatePkgName() {
+    final YamlMap yaml =
+    loadYaml(FlutterProject.current().pubspecFile.readAsStringSync())
+    as YamlMap;
+    return yaml['trans_pkg_name'] as String;
+  }
+
   static Future<ProcessResult> transformDill(
-    BuildMode buildMode,
-    String inputDill,
-    String outputDill,
-  ) async {
+      BuildMode buildMode,
+      String inputDill,
+      String outputDill,
+      ) async {
     final List<String> command = <String>[
       artifacts.getArtifactPath(Artifact.engineDartBinary),
       transformerSnapshot,
@@ -458,9 +485,10 @@ class TransformerHooks {
       inputDill,
       if (buildMode != BuildMode.release) ...<String>[
         '--sdk-root',
-        fs.file(artifacts.getArtifactPath(Artifact.platformKernelDill))
-                .parent
-                .path +
+        fs
+            .file(artifacts.getArtifactPath(Artifact.platformKernelDill))
+            .parent
+            .path +
             fs.path.separator
       ],
       '--output',
@@ -472,4 +500,3 @@ class TransformerHooks {
     return processManager.run(command);
   }
 }
-// END

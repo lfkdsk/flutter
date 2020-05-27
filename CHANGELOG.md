@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-6](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-4...bd1.12.13-6) (2020-05-27)
+
+
+### Bug Fixes
+
+* Reland "Do not rebuild Routes when a new opaque Route is pushed on top" ([#49376](https://jira.bytedance.com/browse/49376)) ([b9ac304](https://code.byted.org/tech_client/flutter/commit/b9ac304))
+* roll engine to 64ff10125d68aebafbcf0662743b9c58c5342122,enable soft_rendering ([c5350d8](https://code.byted.org/tech_client/flutter/commit/c5350d8))
+* 修复脚本报错 ([8150f1b](https://code.byted.org/tech_client/flutter/commit/8150f1b))
+
+
+### Features
+
+* roll engine to f9d455ff8673f0c55d75dbca87ef178395eda1a7 ([e16ad29](https://code.byted.org/tech_client/flutter/commit/e16ad29))
+
 ### [1.12.13-5](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-4...bd1.12.13-5) (2020-05-19)
 
 

@@ -154,7 +154,7 @@ class BuildBundleCommand extends BuildSubCommand {
       // END
     );
     // BD ADD
-    if (await TransformerHooks.isAopEnabled()) {
+    if (await TransformerHooks.isHookEnabled()) {
       await TransformerHooks().runBuildBundleDillCommand(this);
     }
     // END

@@ -245,7 +245,7 @@ class KernelSnapshot extends Target {
     }
     // BD ADD
     else {
-      if (await TransformerHooks.isAopEnabled()) {
+      if (await TransformerHooks.isHookEnabled()) {
         await TransformerHooks().runKernelDillSnapshotCommand(
             this, environment, output.outputFilename);
       } else {

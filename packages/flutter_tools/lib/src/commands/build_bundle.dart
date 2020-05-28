@@ -141,7 +141,7 @@ class BuildBundleCommand extends BuildSubCommand {
       fileSystemRoots: stringsArg('filesystem-root'),
     );
     // BD ADD
-    if (await TransformerHooks.isAopEnabled()) {
+    if (await TransformerHooks.isHookEnabled()) {
       await TransformerHooks().runBuildBundleDillCommand(this);
     }
     // END

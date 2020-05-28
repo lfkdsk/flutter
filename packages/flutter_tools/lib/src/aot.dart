@@ -109,8 +109,13 @@ class AotBuilder {
       // BD ADD
       else if (await TransformerHooks.isHookEnabled()) {
         await TransformerHooks().runBuildAOTDillCommand(
-            platform, outputPath, buildMode, extraFrontEndOptions, dartDefines);
-      } else {
+          platform,
+          outputPath,
+          buildMode,
+          extraFrontEndOptions,
+          dartDefines,
+        );
+      } else if (TransformerHooks.hasTransformer()) {
         await TransformerHooks().justTransformDill(buildMode, outputPath);
       }
       // BD END

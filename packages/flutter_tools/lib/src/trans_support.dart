@@ -157,7 +157,7 @@ class TransformerHooks {
     );
   }
 
-  static Future<bool> isAopEnabled() async {
+  static Future<bool> isHookEnabled() async {
     final Directory transDirectory = getTransDirectory(
       fs.currentDirectory,
     );
@@ -319,7 +319,7 @@ class TransformerHooks {
     fs.file(transformedKernelFilePath).copySync(defaultKernelFilePath);
     fs.currentDirectory = mainDirectory;
     fs.directory(getDillBuildDirectory()).createSync(recursive: true);
-    printStatus('Copy def: $defaultKernelFile to ${getDillPath()}');
+//    printStatus('Copy def: $defaultKernelFile to ${getDillPath()}');
     fs.file(defaultKernelFilePath).copySync(getDillPath());
     return null;
   }
@@ -418,7 +418,7 @@ class TransformerHooks {
     fs.currentDirectory = mainDirectory;
 
     fs.directory(getDillBuildDirectory()).createSync(recursive: true);
-    printStatus('Copy debug $transformedKernelFilePath to ${getDillPath()}');
+//    printStatus('Copy debug $transformedKernelFilePath to ${getDillPath()}');
     fs.file(transformedKernelFilePath).copySync(getDillPath());
   }
 
@@ -448,7 +448,7 @@ class TransformerHooks {
     }
     fs.file(transDill).copySync(originDill);
     fs.directory(getDillBuildDirectory()).createSync(recursive: true);
-    printStatus('Copy $originDill to $getDillPath}');
+//    printStatus('Copy $originDill to $getDillPath}');
     fs.file(originDill).copySync(getDillPath());
   }
 

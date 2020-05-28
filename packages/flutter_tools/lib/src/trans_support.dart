@@ -157,7 +157,7 @@ class TransformerHooks {
     );
   }
 
-  static Future<bool> isAopEnabled() async {
+  static Future<bool> isHookEnabled() async {
     final Directory transDirectory = getTransDirectory(
       fs.currentDirectory,
     );

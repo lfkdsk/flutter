@@ -41,6 +41,9 @@ enum _ProjectType {
   package,
   /// This is a native plugin project.
   plugin,
+  /// BD ADD:START
+  version_spec,
+  /// BD END
 }
 
 _ProjectType _stringToProjectType(String value) {
@@ -87,6 +90,10 @@ class CreateCommand extends FlutterCommand {
             'for both.',
         getEnumName(_ProjectType.module): 'Generate a project to add a Flutter module to an '
             'existing Android or iOS application.',
+        // BD ADD:START
+        getEnumName(_ProjectType.version_spec): 'Generate a project to add a Flutter version spec module to an '
+            'existing Android or iOS application for Version Control.',
+        // BD END
       },
       defaultsTo: null,
     );
@@ -162,6 +169,13 @@ class CreateCommand extends FlutterCommand {
       hide: true,
       help: 'Deprecated',
     );
+    // BD ADD:START
+    argParser.addOption(
+        'parent-package',
+        defaultsTo: null,
+        help: 'Generate version spec package\'s parent name.'
+    );
+    // BD END
   }
 
   @override
@@ -437,6 +451,11 @@ class CreateCommand extends FlutterCommand {
       case _ProjectType.plugin:
         generatedFileCount += await _generatePlugin(relativeDir, templateContext, overwrite: overwrite);
         break;
+    // BD ADD: START
+      case _ProjectType.version_spec:
+        generatedFileCount += await _generateVersionSpec(relativeDir, templateContext, overwrite: overwrite);
+        break;
+    // BD END
     }
     if (sampleCode != null) {
       generatedFileCount += _applySample(relativeDir, sampleCode);
@@ -594,6 +613,29 @@ To edit platform code in an IDE see https://flutter.dev/developing-packages/#edi
     return generatedCount;
   }
 
+  // BD ADD:START
+  Future<int> _generateVersionSpec(Directory directory, Map<String, dynamic> templateContext, { bool overwrite = false }) async {
+    int generatedCount = 0;
+    generatedCount += _renderTemplate('version_spec', directory, templateContext, overwrite: overwrite);
+    final FlutterProject project = FlutterProject.fromDirectory(directory);
+    generatedCount += _injectGradleWrapper(project);
+
+    if (boolArg('with-driver-test')) {
+      final Directory testDirectory = directory.childDirectory('test_driver');
+      generatedCount += _renderTemplate('driver', testDirectory, templateContext, overwrite: overwrite);
+    }
+
+    if (boolArg('pub')) {
+      await pub.get(context: PubContext.create, directory: directory.path, offline: boolArg('offline'));
+      await project.ensureReadyForPlatformSpecificTooling(checkProjects: false);
+    }
+
+    gradle.updateLocalProperties(project: project, requireAndroidSdk: false);
+
+    return generatedCount;
+  }
+  // BD END
+
   // Takes an application template and replaces the main.dart with one from the
   // documentation website in sampleCode.  Returns the difference in the number
   // of files after applying the sample, since it also deletes the application's
@@ -659,6 +701,9 @@ To edit platform code in an IDE see https://flutter.dev/developing-packages/#edi
       'useNewPluginSchema': macos,
       // If a desktop platform is included, add a workaround for #31366.
       'includeTargetPlatformWorkaround': macos,
+      // BD ADD:START
+      'parentPackageName': stringArg('parent-package')
+      // BD END
     };
   }
 

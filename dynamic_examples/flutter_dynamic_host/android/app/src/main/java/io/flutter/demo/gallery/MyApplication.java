@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.bytedance.crash.ICommonParams;
@@ -29,14 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import io.flutter.shrimp.CommonPluginBridge;
-import io.flutter.shrimp.FeedEventChannel;
 import io.flutter.shrimp.FeedPluginBridge;
 import io.flutter.shrimp.SettingsPluginBridge;
-import io.flutter.shrimp.UserEventChannel;
 import io.flutter.shrimp.UserPluginBridge;
 import io.flutter.shrimp.VideoPluginBridge;
 import io.flutter.view.FlutterMain;
-import io.flutter.view.FlutterTextureView;
 
 /**
  * Created by Xie Ran on 2019-07-23.
@@ -141,12 +139,12 @@ public class MyApplication extends Application {
         });
         RouteAppPlugin.addFlutterViewListener(new RouteAppPlugin.IFlutterViewListener() {
             @Override
-            public void onFlutterViewCreated(String viewToken, FlutterTextureView view) {
+            public void onFlutterViewCreated(String viewToken, View view) {
 
             }
 
             @Override
-            public void onFlutterViewDestroyed(String viewToken, FlutterTextureView view) {
+            public void onFlutterViewDestroyed(String viewToken, View view) {
                 Dynamicart.markPluginIsReleased(viewToken);
             }
         });
@@ -158,23 +156,23 @@ public class MyApplication extends Application {
         FlutterBridgeManager.INSTANCE.registerFlutterGlobalBridge(new SettingsPluginBridge());
         FlutterBridgeManager.INSTANCE.registerFlutterGlobalBridge(new UserPluginBridge());
         FlutterBridgeManager.INSTANCE.registerFlutterGlobalBridge(new VideoPluginBridge());
-        RouteAppPlugin.addFlutterViewListener(new RouteAppPlugin.IFlutterViewListener() {
-            @Override
-            public void onFlutterViewCreated(String viewToken, FlutterTextureView view) {
-                if (viewToken.equals("BDSFlutter")) {
-                    UserPluginBridge.Companion.setEventChannel(new UserEventChannel(view.getPluginRegistry()));
-                    FeedPluginBridge.Companion.setEventChannel(new FeedEventChannel(view.getPluginRegistry()));
-                }
-            }
-
-            @Override
-            public void onFlutterViewDestroyed(String viewToken, FlutterTextureView view) {
-                if (viewToken.equals("BDSFlutter")) {
-                    UserPluginBridge.Companion.setEventChannel(null);
-                    FeedPluginBridge.Companion.setEventChannel(null);
-                }
-            }
-        });
+        // RouteAppPlugin.addFlutterViewListener(new RouteAppPlugin.IFlutterViewListener() {
+        //     @Override
+        //     public void onFlutterViewCreated(String viewToken, FlutterTextureView view) {
+        //         if (viewToken.equals("BDSFlutter")) {
+        //             UserPluginBridge.Companion.setEventChannel(new UserEventChannel(view.getPluginRegistry()));
+        //             FeedPluginBridge.Companion.setEventChannel(new FeedEventChannel(view.getPluginRegistry()));
+        //         }
+        //     }
+        //
+        //     @Override
+        //     public void onFlutterViewDestroyed(String viewToken, FlutterTextureView view) {
+        //         if (viewToken.equals("BDSFlutter")) {
+        //             UserPluginBridge.Companion.setEventChannel(null);
+        //             FeedPluginBridge.Companion.setEventChannel(null);
+        //         }
+        //     }
+        // });
     }
 
     private void initHomepage() {

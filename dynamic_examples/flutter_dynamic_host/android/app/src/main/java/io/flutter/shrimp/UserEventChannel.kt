@@ -1,9 +1,6 @@
 package io.flutter.shrimp
 
-import com.example.bridgeunify.BridgeOnPlugin
-import io.flutter.plugin.common.JSONUtil
 import io.flutter.plugin.common.PluginRegistry
-import org.json.JSONObject
 
 class UserEventChannel(private val pluginRegistry: PluginRegistry) {
 
@@ -18,19 +15,19 @@ class UserEventChannel(private val pluginRegistry: PluginRegistry) {
     fun onUserChanged(userJson: String) {
         var map = HashMap<String,String>()
         map[EVENT_NAME_USER_CHANGED] = userJson
-        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(map) as JSONObject?)
+//        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(map) as JSONObject?)
     }
 
     fun onMyUserChanged(userJson: String) {
         var map = HashMap<String,String>()
         map[EVENT_NAME_MY_USER_CHANGED] = userJson
-        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(map) as JSONObject?)
+//        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(map) as JSONObject?)
     }
 
     fun onHashTagChanged(hashTagJson: String) {
         var map = HashMap<String, String>()
         map[EVENT_NAME_HASHTAG_CHANGED] = hashTagJson
-        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(map) as JSONObject?)
+//        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(map) as JSONObject?)
     }
 
 }

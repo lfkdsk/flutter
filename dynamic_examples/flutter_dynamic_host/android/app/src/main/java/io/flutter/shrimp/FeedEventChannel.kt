@@ -1,9 +1,6 @@
 package io.flutter.shrimp
 
-import com.example.bridgeunify.BridgeOnPlugin
-import io.flutter.plugin.common.JSONUtil
 import io.flutter.plugin.common.PluginRegistry
-import org.json.JSONObject
 
 class FeedEventChannel(private val pluginRegistry: PluginRegistry) {
 
@@ -21,7 +18,7 @@ class FeedEventChannel(private val pluginRegistry: PluginRegistry) {
         dataMap["action_type"] = actionType
         dataMap["parent_id"] = parentId
         map[EVENT_NAME_FEED_CHANGED] = dataMap
-        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(dataMap) as JSONObject?)
+//        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(dataMap) as JSONObject?)
     }
 
     fun onFeedGodCommentChanged(cellId: Long, cellType: Int, commentId: Long, commentType: Int, actionType: Int) {
@@ -33,6 +30,6 @@ class FeedEventChannel(private val pluginRegistry: PluginRegistry) {
         dataMap["comment_id"] = commentId
         dataMap["comment_type"] = commentType
         map[EVENT_NAME_FEED_GOD_COMMENT_CHANGED] = dataMap
-        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(dataMap) as JSONObject?)
+//        BridgeOnPlugin.getPluginFromPluginRegistry(pluginRegistry).on(USER_EVENT_CHANNEL_NAME, JSONUtil.wrap(dataMap) as JSONObject?)
     }
 }

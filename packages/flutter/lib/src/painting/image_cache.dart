@@ -7,6 +7,12 @@ import 'dart:ui' show hashValues;
 
 import 'package:flutter/foundation.dart';
 
+// BD ADD: START
+import 'dart:math';
+import 'dart:ui' as ui show window, Size;
+import 'package:flutter/boost.dart';
+import 'package:flutter/foundation.dart';
+// END
 import 'image_stream.dart';
 
 const int _kDefaultSize = 1000;
@@ -83,6 +89,11 @@ class ImageCache {
   ///
   /// Unlike _cache, the [_CachedImage] for this may have a null byte size.
   final Map<Object, _LiveImage> _liveImages = <Object, _LiveImage>{};
+
+  // BD ADD: START
+  int _screenWidth = -1;
+  int _screenHeight = -1;
+  // END
 
   /// Maximum number of entries to store in the cache.
   ///
@@ -404,6 +415,8 @@ class ImageCache {
       }
       // Only touch if the cache was enabled when resolve was initially called.
       if (untrackedPendingImage == null) {
+        // BD ADD:
+        _checkImageSize(key, info, imageSize);
         _touch(key, image, listenerTask);
       }
 
@@ -503,6 +516,30 @@ class ImageCache {
     assert(_cache.length <= maximumSize);
     assert(_currentSizeBytes <= maximumSizeBytes);
   }
+
+  // BD ADD: START
+  void _checkImageSize(Object key, ImageInfo? info, int imageSize) {
+    if (!kReleaseMode || Boost.printKeyDebugInfoOnRelease) {
+      if (_screenWidth == -1) {
+        final ui.Size size = ui.window.physicalSize;
+        _screenWidth = max(size.width.toInt(), 480);
+        _screenHeight = max(size.height.toInt(), 800);
+      }
+      final int infoWidth = info == null || info.image == null ? 0 : info.image.width;
+      final int infoHeight = info == null || info.image == null ? 0 : info.image.height;
+      if (infoWidth > _screenWidth ||
+          infoHeight > _screenHeight ||
+          (Boost.imageAlarmThresholdMB >= 0 &&
+              imageSize >= (Boost.imageAlarmThresholdMB * 1024 * 1024 * 4))) {
+        print('\n[${Boost.kBdFlutterTag}] WARNING: ************************************************');
+        print('[${Boost.kBdFlutterTag}] WARNING: ImageSize: ${(imageSize / 1024 / 1024).toStringAsFixed(1)} MB');
+        print('[${Boost.kBdFlutterTag}] WARNING: width: ${infoWidth}, height: ${infoHeight}');
+        print('[${Boost.kBdFlutterTag}] WARNING: ImageInfo: $key');
+        print('[${Boost.kBdFlutterTag}] WARNING: ************************************************\n');
+      }
+    }
+  }
+  // END
 }
 
 /// Information about how the [ImageCache] is tracking an image.

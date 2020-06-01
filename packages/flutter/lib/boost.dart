@@ -12,6 +12,8 @@ import 'package:flutter/rendering.dart';
 // ignore: avoid_classes_with_only_static_members
 /// See also: https://jira.bytedance.com/browse/FLUTTER-15
 class Boost {
+  static const String kBdFlutterTag = 'BDFlutter';
+
   /// All native engine flags to improve performance
   static const int _kAllFlags = 0xFF;
 
@@ -66,6 +68,11 @@ class Boost {
   /// return disable mipmaps status
   static bool get disableMipmaps => _disableMipmaps;
 
+  /// if true, will print key debug info on release，profile and debug mode.
+  static bool printKeyDebugInfoOnRelease = false;
+
+  /// image alarm threshold (MB)
+  static double imageAlarmThresholdMB = -1;
 
   /// enable or disable semantics, reuseWidget and so on.
   static void enable(

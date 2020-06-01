@@ -2,6 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// BD ADD: START
+import 'dart:math';
+import 'dart:ui' as ui show window, Size;
+import 'package:flutter/boost.dart';
+import 'package:flutter/foundation.dart';
+// END
 import 'image_stream.dart';
 
 const int _kDefaultSize = 1000;
@@ -31,6 +37,11 @@ const int _kDefaultSizeBytes = 100 << 20; // 100 MiB
 class ImageCache {
   final Map<Object, _PendingImage> _pendingImages = <Object, _PendingImage>{};
   final Map<Object, _CachedImage> _cache = <Object, _CachedImage>{};
+
+  // BD ADD: START
+  int _screenWidth = -1;
+  int _screenHeight = -1;
+  // END
 
   /// Maximum number of entries to store in the cache.
   ///
@@ -177,6 +188,8 @@ class ImageCache {
         _maximumSizeBytes = imageSize + 1000;
       }
       _currentSizeBytes += imageSize;
+      // BD ADD:
+      _checkImageSize(key, info, imageSize);
       final _PendingImage pendingImage = _pendingImages.remove(key);
       if (pendingImage != null) {
         pendingImage.removeListener();
@@ -207,6 +220,27 @@ class ImageCache {
     assert(_cache.length <= maximumSize);
     assert(_currentSizeBytes <= maximumSizeBytes);
   }
+
+  // BD ADD: START
+  void _checkImageSize(Object key, ImageInfo info, int imageSize) {
+    if (!kReleaseMode || Boost.printKeyDebugInfoOnRelease) {
+      if (_screenWidth == -1) {
+        final ui.Size size = ui.window.physicalSize;
+        _screenWidth = max(size.width.toInt(), 480);
+        _screenHeight = max(size.height.toInt(), 800);
+      }
+      if (info.image.width >= _screenWidth ||
+          info.image.height >= _screenHeight ||
+          (Boost.imageAlarmThresholdMB >= 0 &&
+              imageSize >= (Boost.imageAlarmThresholdMB * 1024 * 1024 * 4))) {
+        print('\n[${Boost.kBdFlutterTag}] WARNING: ************************************************');
+        print('[${Boost.kBdFlutterTag}] WARNING: ImageSize: ${(imageSize / 1024 / 1024).toStringAsFixed(1)} MB');
+        print('[${Boost.kBdFlutterTag}] WARNING: ImageInfo: $key');
+        print('[${Boost.kBdFlutterTag}] WARNING: ************************************************\n');
+      }
+    }
+  }
+  // END
 }
 
 class _CachedImage {

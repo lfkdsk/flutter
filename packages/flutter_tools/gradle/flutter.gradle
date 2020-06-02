@@ -564,6 +564,11 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('main-module-name')) {
              appName = project.property('main-module-name')
         }
+        if (appName == null || appName.empty) {
+            try {
+                appName = project.rootProject.ext.mainModuleName
+            } catch (Exception ignore) {}
+        }
         return appName ? appName : 'app'
     }
     // END

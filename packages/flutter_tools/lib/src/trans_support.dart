@@ -495,6 +495,8 @@ class TransformerHooks {
       outputDill,
       '--pubspec',
       FlutterProject.current().pubspecFile.path,
+      '--mode',
+      buildMode.name,
     ];
 
     return processManager.run(command);

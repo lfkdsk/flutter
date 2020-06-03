@@ -235,6 +235,7 @@ class ImageCache {
               imageSize >= (Boost.imageAlarmThresholdMB * 1024 * 1024 * 4))) {
         print('\n[${Boost.kBdFlutterTag}] WARNING: ************************************************');
         print('[${Boost.kBdFlutterTag}] WARNING: ImageSize: ${(imageSize / 1024 / 1024).toStringAsFixed(1)} MB');
+        print('[${Boost.kBdFlutterTag}] WARNING: width: ${info.image.width}, height: ${info.image.height}');
         print('[${Boost.kBdFlutterTag}] WARNING: ImageInfo: $key');
         print('[${Boost.kBdFlutterTag}] WARNING: ************************************************\n');
       }

@@ -35,7 +35,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     //            'the command line, then that is used instead.',
     usesTargetOption();
     usesPubOption();
-    addDynamicartModeFlags();
+    addDynamicModeFlags();
     argParser
       ..addOption('origin-resource',
           defaultsTo: '', help: 'aot模式下的资源的目录，文件目录组织形式和flutter_assets目录相同')
@@ -69,7 +69,8 @@ class BuildDynamicCommand extends BuildSubCommand {
     }
 
     final List<String> dynamicPlugins = getDynamicPlugins();
-    final String hostDillPath = stringArg('host-dill');
+    final String hostDillPath = '${Cache.flutterRoot}/bin/internal/app.dill';
+
     final String packagesPath = fs.path.absolute('.packages');
 
     if (!fs.file(packagesPath).existsSync()) {
@@ -427,7 +428,7 @@ List<Font> parseFont(String content) {
       if (key == 'family') {
         family = jsonContent[key] as String;
       } else if (key == 'fonts') {
-        final List<Map<String, dynamic>> fonts = jsonContent[key] as List<Map<String, dynamic>>;
+        final List<dynamic> fonts = jsonContent[key];
         for (Map<String, dynamic> item in fonts) {
           fontAssets.add(FontAsset(Uri.parse(item['asset'] as String),
               weight: item['weight'] as int, style: item['style'] as String));

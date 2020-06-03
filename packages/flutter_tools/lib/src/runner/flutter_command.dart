@@ -390,9 +390,15 @@ abstract class FlutterCommand extends Command<void> {
         help: '开启动态化, 目前只支持release模式.');
     argParser..addOption('dynamic-aot-plugins',
         defaultsTo: '',
+        hide: true,
         help: '需要keep的plugin的包名，格式为package:xxx/');
-    argParser..addOption('host-dill',
-        help: 'host dill 文件，处理 mixin 的问题');
+  }
+
+  void addDynamicModeFlags(){
+    argParser..addOption('dynamic-aot-plugins',
+        defaultsTo: '',
+        hide: true,
+        help: '需要keep的plugin的包名，格式为package:xxx/');
   }
   // END
 

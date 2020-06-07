@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 * Add warning log in image_cache ([817ea95](https://code.byted.org/tech_client/flutter/commit/817ea95))
 * print image w & h info in ImageCache ([0856848](https://code.byted.org/tech_client/flutter/commit/0856848))
+* Add Flutter Transformer Hooks ([65039a17](https://code.byted.org/tech_client/flutter/commit/65039a17)，[transformer-template](https://code.byted.org/tech_client/transformers-template))
 
 ### [1.12.13-6](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-4...bd1.12.13-6) (2020-05-27)
 

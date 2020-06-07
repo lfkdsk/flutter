@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-7](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-6...bd1.12.13-7) (2020-06-07)
+
+
+### Bug Fixes
+
+* cherry-pick native image ([d32c488](https://code.byted.org/tech_client/flutter/commit/d32c488))
+* roll engine to 8c7eb4dba48aa1ec582119a9b180afe8aa715c83:fix call thread ([ea123b3](https://code.byted.org/tech_client/flutter/commit/ea123b3))
+
+
+### Features
+
+* Add warning log in image_cache ([817ea95](https://code.byted.org/tech_client/flutter/commit/817ea95))
+* print image w & h info in ImageCache ([0856848](https://code.byted.org/tech_client/flutter/commit/0856848))
+
 ### [1.12.13-6](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-4...bd1.12.13-6) (2020-05-27)
 
 

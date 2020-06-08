@@ -344,12 +344,13 @@ class TransformerHooks {
 
     final FlutterProject flutterProject = FlutterProject.current();
     final Environment environment = Environment(
-        projectDir: flutterProject.directory,
-        outputDir: fs.directory(outputDir),
-        buildDir: flutterProject.directory
-            .childDirectory('.dart_tool')
-            .childDirectory('flutter_build'),
-        defines: Map<String, String>.from(originalEnvironment.defines));
+      projectDir: flutterProject.directory,
+      outputDir: fs.directory(outputDir),
+      buildDir: flutterProject.directory
+          .childDirectory('.dart_tool')
+          .childDirectory('flutter_build'),
+      defines: Map<String, String>.from(originalEnvironment.defines),
+    );
 
     final KernelCompiler compiler = await kernelCompilerFactory.create(
       FlutterProject.fromDirectory(transDirectory),
@@ -405,7 +406,10 @@ class TransformerHooks {
     final String transformedKernelFilePath =
         output.outputFilename + '.trans.dill';
     final ProcessResult result = await transformDill(
-        buildMode, output.outputFilename, transformedKernelFilePath);
+      buildMode,
+      output.outputFilename,
+      transformedKernelFilePath,
+    );
     if (result.exitCode != 0) {
       fs.currentDirectory = mainDirectory;
       throwToolExit(

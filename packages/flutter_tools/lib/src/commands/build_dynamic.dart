@@ -10,6 +10,8 @@ import 'package:flutter_tools/src/base/common.dart';
 import 'package:flutter_tools/src/base/file_system.dart' hide FileSystemEntity;
 import 'package:flutter_tools/src/base/fingerprint.dart';
 import 'package:flutter_tools/src/base/process_manager.dart';
+import 'package:flutter_tools/src/build_system/build_system.dart';
+import 'package:flutter_tools/src/build_system/targets/dart.dart';
 import 'package:flutter_tools/src/dart/package_map.dart';
 import 'package:meta/meta.dart';
 import '../artifacts.dart';
@@ -24,6 +26,7 @@ import '../globals.dart';
 import '../project.dart';
 import '../resident_runner.dart';
 import '../runner/flutter_command.dart' show FlutterCommandResult;
+import '../trans_support.dart';
 import 'build.dart';
 
 const String defaultManifestPath = 'pubspec.yaml';
@@ -232,6 +235,26 @@ Future<bool> compileKernel({
       verbose: verbose,
       hostDillPath: hostDillPath
   );
+
+  if (await TransformerHooks.isHookEnabled()) {
+    await TransformerHooks().runKernelDillSnapshotCommand(
+      null,
+      Environment(
+        outputDir: tempDir.absolute,
+        projectDir: FlutterProject.current().directory,
+        defines: {
+          kBuildMode : 'release',
+          kTargetPlatform: 'android',
+        },
+      ),
+      compilerOutput.outputFilename,
+    );
+  } else if (TransformerHooks.hasTransformer()) {
+    await TransformerHooks().justTransformDill(
+      BuildMode.release,
+      compilerOutput.outputFilename,
+    );
+  }
 
   // Write path to frontend_server, since things need to be re-generated when that changes.
   final String frontendPath = artifacts

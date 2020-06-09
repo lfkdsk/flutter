@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-8](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-7...bd1.12.13-8) (2020-06-09)
+
+
+### Bug Fixes
+
+* fix sliver list assert error ([d814dc3](https://code.byted.org/tech_client/flutter/commit/d814dc3))
+* native image callback error ([06d1bc4](https://code.byted.org/tech_client/flutter/commit/06d1bc4))
+
+
+### Features
+
+* Update transformer hooks in CHANGELOG.md ([6c693cf](https://code.byted.org/tech_client/flutter/commit/6c693cf))
+
 ### [1.12.13-7](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-6...bd1.12.13-7) (2020-06-07)
 
 

@@ -222,7 +222,6 @@ class RenderSliverList extends RenderSliverMultiBoxAdaptor {
         assert(child == null);
         // we want to make sure we keep the last child around so we know the end scroll offset
         collectGarbage(leadingGarbage - 1, 0);
-        assert(firstChild == lastChild);
         final double extent = childScrollOffset(lastChild) + paintExtentOf(lastChild);
         geometry = SliverGeometry(
           scrollExtent: extent,

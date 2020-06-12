@@ -365,6 +365,11 @@ class KernelCompiler {
         '--platform',
         platformDill,
       ],
+      // BD ADD
+      ...<String>[
+        '--pubspec-file',
+        FlutterProject.current().pubspecFile.absolute.path,
+      ],
       ...?extraFrontEndOptions,
       mainUri?.toString() ?? mainPath,
     ];

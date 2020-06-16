@@ -838,7 +838,7 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
             timeToFrameworkInitMicros, timeToFirstFrameMicros);
       }
       if (!kReleaseMode) {
-        developer.Timeline.instantSync('Widgets completed first useful frame');
+        developer.Timeline.instantSync('Widgets built first useful frame');
       }
     }
     _needToReportFirstFrame = false;

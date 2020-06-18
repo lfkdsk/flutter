@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-10](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-9...bd1.12.13-10) (2020-06-18)
+
+
+### Bug Fixes
+
+* fix RawKeyboard._synchronizeModifiers npe ([f9cbb9c](https://code.byted.org/tech_client/flutter/commit/f9cbb9c))
+
 ### [1.12.13-9](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-8...bd1.12.13-9) (2020-06-17)
 
 

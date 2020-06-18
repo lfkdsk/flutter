@@ -577,10 +577,17 @@ class RawKeyboard {
     final Set<LogicalKeyboardKey> modifierKeys = <LogicalKeyboardKey>{};
     for (ModifierKey key in modifiersPressed.keys) {
       final Set<LogicalKeyboardKey> mappedKeys = _modifierKeyMap[_ModifierSidePair(key, modifiersPressed[key])];
-      assert(mappedKeys != null,
-        'Platform key support for ${Platform.operatingSystem} is '
-        'producing unsupported modifier combinations.');
-      modifierKeys.addAll(mappedKeys);
+      // BD MOD: START
+      // assert(mappedKeys != null,
+      //   'Platform key support for ${Platform.operatingSystem} is '
+      //   'producing unsupported modifier combinations.');
+      // modifierKeys.addAll(mappedKeys);
+      if (mappedKeys == null) {
+        print('Platform key support for ${Platform.operatingSystem} is producing unsupported modifier combinations.');
+      } else {
+        modifierKeys.addAll(mappedKeys);
+      }
+      // END
     }
     // Don't send any key events for these changes, since there *should* be
     // separate events for each modifier key down/up that occurs while the app

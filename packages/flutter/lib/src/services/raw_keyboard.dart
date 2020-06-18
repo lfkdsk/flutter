@@ -660,9 +660,17 @@ class RawKeyboard {
     final Map<PhysicalKeyboardKey, LogicalKeyboardKey> modifierKeys = <PhysicalKeyboardKey, LogicalKeyboardKey>{};
     for (final ModifierKey key in modifiersPressed.keys) {
       final Set<PhysicalKeyboardKey> mappedKeys = _modifierKeyMap[_ModifierSidePair(key, modifiersPressed[key])];
-      assert(mappedKeys != null,
-        'Platform key support for ${Platform.operatingSystem} is '
-        'producing unsupported modifier combinations.');
+      // BD MOD: START
+      // assert(mappedKeys != null,
+      //   'Platform key support for ${Platform.operatingSystem} is '
+      //   'producing unsupported modifier combinations.');
+      // modifierKeys.addAll(mappedKeys);
+      if (mappedKeys == null) {
+        print('Platform key support for ${Platform.operatingSystem} is '
+            'producing unsupported modifier combinations.');
+        continue;
+      }
+      // END
       for (final PhysicalKeyboardKey physicalModifier in mappedKeys) {
         modifierKeys[physicalModifier] = _allModifiers[physicalModifier];
       }

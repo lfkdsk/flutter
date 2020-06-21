@@ -150,7 +150,10 @@ projectsEvaluated {
 
     // Gets the plugin subprojects.
     Set<Project> modulePlugins = rootProject.subprojects.findAll {
-        it.name != "flutter" && it.name != "app"
+        // BD MOD START:
+        // it.name != "flutter" && it.name != "app"
+        it.name != "flutter" && it.name != "app"&&it.hasProperty("android")&&it.android.hasProperty("libraryVariants")
+        // END
     }
     // When a module is built as a Maven artifacts, plugins must also be built this way
     // because the module POM's file will include a dependency on the plugin Maven artifact.

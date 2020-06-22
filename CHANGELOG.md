@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-11](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-10...bd1.12.13-11) (2020-06-22)
+
+### Bug Fixes
+* Fix: define timeline event func as null in release mode (BD#2004) ([bf65af2](https://code.byted.org/tech_client/flutter/commit/bf65af2))
+
+### Features
+* ImageLoaderRegistry support ShimRegistrar.java ([bf65af2](https://code.byted.org/tech_client/flutter/commit/bf65af2))
+* Support preload DartVM and FontMgr ([bf65af2](https://code.byted.org/tech_client/flutter/commit/bf65af2))
+
 ### [1.12.13-10](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-9...bd1.12.13-10) (2020-06-18)
 
 

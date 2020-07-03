@@ -14,9 +14,9 @@ class Performance {
     engine.startStackTraceSamples();
   }
 
-  // 拿到最近 microseconds 时间段的栈采集信息
+  // 拿到最近 microseconds（微秒） 时间段的栈采集信息{func_name:exec_count}
   static String getStackTraceSamples(int microseconds) {
-    engine.getStackTraceSamples(microseconds);
+    return engine.getStackTraceSamples(microseconds);
   }
 
   // 停止栈采集

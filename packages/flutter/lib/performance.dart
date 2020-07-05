@@ -75,4 +75,52 @@ class Performance {
     await snapshot.loadProgress(datas).last;
     return snapshot;
   }
+
+  static String getHeapUsageJSON() {
+    return performance.getHeapInfo();
+  }
+
+  /// Dart heap used, in KB
+  static int getHeapUsed() {
+    String jsonString = getHeapUsageJSON();
+    final isolates = jsonDecode(jsonString);
+    assert(isolates is List);
+    int used = 0;
+    for (var isolate in isolates) {
+      used += isolate['heaps']['new']['used'];
+      used += isolate['heaps']['old']['used'];
+    }
+    return used;
+  }
+
+  /// Dart heap capacity, in KB
+  static int getHeapCapacity() {
+    String jsonString = getHeapUsageJSON();
+    final isolates = jsonDecode(jsonString);
+    assert(isolates is List);
+    int capacity = 0;
+    for (var isolate in isolates) {
+      capacity += isolate['heaps']['new']['capacity'];
+      capacity += isolate['heaps']['old']['capacity'];
+    }
+    return capacity;
+  }
+
+  /// Dart heap external, in KB
+  static int getHeapExternal() {
+    String jsonString = getHeapUsageJSON();
+    final isolates = jsonDecode(jsonString);
+    assert(isolates is List);
+    int externl = 0;
+    for (var isolate in isolates) {
+      externl += isolate['heaps']['new']['external'];
+      externl += isolate['heaps']['old']['external'];
+    }
+    return externl;
+  }
+
+  /// Memory usage of decoded image in dart heap external, in KB
+  static int getImageMemoryKB() {
+    return performance.getImageMemoryUsage();
+  }
 }

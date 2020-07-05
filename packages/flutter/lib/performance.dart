@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
 /// The Flutter Monitor framework.
 ///
 /// To use, import `package:flutter/performance.dart`.
@@ -7,6 +5,9 @@ import 'dart:typed_data';
 /// zhaoxuyang.6@bytedance.com
 ///
 
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as engine;
 
 import 'package:flutter/src/snapshot_graph.dart';
@@ -42,7 +43,51 @@ class Performance {
     return await HeapSnapshotGraph.parseSnapshot(filePath);
   }
 
-  static String getHeapInfo() {
+  static String getHeapUsageJSON() {
     return engine.getHeapInfo();
+  }
+
+  /// Dart heap used, in KB
+  static int getHeapUsed() {
+    String jsonString = getHeapUsageJSON();
+    final isolates = jsonDecode(jsonString);
+    assert(isolates is List);
+    int used = 0;
+    for (var isolate in isolates) {
+      used += isolate['heaps']['new']['used'];
+      used += isolate['heaps']['old']['used'];
+    }
+    return used;
+  }
+
+  /// Dart heap capacity, in KB
+  static int getHeapCapacity() {
+    String jsonString = getHeapUsageJSON();
+    final isolates = jsonDecode(jsonString);
+    assert(isolates is List);
+    int capacity = 0;
+    for (var isolate in isolates) {
+      capacity += isolate['heaps']['new']['capacity'];
+      capacity += isolate['heaps']['old']['capacity'];
+    }
+    return capacity;
+  }
+
+  /// Dart heap external, in KB
+  static int getHeapExternal() {
+    String jsonString = getHeapUsageJSON();
+    final isolates = jsonDecode(jsonString);
+    assert(isolates is List);
+    int externl = 0;
+    for (var isolate in isolates) {
+      externl += isolate['heaps']['new']['external'];
+      externl += isolate['heaps']['old']['external'];
+    }
+    return externl;
+  }
+
+  /// Memory usage of decoded image in dart heap external, in KB
+  static int getImageMemoryKB() {
+    return engine.getImageMemoryUsage();
   }
 }

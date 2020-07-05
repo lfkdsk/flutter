@@ -29,5 +29,7 @@ class Performance {
 
   }
 
-
+  static String getHeapInfo() {
+    return engine.getHeapInfo();
+  }
 }

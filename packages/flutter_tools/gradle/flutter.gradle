@@ -394,7 +394,9 @@ class FlutterPlugin implements Plugin<Project> {
                 return
             }
             Project dependencyProject = project.rootProject.findProject(":$pluginDependencyName")
-            if (!dependencyProject.projectDir.exists() || dependencyProject == null) {
+            // BD MOD:
+            // if (!dependencyProject.projectDir.exists() || dependencyProject == null) {
+            if (dependencyProject == null || !dependencyProject.projectDir.exists()) {
                 return
             }
             // Wait for the Android plugin to load and add the dependency to the plugin project.

@@ -69,28 +69,6 @@ class TransformerHooks {
         'transformer_template.dart.snapshot');
     final File expectedTransformerSnapshot =
     fs.file(expectedTransformerSnapshotPath);
-    final String expectedDartSha = getExpectedDartSha();
-    final String transPubspecPath = fs.path.join(
-      fs.directory(transLibPath).parent.path,
-      'pubspec.yaml',
-    );
-    final String defaultDartSha = getDartShaFromPubspec(transPubspecPath);
-    if (defaultDartSha == null || expectedDartSha == null) {
-      return false;
-    }
-    if (defaultDartSha != expectedDartSha) {
-      if (expectedTransformerSnapshot.existsSync()) {
-        expectedTransformerSnapshot.deleteSync();
-      }
-      final File transPubspecFile = fs.file(transPubspecPath);
-      final String transPubspecContent = transPubspecFile
-          .readAsStringSync()
-          .replaceAll(defaultDartSha, expectedDartSha);
-      transPubspecFile.writeAsStringSync(
-        transPubspecContent,
-        flush: true,
-      );
-    }
     if (!expectedTransformerSnapshot.existsSync()) {
       await generateTransformerSnapshot(expectedTransformerSnapshotPath);
     }

@@ -392,6 +392,13 @@ class Cache {
     if (!_lockEnabled) {
       return;
     }
+    /// BD ADD: 防止产物下载不完全
+    requiredArtifacts = Set<DevelopmentArtifact>.of(requiredArtifacts);
+    requiredArtifacts.add(DevelopmentArtifact.androidGenSnapshot);
+    requiredArtifacts.add(DevelopmentArtifact.androidInternalBuild);
+    requiredArtifacts.add(DevelopmentArtifact.iOS);
+    requiredArtifacts.add(DevelopmentArtifact.universal);
+    /// BD ADD END
     for (ArtifactSet artifact in _artifacts) {
       if (!requiredArtifacts.contains(artifact.developmentArtifact)) {
         printTrace('Artifact $artifact is not required, skipping update.');

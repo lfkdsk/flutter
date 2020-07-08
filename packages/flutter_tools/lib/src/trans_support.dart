@@ -46,7 +46,7 @@ class TransformerHooks {
     );
   }
 
-  static Future<void> checkTransformerSnapshot({bool hasAop = true}) async {
+  static Future<bool> checkTransformerSnapshot({bool hasAop = true}) async {
     final PackageMap packageMap = PackageMap(
       fs.path.join(
         hasAop
@@ -56,12 +56,12 @@ class TransformerHooks {
       ),
     );
     if (packageMap.map == null) {
-      return;
+      return false;
     }
     final String transLibPath =
     packageMap.map['transformer_template']?.toFilePath();
     if (transLibPath == null) {
-      return;
+      return false;
     }
     final String expectedTransformerSnapshotPath = fs.path.join(
         fs.directory(transLibPath).parent.path,
@@ -76,7 +76,7 @@ class TransformerHooks {
     );
     final String defaultDartSha = getDartShaFromPubspec(transPubspecPath);
     if (defaultDartSha == null || expectedDartSha == null) {
-      return;
+      return false;
     }
     if (defaultDartSha != expectedDartSha) {
       if (expectedTransformerSnapshot.existsSync()) {
@@ -103,10 +103,13 @@ class TransformerHooks {
       final String outputStr = result.stderr.toString().trim();
       if (outputStr == unmatchDartKernelBinaryErrMsg) {
         fs.file(expectedTransformerSnapshotPath).deleteSync();
-        return;
+        return false;
       }
       transformerSnapshot = expectedTransformerSnapshotPath;
+      return true;
     }
+
+    return false;
   }
 
   static String getExpectedDartSha() {
@@ -426,7 +429,10 @@ class TransformerHooks {
       BuildMode buildMode,
       String outputFilename,
       ) async {
-    await checkTransformerSnapshot(hasAop: false);
+    final bool isEnable = await checkTransformerSnapshot(hasAop: false);
+    if (!isEnable) {
+      return;
+    }
     final String originDill = outputFilename;
     final String transDill = '$outputFilename.trans.dill';
     final ProcessResult result = await transformDill(

@@ -703,6 +703,11 @@ class DefaultResidentCompiler implements ResidentCompiler {
       if (unsafePackageSerialization == true) '--unsafe-package-serialization',
       if ((experimentalFlags != null) && experimentalFlags.isNotEmpty)
         '--enable-experiment=${experimentalFlags.join(',')}',
+      // BD ADD
+      ...<String>[
+        '--pubspec-file',
+        FlutterProject.current().pubspecFile.absolute.path,
+      ],
     ];
     printTrace(command.join(' '));
     _server = await processManager.start(command);

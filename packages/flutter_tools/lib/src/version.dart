@@ -651,14 +651,15 @@ class GitTagVersion {
 // BD ADD: START
 class BDGitTagVersion {
   const BDGitTagVersion(
-      this.x, this.y, this.z, this.hotfix, this.commits, this.hash);
+      this.x, this.y, this.z, this.hotfix, this.commits, this.hash, this.suffix);
   const BDGitTagVersion.unknown()
       : x = null,
         y = null,
         z = null,
         hotfix = null,
         commits = 0,
-        hash = '';
+        hash = '',
+        suffix = '';
 
   /// The X in bdX.Y.Z-H.
   final int x;
@@ -678,19 +679,28 @@ class BDGitTagVersion {
   /// The git hash (or an abbreviation thereof) for this commit.
   final String hash;
 
+  final String suffix;
+
   static BDGitTagVersion determine() {
     return parse(
         _runGit('git describe --match bd*.*.* --first-parent --long --tags'));
   }
 
   static BDGitTagVersion parse(String version) {
-    final RegExp versionPattern = RegExp(
+    String suffix = '';
+    RegExp versionPattern = RegExp(
         r'^bd([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9]+))-([0-9]+)-g([a-f0-9]+)$');
-    final List<String> parts =
+    List<String> parts =
         versionPattern.matchAsPrefix(version)?.groups(<int>[1, 2, 3, 4, 5, 6]);
     if (parts == null) {
-      printTrace('Could not interpret results of "git describe": $version');
-      return const BDGitTagVersion.unknown();
+      suffix = '-dynamicart';
+      versionPattern = RegExp(
+          r'^bd_([0-9]+)\.([0-9]+)\.([0-9]+)-dynamicart(?:-([0-9]+))-([0-9]+)-g([a-f0-9]+)$');
+      parts = versionPattern.matchAsPrefix(version)?.groups(<int>[1, 2, 3, 4, 5, 6]);
+      if (parts == null) {
+        printTrace('Could not interpret results of "git describe": $version');
+        return const BDGitTagVersion.unknown();
+      }
     }
     final List<int> parsedParts = parts
         .take(5)
@@ -698,7 +708,7 @@ class BDGitTagVersion {
             (String source) => source == null ? null : int.tryParse(source))
         .toList();
     return BDGitTagVersion(parsedParts[0], parsedParts[1], parsedParts[2],
-        parsedParts[3], parsedParts[4], parts[5]);
+        parsedParts[3], parsedParts[4], parts[5], suffix);
   }
 
   String frameworkVersionFor(String revision) {
@@ -707,30 +717,30 @@ class BDGitTagVersion {
     }
     if (commits == 0) {
       if (hotfix != null) {
-        return '$x.$y.$z-$hotfix';
+        return '$x.$y.$z$suffix-$hotfix';
       }
-      return '$x.$y.$z';
+      return '$x.$y.$z$suffix';
     }
     if (hotfix != null) {
-      return '$x.$y.$z-${hotfix + 1}-pre.$commits';
+      return '$x.$y.$z$suffix-${hotfix + 1}-pre.$commits';
     }
-    return '$x.$y.${z + 1}-pre.$commits';
+    return '$x.$y.${z + 1}$suffix-pre.$commits';
   }
 
   String nextVersion() {
     if (hotfix != null) {
-      return '$x.$y.$z-${hotfix + 1}';
+      return '$x.$y.$z$suffix-${hotfix + 1}';
     } else {
-      return '$x.$y.$z-1';
+      return '$x.$y.$z$suffix-1';
     }
   }
 
   @override
   String toString() {
     if (hotfix != null) {
-      return '$x.$y.$z-$hotfix';
+      return '$x.$y.$z$suffix-$hotfix';
     } else {
-      return '$x.$y.$z';
+      return '$x.$y.$z$suffix';
     }
   }
 }

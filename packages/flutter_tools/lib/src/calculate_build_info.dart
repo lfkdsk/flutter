@@ -281,7 +281,7 @@ class FlutterBuildInfo {
     final String url = 'http://$host/$_kBucket/$_kTosPre/$fileName';
     return http
         .put(url, headers: headers, body: jsonResult)
-        .timeout(Duration(seconds: 60))
+        .timeout(Duration(seconds: 30))
         .catchError((Object error) {
       return null;
     });

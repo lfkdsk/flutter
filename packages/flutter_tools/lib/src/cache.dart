@@ -394,8 +394,6 @@ class Cache {
     }
     /// BD ADD: 防止产物下载不完全
     requiredArtifacts = Set<DevelopmentArtifact>.of(requiredArtifacts);
-    requiredArtifacts.add(DevelopmentArtifact.androidGenSnapshot);
-    requiredArtifacts.add(DevelopmentArtifact.androidInternalBuild);
     requiredArtifacts.add(DevelopmentArtifact.iOS);
     requiredArtifacts.add(DevelopmentArtifact.universal);
     /// BD ADD END

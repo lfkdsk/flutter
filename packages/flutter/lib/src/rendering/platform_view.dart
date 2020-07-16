@@ -572,7 +572,12 @@ class _MotionEventsDispatcher {
         downTimeMillis = event.timeStamp.inMilliseconds;
       pointerProperties[event.pointer] = propertiesFor(event, nextPointerId++);
     }
-    pointerPositions[event.pointer] = coordsFor(event);
+    // BD MOD:
+    // pointerPositions[event.pointer] = coordsFor(event);
+    if (pointerProperties[event.pointer] != null) {
+      pointerPositions[event.pointer] = coordsFor(event);
+    }
+    // END
 
     dispatchPointerEvent(event);
 

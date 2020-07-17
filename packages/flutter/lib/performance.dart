@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 /// The Flutter Monitor framework.
 ///
 /// To use, import `package:flutter/performance.dart`.
@@ -25,8 +26,8 @@ class Performance {
   }
 
   // 获取堆快照
-  static String getHeapSnapshot(){
-
+  static ByteData requestHeapSnapshot(){
+    return engine.requestHeapSnapshot();
   }
 
   static String getHeapInfo() {

@@ -40,7 +40,7 @@ class Performance {
   }
 
   // 解析堆快照
-  static Future<HeapSnapshot> parseSnapshot(String filePath) async{
+  static Future<HeapSnapshot> parseHeapSnapshot(String filePath) async{
     File file = File(filePath);
     if(!await file.exists()){
       return null;

@@ -9,7 +9,8 @@ import 'dart:typed_data';
 
 import 'dart:ui' as engine;
 
-import 'package:flutter/src/snapshot_graph.dart';
+import 'package:flutter/src/performance/heap_snapshot.dart';
+
 
 class Performance {
 
@@ -38,8 +39,15 @@ class Performance {
   }
 
   // 解析堆快照
-  static Future<HeapSnapshotGraph> parseSnapshot(String filePath) async{
-    return await HeapSnapshotGraph.parseSnapshot(filePath);
+  static Future<HeapSnapshot> parseSnapshot(String filePath) async{
+    File file = File(filePath);
+    if(!await file.exists()){
+      return null;
+    }
+    Uint8List datas = await file.readAsBytes();
+    var snapshot = HeapSnapshot();
+    await snapshot.loadProgress(datas).last;
+    return snapshot;
   }
 
   static String getHeapInfo() {

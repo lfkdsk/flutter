@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 /// The Flutter Monitor framework.
 ///
@@ -7,6 +8,8 @@ import 'dart:typed_data';
 ///
 
 import 'dart:ui' as engine;
+
+import 'package:flutter/src/snapshot_graph.dart';
 
 class Performance {
 
@@ -26,8 +29,17 @@ class Performance {
   }
 
   // 获取堆快照
-  static ByteData requestHeapSnapshot(){
-    return engine.requestHeapSnapshot();
+  static bool requestHeapSnapshot(String outFilePath){
+    File outFile=File(outFilePath);
+    if(outFile.existsSync()){
+      outFile.createSync(recursive:true);
+    }
+    return engine.requestHeapSnapshot(outFilePath);
+  }
+
+  // 解析堆快照
+  static Future<HeapSnapshotGraph> parseSnapshot(String filePath) async{
+    return await HeapSnapshotGraph.parseSnapshot(filePath);
   }
 
   static String getHeapInfo() {

@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-12](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-11...bd1.12.13-12) (2020-07-20)
+
+
+### Bug Fixes
+
+* Fix checkInputConnectionProxy NPE (BD#2008) ([f52f94b](https://code.byted.org/tech_client/flutter/commit/f52f94b))
+* Fix create platform_views crash, when activity finishing. (BD#2009) ([f52f94b](https://code.byted.org/tech_client/flutter/commit/f52f94b))
+* Fix naitve image decode crash when complete block is called ([f52f94b](https://code.byted.org/tech_client/flutter/commit/f52f94b))
+* Made the Rasterizer avoid GPU calls when backgrounded (#18563) ([f52f94b](https://code.byted.org/tech_client/flutter/commit/f52f94b))
+* Fix: Poor video scaling quality #53080 (#18814) ([44b6ad5](https://code.byted.org/tech_client/flutter/commit/44b6ad5))
+* Fix: change image size, while disable mips (BD#2006) ([44b6ad5](https://code.byted.org/tech_client/flutter/commit/44b6ad5))
+* Fix artifacts not download. ([7c37117](https://code.byted.org/tech_client/flutter/commit/7c37117))
+* **flutter_tools:** [DO NOT MERGE] Don't import plugins that don't support android ([f0b786a](https://code.byted.org/tech_client/flutter/commit/f0b786a))
+* **flutter_tools:** add transformers change ([da61ace](https://code.byted.org/tech_client/flutter/commit/da61ace))
+* Roll Engine to a682f2407feb58ccfe919d19918a0c7e94c64c10 (BD[#1004](https://jira.bytedance.com/browse/1004)) ([44b6ad5](https://code.byted.org/tech_client/flutter/commit/44b6ad5)), closes [BD#2005](https://jira.bytedance.com/browse/2005) [BD#2006](https://jira.bytedance.com/browse/2006) [#53080](https://jira.bytedance.com/browse/53080) [#18814](https://jira.bytedance.com/browse/18814)
+* **flutter_tools:** fix aot build trans path ([2e78fe4](https://code.byted.org/tech_client/flutter/commit/2e78fe4))
+
+
+### Features
+
+* **trans_support:** not check dart sha ([93f0bfa](https://code.byted.org/tech_client/flutter/commit/93f0bfa))
+
 ### [1.12.13-11](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-10...bd1.12.13-11) (2020-06-22)
 
 ### Bug Fixes

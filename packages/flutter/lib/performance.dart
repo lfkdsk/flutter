@@ -12,8 +12,12 @@ import 'dart:ui' as engine;
 
 import 'package:flutter/src/performance/heap_snapshot.dart';
 
+typedef void LowMemoryCallback();
 
+@pragma("vm:entry-point")
 class Performance {
+
+  static LowMemoryCallback _lowMemoryCallback;
 
   /// 开始栈采集
   static void startStackTraceSamples(){
@@ -29,6 +33,22 @@ class Performance {
   static void stopStackTraceSamples(){
     engine.stopStackTraceSamples();
   }
+
+  /// 开启低内存获取堆镜像
+  static void enableDumpLowMemoryHeapSnapshot(String outFilePath){
+    _lowMemoryCallback = (){
+      requestHeapSnapshot(outFilePath);
+    };
+  }
+
+  /// VM 会调用该方法
+  @pragma("vm:entry-point")
+  static void _performLowMemoryCallback(){
+    if(_lowMemoryCallback!=null){
+      _lowMemoryCallback();
+    }
+  }
+
 
   /// 获取堆快照
   static bool requestHeapSnapshot(String outFilePath){

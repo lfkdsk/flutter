@@ -11,13 +11,22 @@ import 'dart:typed_data';
 import 'dart:ui' as engine;
 
 import 'package:flutter/src/performance/heap_snapshot.dart';
+import 'package:flutter/src/widgets/binding.dart';
 
-typedef void LowMemoryCallback();
+class LowMemoryObserver extends WidgetsBindingObserver{
+  String outFilePath;
+
+  LowMemoryObserver(this.outFilePath);
+
+  @override
+  void didHaveMemoryPressure() {
+    super.didHaveMemoryPressure();
+    Performance.requestHeapSnapshot(outFilePath);
+  }
+}
 
 @pragma("vm:entry-point")
 class Performance {
-
-  static List<LowMemoryCallback> _lowMemoryCallbacks = [];
 
   /// 开始栈采集
   static void startStackTraceSamples(){
@@ -34,40 +43,10 @@ class Performance {
     engine.stopStackTraceSamples();
   }
 
+
   /// 开启低内存获取堆镜像
   static void enableDumpLowMemoryHeapSnapshot(String outFilePath){
-    _lowMemoryCallbacks.add((){
-      requestHeapSnapshot(outFilePath);
-    });
-  }
-
-  /// 注册低内存回调
-  static int registerLowMemoryCallback(LowMemoryCallback cb){
-    if(cb==null){
-      return -1;
-    }
-    _lowMemoryCallbacks.add(cb);
-    return _lowMemoryCallbacks.length-1;
-  }
-
-  /// 解除低内存回调
-  static bool unRegisterLowMemoryCallback(LowMemoryCallback cb){
-    if(cb==null){
-      return false;
-    }
-    return _lowMemoryCallbacks.remove(cb);
-  }
-
-  /// 解除低内存回调
-  static bool unRegisterLowMemoryCallbackByIndex(int index){
-    return _lowMemoryCallbacks.remove(index);
-  }
-
-  /// VM 会调用该方法
-  @pragma("vm:entry-point")
-  static void _performLowMemoryCallback(){
-    print("Performance performLowMemoryCallback");
-    _lowMemoryCallbacks.forEach((f)=>f());
+    WidgetsBinding.instance.addObserver(LowMemoryObserver(outFilePath));
   }
 
   /// 获取堆快照

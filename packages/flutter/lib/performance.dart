@@ -28,6 +28,8 @@ class LowMemoryObserver extends WidgetsBindingObserver{
 @pragma("vm:entry-point")
 class Performance {
 
+  static bool _enableLMS = false;
+
   /// 开始栈采集
   static void startStackTraceSamples(){
     engine.startStackTraceSamples();
@@ -46,7 +48,11 @@ class Performance {
 
   /// 开启低内存获取堆镜像
   static void enableDumpLowMemoryHeapSnapshot(String outFilePath){
+    if(_enableLMS){
+      return;
+    }
     WidgetsBinding.instance.addObserver(LowMemoryObserver(outFilePath));
+    _enableLMS = true;
   }
 
   /// 获取堆快照

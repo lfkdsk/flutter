@@ -20,12 +20,11 @@
 import java.nio.file.Paths
 
 repositories {
-    google()
-    jcenter()
     maven {
-        // BD MOD:
-        // url "http://download.flutter.io"
-        url "http://tosv.byted.org/obj/toutiao.ios.arch/flutter/framework/"
+        url 'http://ttandroid.byted.org/repository/bd_framework/'
+    }
+    maven {
+        url 'http://maven.byted.org/repository/android_public/'
     }
 }
 

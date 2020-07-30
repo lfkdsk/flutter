@@ -30,11 +30,11 @@ group '{{androidIdentifier}}'
 version '1.0'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.hasProperty("compileSdkVersion") ? rootProject.compileSdkVersion : 28
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
+        minSdkVersion rootProject.hasProperty("minSdkVersion") ? rootProject.minSdkVersion : 16
+        targetSdkVersion rootProject.hasProperty("targetSdkVersion") ? rootProject.targetSdkVersion : 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         {{#androidX}}

@@ -15,8 +15,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-// BD ADD:
+// BD ADD: START
 import 'package:flutter/widgets.dart';
+import 'package:flutter/boost.dart';
+// END
 
 import 'app.dart';
 import 'debug.dart';
@@ -866,10 +868,43 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
     }
 
     try {
-      if (renderViewElement != null)
-        buildOwner.buildScope(renderViewElement);
-      super.drawFrame();
-      buildOwner.finalizeTree();
+      // BD MOD: START
+//      if (renderViewElement != null)
+//        buildOwner.buildScope(renderViewElement);
+//      super.drawFrame();
+//      buildOwner.finalizeTree();
+      if (Boost.notifyDrawFrameCallback == null) {
+        if (renderViewElement != null)
+          buildOwner.buildScope(renderViewElement);
+        super.drawFrame();
+        buildOwner.finalizeTree();
+      } else {
+        int buildScopeCostTime = 0;
+        int finalizeTreeCostTime = 0;
+        int preTime = DateTime.now().microsecondsSinceEpoch;
+        if (renderViewElement != null) {
+          buildOwner.buildScope(renderViewElement);
+          buildScopeCostTime = DateTime.now().microsecondsSinceEpoch - preTime;
+        }
+        super.drawFrame();
+        preTime = DateTime.now().microsecondsSinceEpoch;
+        buildOwner.finalizeTree();
+        finalizeTreeCostTime = DateTime.now().microsecondsSinceEpoch - preTime;
+        Boost.notifyDrawFrameCallback(
+            buildScopeCostTime,
+            lastFlushLayoutCostTime,
+            lastFlushCompositingBitsCostTime,
+            lastFlushPaintCostTime,
+            lastCompositeFrameCostTime,
+            lastFlushSemanticsCostTime,
+            finalizeTreeCostTime);
+        lastFlushLayoutCostTime = 0;
+        lastFlushCompositingBitsCostTime = 0;
+        lastFlushPaintCostTime = 0;
+        lastCompositeFrameCostTime = 0;
+        lastFlushSemanticsCostTime = 0;
+      }
+      // END
     } finally {
       assert(() {
         debugBuildingDirtyElements = false;

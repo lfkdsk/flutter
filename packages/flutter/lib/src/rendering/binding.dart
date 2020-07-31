@@ -342,16 +342,56 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
   /// list (for example, see [WidgetsBinding.drawFrame]).
   //
   // When editing the above, also update widgets/binding.dart's copy.
+
+  // BD ADD START:
+  int lastFlushLayoutCostTime = 0;
+  int lastFlushCompositingBitsCostTime = 0;
+  int lastFlushPaintCostTime = 0;
+  int lastCompositeFrameCostTime = 0;
+  int lastFlushSemanticsCostTime = 0;
+  // END
+
   @protected
   void drawFrame() {
     // BD ADD:
     Boost.resetIdleCallbacks();
     assert(renderView != null);
-    pipelineOwner.flushLayout();
-    pipelineOwner.flushCompositingBits();
-    pipelineOwner.flushPaint();
-    renderView.compositeFrame(); // this sends the bits to the GPU
-    pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+    // BD MOD START:
+//    pipelineOwner.flushLayout();
+//    pipelineOwner.flushCompositingBits();
+//    pipelineOwner.flushPaint();
+//    renderView.compositeFrame(); // this sends the bits to the GPU
+//    pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+
+    if (Boost.notifyDrawFrameCallback == null) {
+      pipelineOwner.flushLayout();
+      pipelineOwner.flushCompositingBits();
+      pipelineOwner.flushPaint();
+      renderView.compositeFrame(); // this sends the bits to the GPU
+      pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+    } else {
+      int preTime = DateTime.now().microsecondsSinceEpoch;
+      pipelineOwner.flushLayout();
+      int nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushLayoutCostTime = nowTime - preTime;
+      pipelineOwner.flushCompositingBits();
+      preTime = nowTime;
+      nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushCompositingBitsCostTime = nowTime - preTime;
+      pipelineOwner.flushPaint();
+      preTime = nowTime;
+      nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushPaintCostTime = nowTime - preTime;
+      renderView.compositeFrame(); // this sends the bits to the GPU
+      preTime = nowTime;
+      nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastCompositeFrameCostTime = nowTime - preTime;
+      pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+      preTime = nowTime;
+      nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushSemanticsCostTime = nowTime - preTime;
+    }
+    // END
   }
 
   @override

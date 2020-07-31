@@ -433,19 +433,71 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
   /// list (for example, see [WidgetsBinding.drawFrame]).
   //
   // When editing the above, also update widgets/binding.dart's copy.
+
+  // BD ADD START:
+  int lastFlushLayoutCostTime = 0;
+  int lastFlushCompositingBitsCostTime = 0;
+  int lastFlushPaintCostTime = 0;
+  int lastCompositeFrameCostTime = 0;
+  int lastFlushSemanticsCostTime = 0;
+  // END
+
   @protected
   void drawFrame() {
     // BD ADD:
     Boost.resetIdleCallbacks();
     assert(renderView != null);
-    pipelineOwner.flushLayout();
-    pipelineOwner.flushCompositingBits();
-    pipelineOwner.flushPaint();
-    if (sendFramesToEngine) {
-      renderView.compositeFrame(); // this sends the bits to the GPU
-      pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
-      _firstFrameSent = true;
+    // BD MOD START:
+    // pipelineOwner.flushLayout();
+    // pipelineOwner.flushCompositingBits();
+    // pipelineOwner.flushPaint();
+    // if (sendFramesToEngine) {
+    //   renderView.compositeFrame(); // this sends the bits to the GPU
+    //   pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+    //   _firstFrameSent = true;
+    // }
+
+    if (Boost.notifyDrawFrameCallback == null) {
+      pipelineOwner.flushLayout();
+      pipelineOwner.flushCompositingBits();
+      pipelineOwner.flushPaint();
+      if (sendFramesToEngine) {
+        renderView.compositeFrame(); // this sends the bits to the GPU
+        pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+        _firstFrameSent = true;
+      }
+    } else {
+      int preTime = DateTime.now().microsecondsSinceEpoch;
+      pipelineOwner.flushLayout();
+      int nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushLayoutCostTime = nowTime - preTime;
+
+      pipelineOwner.flushCompositingBits();
+      preTime = nowTime;
+      nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushCompositingBitsCostTime = nowTime - preTime;
+
+      pipelineOwner.flushPaint();
+      preTime = nowTime;
+      nowTime = DateTime.now().microsecondsSinceEpoch;
+      lastFlushPaintCostTime = nowTime - preTime;
+
+      lastCompositeFrameCostTime = 0;
+      lastFlushSemanticsCostTime = 0;
+      if (sendFramesToEngine) {
+        renderView.compositeFrame(); // this sends the bits to the GPU
+        preTime = nowTime;
+        nowTime = DateTime.now().microsecondsSinceEpoch;
+        lastCompositeFrameCostTime = nowTime - preTime;
+
+        pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
+        preTime = nowTime;
+        nowTime = DateTime.now().microsecondsSinceEpoch;
+        lastFlushSemanticsCostTime = nowTime - preTime;
+        _firstFrameSent = true;
+      }
     }
+    // END
   }
 
   @override

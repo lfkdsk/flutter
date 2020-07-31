@@ -11,6 +11,15 @@ import 'dart:ui' show NotifyIdleCallback, performance;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
+typedef NotifyDrawFrameCallback = void Function(
+    int buildScopeCostTime,
+    int flushLayoutCostTime,
+    int flushCompositingBitsCostTime,
+    int flushPaintCostTime,
+    int compositeFrameCostTime,
+    int flushSemanticsCostTime,
+    int finalizeTreeCostTime);
+
 // ignore: avoid_classes_with_only_static_members
 /// See also: https://jira.bytedance.com/browse/FLUTTER-15
 class Boost {
@@ -191,6 +200,9 @@ class Boost {
 
   /// 一帧时间
   static const int oneFrameMicros = 16667;
+
+  /// drawFrame cost time
+  static NotifyDrawFrameCallback notifyDrawFrameCallback;
 
   /// 内部调用，回调赋值
   static void ensureNotifyIdle() {

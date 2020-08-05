@@ -1,0 +1,28 @@
+.default_only: &default_only
+  only:
+    - /^test-ci\/.*$/
+
+# define stages
+# these jobs can not run in the same stage because they shared the same runner!
+stages:
+  - init-flutter-env
+  - benchmark-test
+
+before_script:
+  - cd $HOME/MyProject/benchmark-runner/
+
+init-flutter-env:
+  <<: *default_only
+  stage: init-flutter-env
+  script:
+    - ./init_flutter.sh
+  tags:
+    - benchmark-runner
+
+benchmark:
+  <<: *default_only
+  stage: benchmark-test
+  script:
+    - ./benchmark_test.sh
+  tags:
+    - benchmark-runner

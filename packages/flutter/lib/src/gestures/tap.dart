@@ -247,6 +247,24 @@ abstract class BaseTapGestureRecognizer extends PrimaryPointerGestureRecognizer 
     _checkDown();
   }
 
+  /**
+   * BD ADD:
+   *
+   */
+  @override
+  void didExceedDeadlineWithEvent(PointerDownEvent event) {
+    if(_down == null) {
+      /**
+       * When two  down point come and the second point  up earlier in deadLine,
+       * Dart Exception will occur in  the func handleTapDown.
+       * So if _downent has been reset, then we re-assign.
+       */
+      _down = event;
+    }
+
+    didExceedDeadline();
+  }
+
   @override
   void acceptGesture(int pointer) {
     super.acceptGesture(pointer);

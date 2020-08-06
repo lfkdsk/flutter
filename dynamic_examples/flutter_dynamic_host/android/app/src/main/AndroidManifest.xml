@@ -29,7 +29,9 @@
         <activity
             android:name="com.ss.android.dynamicart.homepage.HomepageActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
-            android:windowSoftInputMode="adjustResize|stateHidden">
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            tools:replace="android:exported"
+            android:exported="true">
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -38,13 +40,6 @@
         </activity>
         <activity
             android:name=".CommonRouteActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
-            android:hardwareAccelerated="true"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-        <activity
-            android:name="io.flutter.shrimp.FlutterDemoActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:hardwareAccelerated="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"

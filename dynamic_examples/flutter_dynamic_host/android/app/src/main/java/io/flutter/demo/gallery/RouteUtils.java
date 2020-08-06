@@ -5,14 +5,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.bytedance.flutter.dynamicart.Dynamicart;
-import com.bytedance.routeapp.DynamicRouteHelper;
+import com.bytedance.flutter.vessel.route.DynamicRouteHelper;
+import com.bytedance.flutter.vessel.route.RouteConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.shrimp.FlutterDemoActivity;
 
 /**
  * Created by Xie Ran on 2019-08-21.
@@ -28,10 +29,6 @@ public class RouteUtils {
             @Override
             public void interceptIntent(@NonNull Intent intent, @NonNull Context context,
                     @Nullable String pluginName, @Nullable String path, @Nullable Map<String, Object> params) {
-                // 皮皮虾定制Activity
-                if ("BDSFlutter".equals(path)) {
-                    intent.setClass(context, FlutterDemoActivity.class);
-                }
             }
         }, new DynamicRouteHelper.KernelAppPathGetter() {
             @Override

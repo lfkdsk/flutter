@@ -25,6 +25,11 @@ public class TTNetDependImpl implements ITTNetDepend {
 
     @Override
     public boolean isCronetPluginInstalled() {
+        return true;
+    }
+
+    @Override
+    public boolean isPrivateApiAccessEnabled() {
         return false;
     }
 
@@ -65,7 +70,7 @@ public class TTNetDependImpl implements ITTNetDepend {
 
     @Override
     public String getProviderString(Context context, String key, String defaultValue) {
-        return "";
+        return null;
     }
 
     @Override
@@ -116,6 +121,11 @@ public class TTNetDependImpl implements ITTNetDepend {
 
     @Override
     public String getShareCookieMainDomain() {
-        return null;
+        return "";
+    }
+
+    @Override
+    public void onColdStartFinish() {
+
     }
 }

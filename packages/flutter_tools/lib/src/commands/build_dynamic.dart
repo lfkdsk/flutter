@@ -11,6 +11,7 @@ import 'package:flutter_tools/src/base/file_system.dart' hide FileSystemEntity;
 import 'package:flutter_tools/src/base/fingerprint.dart';
 import 'package:flutter_tools/src/base/process_manager.dart';
 import 'package:flutter_tools/src/dart/package_map.dart';
+import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import '../artifacts.dart';
 import '../asset.dart';
@@ -562,6 +563,8 @@ Future<CompilerOutput> compile({
   if(hostDillPath != null && hostDillPath.isNotEmpty){
     command.addAll(<String>['--host-dill', hostDillPath]);
   }
+
+  command.addAll(await TransformerHooks.getTransformerParams());
 
   if (extraFrontEndOptions != null) command.addAll(extraFrontEndOptions);
 

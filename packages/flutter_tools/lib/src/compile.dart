@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import 'package:usage/uuid/uuid.dart';
 
@@ -365,6 +366,7 @@ class KernelCompiler {
         '--platform',
         platformDill,
       ],
+      ...await TransformerHooks.getTransformerParams(),
       ...?extraFrontEndOptions,
       mainUri?.toString() ?? mainPath,
     ];
@@ -695,6 +697,7 @@ class DefaultResidentCompiler implements ResidentCompiler {
         '--platform',
         platformDill,
       ],
+      ...await TransformerHooks.getTransformerParams(),
       if (unsafePackageSerialization == true) '--unsafe-package-serialization',
       if ((experimentalFlags != null) && experimentalFlags.isNotEmpty)
         '--enable-experiment=${experimentalFlags.join(',')}',

@@ -140,11 +140,6 @@ class BuildBundleCommand extends BuildSubCommand {
       fileSystemScheme: stringArg('filesystem-scheme'),
       fileSystemRoots: stringsArg('filesystem-root'),
     );
-    // BD ADD
-    if (await TransformerHooks.isHookEnabled()) {
-      await TransformerHooks().runBuildBundleDillCommand(this);
-    }
-    // END
     return null;
   }
 }

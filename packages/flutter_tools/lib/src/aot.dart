@@ -106,20 +106,6 @@ class AotBuilder {
         throwToolExit('Compiler terminated unexpectedly.');
         return;
       }
-      // BD ADD
-      else if (await TransformerHooks.isHookEnabled()) {
-        await TransformerHooks().runBuildAOTDillCommand(
-          platform,
-          kernelOut,
-          buildMode,
-          extraFrontEndOptions,
-          dartDefines,
-        );
-      } else if (TransformerHooks.hasTransformer()) {
-        await TransformerHooks().justTransformDill(buildMode, kernelOut);
-      }
-      // BD END
-
       // Build AOT snapshot.
       if (platform == TargetPlatform.ios) {
         // Determine which iOS architectures to build for.

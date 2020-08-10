@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-14](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-13...bd1.12.13-14) (2020-08-10)
+
+
+### Features
+
+* add gitlab-ci.yml for ci test ([6f20d86](https://code.byted.org/tech_client/flutter/commit/6f20d86))
+* change packages/flutter_tools/templates's build.gradle.tmpl minSdkVersion ([4790265](https://code.byted.org/tech_client/flutter/commit/4790265))
+
+### Bug Fixes
+* fix: skip accessibility event when FlutterView has no parent. ([62520125](https://code.byted.org/tech_client/flutter_engine/commit/62520125))
+* fix: obtain eaglContext in io thread ([fd3c4232](https://code.byted.org/tech_client/flutter_engine/commit/fd3c4232))
+* fix: getPluginRegistry NPE ([3cce8620](https://code.byted.org/tech_client/flutter_engine/commit/3cce8620))
+* Use the private presentation window type for platform view windows (#17385) ([021a9d20](https://code.byted.org/tech_client/flutter_engine/commit/021a9d20))
+
 ### [1.12.13-13](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-12...bd1.12.13-13) (2020-07-21)
 
 ### [1.12.13-12](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-11...bd1.12.13-12) (2020-07-20)

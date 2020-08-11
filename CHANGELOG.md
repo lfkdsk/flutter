@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-15](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-14...bd1.12.13-15) (2020-08-11)
+
+
+### Features
+
+* add new native image interface ([90ddc70](https://code.byted.org/tech_client/flutter/commit/90ddc70))
+
 ### [1.12.13-14](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-13...bd1.12.13-14) (2020-08-10)
 
 

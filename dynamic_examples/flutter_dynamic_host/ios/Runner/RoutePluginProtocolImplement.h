@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <bd_route_app/RouteAppPlugin.h>
+#import "RouteAppPlugin.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

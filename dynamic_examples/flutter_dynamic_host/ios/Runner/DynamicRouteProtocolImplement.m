@@ -16,9 +16,9 @@
     return 3;
 }
 
-- (void)validPackageWithName:(NSString *)name completion:(void(^)(id<DynamicRoutePackageProtocol> _Nullable package))completion {
+- (void)validPackageWithName:(NSString *)name completion:(void(^)(id<PackageRoutePackageProtocol> _Nullable package))completion {
     if (completion) {
-        id<DynamicRoutePackageProtocol> package = (id<DynamicRoutePackageProtocol>)[[BDFlutterPackageManager sharedInstance] validPackageWithName:name];
+        id<PackageRoutePackageProtocol> package = (id<PackageRoutePackageProtocol>)[[BDFlutterPackageManager sharedInstance] validPackageWithName:name];
         completion(package);
     }
 }

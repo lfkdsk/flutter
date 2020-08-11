@@ -18,8 +18,7 @@ dependencies:
   #connectivity: 0.4.8+1 # 会引入Reachability依赖，与TTReachability冲突
 #  url_launcher: 5.4.1
 #  video_player: 0.10.7 #plugin类名与bd_video_player类名冲突
-  bd_video_player:
-      git: git@code.byted.org:bd-flutter-plugins/video_player.git
+  bd_video_player: 1.0.4-alpha.5
   #  soundpool: ^0.5.0 # 俄罗斯方块tetris 使用，但是影响iOS编译，先注释掉。
   audioplayers: ^0.8.0
   share: ^0.6.3+5

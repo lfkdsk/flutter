@@ -14,6 +14,8 @@
 #import "BDSFlutterBridgePlugin.h"
 #import <Flutter/Flutter.h>
 #import "FlutterManager.h"
+#import "HMDTTMonitor.h"
+#import "Heimdallr.h"
 #define REGISTER_BRIDGE(name)
 
 extern BOOL FlutterRecreateSurfaceWhenReceiveMemorying;
@@ -53,11 +55,20 @@ extern BOOL FlutterRecreateSurfaceWhenReceiveMemorying;
 }
 
 - (void)initEnv {
+    [self initVessel];
+
     [self initNetwork];
     [self initPackage];
     [self initRouteApp];
     [self initVideo];
     [self initBridge];
+}
+
+- (void)initVessel {
+    HMDInjectedInfo *info = [HMDInjectedInfo defaultInfo];
+    info.appID = @"99998";
+    [[Heimdallr shared] setupWithInjectedInfo:info];
+    
 }
 
 - (void)initNetwork {

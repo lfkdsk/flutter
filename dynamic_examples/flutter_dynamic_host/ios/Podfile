@@ -70,19 +70,29 @@ target 'Runner' do
   }
   
   # Bytedance Pods
-  pod_source 'BDPackageManagerService', '1.1.0-rc.13'
-  pod_source 'BDFlutterPackageManager', '0.0.2-rc.3'
-  #pod 'BDPackageManagerService', :path => '/Users/baikunlun/Documents/Git/Project_2/BDPackageManagerService'
-  # pod 'BDFlutterPackageManager', :path => '/Users/baikunlun/Documents/Git/Project_2/BDFlutterPackageManager'
+  pod_binary 'BDFlutterPluginManager', '0.1.6'
+  pod 'BDPackageManagerService', :path => '/Users/bytedance/Documents/project/projects/BDPackageManagerService'
+  pod 'BDFlutterPackageManager', :path => '/Users/bytedance/Documents/project/projects/BDFlutterPackageManager'
+
+#  pod_source 'BDPackageManagerService', '1.1.0-rc.13'
+#  pod_source 'BDFlutterPackageManager', '0.0.2-rc.3'
+  pod_binary 'TransBridge-iOS', '0.1.4'
+  pod_binary 'Toast', '4.0.0'
+  pod_binary 'BDADFlutterLanding', '0.1.4-rc.0'
+  pod_binary 'ByteDanceKit','3.0.2',:subspecs => [
+     'Foundation',
+     'UIKit',
+     'UITextView'
+  ]
   pod_binary 'AFgzipRequestSerializer','0.0.3'
   pod_binary 'AFNetworking','2.5.4'
   pod_binary 'AWEVideoPlayer', '0.5.4'
   pod_binary 'BDALog','0.1.20'
   pod_source 'BDAlogProtocol','0.1.7'
-  pod_source 'BDAssert','2.0.0',:subspecs => [
-       'Core',
-       'UserException'
-    ]
+  pod_binary 'BDAssert','2.0.1',:subspecs => [
+     'Core',
+     'UserException'
+  ]
   pod_binary 'BDTrackerProtocol','2.0.0'
   pod_binary 'BDWebImage','1.0.10-rc.1',:subspecs => [
        'Core',
@@ -104,6 +114,7 @@ target 'Runner' do
   pod_binary 'Gaia','3.0.2'
   pod_binary 'Godzippa','1.1.0'
   pod_binary 'IESVideoPlayer','0.2.28'
+  pod 'boringssl', '0.0.7'
   pod_binary 'libwebp','1.0.0',:subspecs => [
        'core',
        'demux',
@@ -115,9 +126,14 @@ target 'Runner' do
   pod_binary 'TTBridgeUnify','2.2.0-alpha.0',:subspecs => [
        'TTBridge',
     ]
+  pod_binary 'ABRInterface', '0.3.2'
+  pod_binary 'BDDataDecorator','2.0.3',:subspecs => [
+    'Data',
+    'AES',
+  ]
   pod_binary 'TTTopSignature' ,'0.0.4'
   pod_binary 'TTTracker','1.1.16-rc.0'
-  pod_binary 'TTVideoEngine','1.9.8.15'
+  pod_binary 'TTVideoEngine','1.9.52.6'
   pod_binary 'TTVideoSetting','0.0.5'
   pod_binary 'YYCache','1.0.4.3'
   pod_binary 'TTInstallService','1.3.3'
@@ -126,7 +142,7 @@ target 'Runner' do
   pod_binary 'TTPlayerSDK','2.8.14.5'
   pod_binary 'TTPreloaderSDK', '1.4.30'
   pod_binary 'AWECloudCommand','1.0.8'
-  pod_binary 'TTReachability','0.5.3'
+  pod_binary 'TTReachability','1.7.1'
   pod_binary 'BDTracker','0.5.3',:subspecs => [
        'InstallBase',
        'InstallCore',
@@ -138,35 +154,42 @@ target 'Runner' do
        'TrackerDatabase',
        'TrackerHome'
     ]
-  pod_binary 'Heimdallr','0.7.6-rc.10',:subspecs => [
-       'Core',
-       'Monitors',
-       'TTMonitor',
-       'HMDURLProtocolTracker',
-       'TTNet',
-       'HMDStart',
-       'Mach',
-       'Utility',
-       'DeviceInfo',
-       'HMDANR',
-       'HMDOOM',
-       'CrashDetector',
-       'Log',
-       'UITracker',
-       'MemorySnapshot',
-       'Upload',
-       'HMDSession',
-       'HMDConfig',
-       'HMDStore',
-       'ALog',
-       'CloudCommand',
-       'Network',
-       'HTTPRequestTracker',
-       'Dart',
-       'HMDOOMCrash',
-       'HMDWatchDog',
-       'UserException'
-    ]
+  pod_binary 'Heimdallr', '0.7.19-rc.4.1-bugfix', :subspecs => [
+     'Core',
+     'Monitors',
+     'TTMonitor',
+     'HMDURLProtocolTracker',
+     'TTNet',
+     'HMDStart',
+     'Mach',
+     'Utility',
+     'DeviceInfo',
+     'HMDANR',
+     'HMDOOM',
+     'CrashCapture',
+     'CrashDetector',
+     'Log',
+     'UITracker',
+     'Upload',
+     'HMDSession',
+     'HMDConfig',
+     'HMDStore',
+     'ALog',
+     'CloudCommand',
+     'Network',
+     'HTTPRequestTracker',
+     'Dart',
+     'HMDOOMCrash',
+     'HMDWatchDog',
+     'UserException',
+     'Protect',
+     'Runloop',
+     'HMDLaunchTracing',
+     'OpenTracing',
+     'HMDDomestic',
+     'HMDAlogProtocol',
+     'HMDSDKMonitor'
+  ]
   pod_binary 'TTUIWidget', '1.3.3', :subspecs => [
        'TTIndicatorView',
     ]

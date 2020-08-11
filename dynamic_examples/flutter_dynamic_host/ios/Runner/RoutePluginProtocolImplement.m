@@ -7,7 +7,6 @@
 //
 
 #import "RoutePluginProtocolImplement.h"
-#import <bd_route_app/RouteAppPlugin.h>
 #import "FlutterViewWrapperController.h"
 
 @interface RoutePluginProtocolImplement () <UIGestureRecognizerDelegate>

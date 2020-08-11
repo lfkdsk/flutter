@@ -13,8 +13,8 @@
 #import <Flutter/Flutter.h>
 #import "GeneratedPluginRegistrant.h"
 #import <BDPackageManagerService/BDPMSManager.h>
-#import <bd_route_app/FlutterManager.h>
-#import <bd_route_app/FlutterViewWrapperController.h>
+#import "FlutterManager.h"
+#import "FlutterViewWrapperController.h"
 #import <objc/runtime.h>
 #import "BDPMSUtility.h"
 
@@ -291,11 +291,16 @@ static NSInteger const kFooterBtnNumber = 3;
     
     FlutterDartProject *config = [[FlutterDartProject alloc] init];
     if ([BDFlutterPackageManager sharedInstance].isEnginePackageMode) {
-        [config setDynamicEnginePath:[BDFlutterPackageManager sharedInstance].enginePackagePath];
+
+        if ([config respondsToSelector:@selector(setEnginePath:)]) {
+            [config performSelector:@selector(setEnginePath:) withObject:[BDFlutterPackageManager sharedInstance].enginePackagePath];
+        }
     }
     
     if (path) {
-        [config setDynamicDillPath:[path stringByAppendingPathComponent:@"flutter_assets"]];
+        if ([config respondsToSelector:@selector(setDillPath:)]) {
+            [config performSelector:@selector(setDillPath:) withObject:[path stringByAppendingPathComponent:@"flutter_assets"]];
+        }
     }
          
     FlutterViewController *vc = [[FlutterViewController alloc] initWithProject:config nibName:nil bundle:nil];

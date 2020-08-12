@@ -1039,15 +1039,11 @@ class _ImageState extends State<Image> with WidgetsBindingObserver {
   }
 
   void _resolveImage() {
-    final ScrollAwareImageProvider provider = ScrollAwareImageProvider<dynamic>(
-      context: _scrollAwareContext,
-      imageProvider: widget.image,
-    );
     final ImageStream newStream =
-      provider.resolve(createLocalImageConfiguration(
-        context,
-        size: widget.width != null && widget.height != null ? Size(widget.width, widget.height) : null,
-      ));
+    widget.image.resolve(createLocalImageConfiguration(
+      context,
+      size: widget.width != null && widget.height != null ? Size(widget.width, widget.height) : null,
+    ));
     assert(newStream != null);
     _updateSourceStream(newStream);
   }

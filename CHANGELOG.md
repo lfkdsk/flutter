@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-16](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-15...bd1.12.13-16) (2020-08-12)
+
+
+### Bug Fixes
+
+* image load pending ([8637744](https://code.byted.org/tech_client/flutter/commit/8637744))
+
 ### [1.12.13-15](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-14...bd1.12.13-15) (2020-08-11)
 
 

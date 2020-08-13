@@ -445,7 +445,7 @@ class XcodeProjectInterpreter {
     if (result.exitCode == missingProjectExitCode) {
       throwToolExit('Unable to get Xcode project information:\n ${result.stderr}');
     }
-    return XcodeProjectInfo.fromXcodeBuildOutput(result.toString());
+    return XcodeProjectInfo.fromXcodeBuildOutput(result.toString(), _logger);
   }
 }
 
@@ -489,9 +489,14 @@ String substituteXcodeVariables(String str, Map<String, String> xcodeBuildSettin
 ///
 /// Represents the output of `xcodebuild -list`.
 class XcodeProjectInfo {
-  XcodeProjectInfo(this.targets, this.buildConfigurations, this.schemes);
+  XcodeProjectInfo(
+    this.targets,
+    this.buildConfigurations,
+    this.schemes,
+    Logger logger
+  ) : _logger = logger;
 
-  factory XcodeProjectInfo.fromXcodeBuildOutput(String output) {
+  factory XcodeProjectInfo.fromXcodeBuildOutput(String output, Logger logger) {
     final List<String> targets = <String>[];
     final List<String> buildConfigurations = <String>[];
     final List<String> schemes = <String>[];
@@ -515,16 +520,18 @@ class XcodeProjectInfo {
     if (schemes.isEmpty) {
       schemes.add('Runner');
     }
-    return XcodeProjectInfo(targets, buildConfigurations, schemes);
+    return XcodeProjectInfo(targets, buildConfigurations, schemes, logger);
   }
 
   final List<String> targets;
   final List<String> buildConfigurations;
   final List<String> schemes;
+  final Logger _logger;
 
   bool get definesCustomSchemes => !(schemes.contains('Runner') && schemes.length == 1);
 
   /// The expected scheme for [buildInfo].
+  @visibleForTesting
   static String expectedSchemeFor(BuildInfo buildInfo) {
     return toTitleCase(buildInfo?.flavor ?? 'runner');
   }
@@ -559,6 +566,16 @@ class XcodeProjectInfo {
     return _uniqueMatch(schemes, (String candidate) {
       return candidate.toLowerCase() == expectedScheme.toLowerCase();
     });
+  }
+
+  void reportFlavorNotFoundAndExit() {
+    _logger.printError('');
+    if (definesCustomSchemes) {
+      _logger.printError('The Xcode project defines schemes: ${schemes.join(', ')}');
+      throwToolExit('You must specify a --flavor option to select one of the available schemes.');
+    } else {
+      throwToolExit('The Xcode project does not define custom schemes. You cannot use the --flavor option.');
+    }
   }
 
   /// Returns unique build configuration matching [buildInfo] and [scheme], or

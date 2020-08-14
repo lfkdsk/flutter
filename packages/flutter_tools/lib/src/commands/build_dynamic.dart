@@ -564,7 +564,7 @@ Future<CompilerOutput> compile({
     command.addAll(<String>['--host-dill', hostDillPath]);
   }
 
-  command.addAll(await TransformerHooks.getTransformerParams());
+//  command.addAll(await TransformerHooks.getTransformerParams());
 
   if (extraFrontEndOptions != null) command.addAll(extraFrontEndOptions);
 

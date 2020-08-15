@@ -195,3 +195,20 @@ class _BoxedNull {
 
   static const _BoxedNull instance = _BoxedNull();
 }
+
+/**
+ * BD ADD: START
+ *    bundler for ios bundle exec pod install
+ */
+class Bundler {
+  static bool _isBundled = false;
+
+  static void commandUsedBundler(){
+    _isBundled = true;
+  }
+
+  static bool get_isBundled(){
+    return _isBundled;
+  }
+}
+// END

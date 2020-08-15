@@ -237,6 +237,17 @@ List<String> _xcodeBuildSettingsLines({
   if (compressSize) {
     xcodeBuildSettings.add('COMPRESS_SIZE=true');
   }
+  if (buildInfo.lite) {
+    xcodeBuildSettings.add('LITE=true');
+  }
+
+  if (buildInfo.liteGlobal) {
+    xcodeBuildSettings.add('LITE_GLOBAL=true');
+  }
+
+  if (buildInfo.liteShareSkia) {
+    xcodeBuildSettings.add('LITE_SHARE_SKIA=true');
+  }
   // END
   return xcodeBuildSettings;
 }

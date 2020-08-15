@@ -362,6 +362,19 @@ Future<void> buildGradleApp({
   }
   command.add(assembleTask);
 
+  // BD ADD: START
+  if (buildInfo.lite) {
+    command.add('-Plite=true');
+  }
+  if (buildInfo.liteGlobal) {
+    command.add('-Plite-global=true');
+  }
+  if (buildInfo.liteShareSkia) {
+    command.add('-Plite-share-skia=true');
+  }
+  // END
+  print("gradle==${command.join(" ")}");
+
   GradleHandledError detectedGradleError;
   String detectedGradleErrorLine;
   String consumeLog(String line) {
@@ -652,6 +665,18 @@ Future<void> buildGradleAar({
 
   command.add(aarTask);
 
+  // BD ADD: START
+  if (androidBuildInfo.buildInfo.lite) {
+    command.add('-Plite=true');
+  }
+  if (androidBuildInfo.buildInfo.liteGlobal) {
+    command.add('-Plite-global=true');
+  }
+  if (androidBuildInfo.buildInfo.liteShareSkia) {
+    command.add('-Plite-share-skia=true');
+  }
+  // END
+
   final Stopwatch sw = Stopwatch()..start();
   RunResult result;
   try {
@@ -835,6 +860,10 @@ Future<void> buildPluginsAsAar(
             null, // Plugins don't define flavors.
             treeShakeIcons: androidBuildInfo.buildInfo.treeShakeIcons,
             packagesPath: androidBuildInfo.buildInfo.packagesPath,
+            // BD ADD: START
+            lite: androidBuildInfo.buildInfo.lite,
+            liteGlobal: androidBuildInfo.buildInfo.liteGlobal,
+            // END
           ),
         ),
         target: '',

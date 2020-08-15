@@ -44,6 +44,16 @@ class PrecacheCommand extends FlutterCommand {
         hide: !verboseHelp);
     argParser.addFlag('ios', negatable: true, defaultsTo: true,
         help: 'Precache artifacts for iOS development.');
+    // BD ADD: START
+    argParser.addFlag('android_gen_snapshot_lite', negatable: true, defaultsTo: true,
+        help: 'Precache gen_snapshot for Android Lite development.',
+        hide: !verboseHelp);
+    argParser.addFlag('android_internal_build_lite', negatable: true, defaultsTo: false,
+        help: 'Precache dependencies for internal Android Lite development.',
+        hide: !verboseHelp);
+    argParser.addFlag('ios-lite', negatable: true, defaultsTo: true,
+        help: 'Precache artifacts for iOS lite developemnt');
+    // END
     argParser.addFlag('web', negatable: true, defaultsTo: false,
         help: 'Precache artifacts for web development.');
     argParser.addFlag('linux', negatable: true, defaultsTo: false,

@@ -28,14 +28,29 @@ class AotBuilder {
     @required String mainDartFile,
     bool bitcode = kBitcodeEnabledDefault,
     bool quiet = true,
-    // BD ADD：
+    // BD ADD：START
     bool compressSize = false,
+    bool trackWidgetCreation = false,
+    bool useLite = false,
+    bool useLiteGlobal = false,
+    bool useLiteShareSkia = false,
+    // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     bool reportTimings = false,
   }) async {
     if (platform == null) {
       throwToolExit('No AOT build platform specified');
     }
+
+    // BD ADD: START
+    if (useLite) {
+      print('Build with lite edition...');
+    }
+    if (useLiteGlobal) {
+      print('Build with lite global edition...');
+    }
+    // END
+
     Target target;
     bool expectSo = false;
     switch (platform) {

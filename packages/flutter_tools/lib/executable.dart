@@ -60,6 +60,7 @@ import 'src/web/web_runner.dart';
 // BD ADD: START
 import 'src/commands/analyze_size.dart';
 import 'src/commands/develop.dart';
+import 'src/artifacts.dart';
 // END
 /// Main entry point for commands.
 ///
@@ -77,6 +78,33 @@ Future<void> main(List<String> args) async {
   final bool daemon = args.contains('daemon');
   final bool runMachine = (args.contains('--machine') && args.contains('run')) ||
                           (args.contains('--machine') && args.contains('attach'));
+
+  // BD ADD: START
+  final bool lite = args.contains('--lite');
+  final bool liteGlobal = args.contains('--lite-global');
+  final bool liteShareSkia = args.contains('--lite-share-skia');
+
+  EngineMode engineMode = EngineMode.normal;
+  if (lite) {
+    engineMode = EngineMode.lite;
+    print('Currently in lite mode...');
+  } else if (liteGlobal) {
+    engineMode = EngineMode.lite_global;
+    print('Currently in lite global mode...');
+  } else if (liteShareSkia) {
+      engineMode = EngineMode.lite_share_skia;
+      print('Currently in lite & share skia mode...');
+  }
+  setEngineMode(engineMode);
+
+  // BD ADD: START
+  // print current command
+  String cmdStr = '';
+  for (String cmd in args) {
+    cmdStr += ' ' + cmd;
+  }
+  print('current cmd: flutter $cmdStr');
+  // END
 
     /**
      * BD ADD: START

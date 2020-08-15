@@ -393,7 +393,9 @@ class FlutterCommandRunner extends CommandRunner<void> {
     String tmpBasename = localEngineBasename.replaceFirst('_sim_', '_');
     tmpBasename = tmpBasename.substring(tmpBasename.indexOf('_') + 1);
     // Strip suffix for various archs.
-    final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64'];
+    // BD MOD:
+    // final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64'];
+    final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64', '_lite', '_liteg', '_lites'];
     for (final String suffix in suffixes) {
       tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
     }

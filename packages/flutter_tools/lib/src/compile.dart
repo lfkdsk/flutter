@@ -236,6 +236,11 @@ class KernelCompiler {
     @required bool trackWidgetCreation,
     @required List<String> dartDefines,
     @required PackageConfig packageConfig,
+    // BD ADD: START
+    bool lite = false,
+    bool liteGlobal = false,
+    bool liteShareSkia = false,
+    // END
   }) async {
     final String frontendServer = _artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
@@ -267,6 +272,11 @@ class KernelCompiler {
         '-D$dartDefine',
       ...buildModeOptions(buildMode),
       if (trackWidgetCreation) '--track-widget-creation',
+      // BD ADD: START
+      if (lite) '--lite',
+      if (liteGlobal) '--lite-global',
+      if (liteShareSkia) '--lite-share-skia',
+    // END
       if (!linkPlatformKernelIn) '--no-link-platform',
       if (aot) ...<String>[
         '--aot',

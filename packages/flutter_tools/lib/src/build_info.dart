@@ -31,6 +31,11 @@ class BuildInfo {
     this.performanceMeasurementFile,
     this.packagesPath = '.packages',
     this.nullSafetyMode = NullSafetyMode.autodetect,
+    // BD ADD: START
+    this.lite = false,
+    this.liteGlobal = false,
+    this.liteShareSkia = false
+    // END
   });
 
   final BuildMode mode;
@@ -81,6 +86,11 @@ class BuildInfo {
   /// On Android it is used as versionName.
   /// On Xcode builds it is used as CFBundleShortVersionString,
   final String buildName;
+  // BD ADD:START
+  final bool lite;
+  final bool liteGlobal;
+  final bool liteShareSkia;
+  // END
 
   /// An optional directory path to save debugging information from dwarf stack
   /// traces. If null, stack trace information is not stripped from the

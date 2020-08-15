@@ -219,9 +219,15 @@ class FlutterPlugin implements Plugin<Project> {
                 }
             }
         }
+        // BD ADD: START
+        String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
+        if (flutterBuildMode != "release") {
+            liteSuffix=''
+        }
+        // END
         // Add the embedding dependency.
         addApiDependencies(project, buildType.name,
-                "io.flutter:flutter_embedding_$flutterBuildMode:$engineVersion")
+                "io.flutter:flutter_embedding_${flutterBuildMode}${liteSuffix}:$engineVersion")
 
         List<String> platforms = getTargetPlatforms().collect()
         // Debug mode includes x86 and x64, which are commonly used in emulators.
@@ -233,7 +239,7 @@ class FlutterPlugin implements Plugin<Project> {
             String arch = PLATFORM_ARCH_MAP[platform].replace("-", "_")
             // Add the `libflutter.so` dependency.
             addApiDependencies(project, buildType.name,
-                    "io.flutter:${arch}_$flutterBuildMode:$engineVersion")
+                    "io.flutter:${arch}_${flutterBuildMode}${liteSuffix}:$engineVersion")
         }
     }
 
@@ -322,11 +328,20 @@ class FlutterPlugin implements Plugin<Project> {
             if (!supportsBuildMode(flutterBuildMode)) {
                 return
             }
+            // BD ADD START
+            String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
+            if (flutterBuildMode != "release") {
+                liteSuffix=''
+            }
+            // END
+            // BD MOD: START
+            // addApiDependencies(project, buildType.name, "io.flutter:${arch}_$flutterBuildMode:$engineVersion")
             addApiDependencies(
                 pluginProject,
                 buildType.name,
-                "io.flutter:flutter_embedding_$flutterBuildMode:$engineVersion"
+                "io.flutter:flutter_embedding_${flutterBuildMode}${liteSuffix}:$engineVersion"
             )
+            // END
         }
         pluginProject.afterEvaluate {
             pluginProject.android.buildTypes {
@@ -482,6 +497,29 @@ class FlutterPlugin implements Plugin<Project> {
         return project.hasProperty('local-engine-repo')
     }
 
+    // BD ADD: START
+    private Boolean useLite() {
+        if (project.hasProperty('lite')) {
+            return project.property('lite').toBoolean()
+        }
+        return false
+    }
+
+    private Boolean useLiteGlobal() {
+        if (project.hasProperty('lite-global')) {
+            return project.property('lite-global').toBoolean()
+        }
+        return false
+    }
+
+    private Boolean useLiteShareSkia() {
+        if (project.hasProperty('lite-share-skia')) {
+            return project.property('lite-share-skia').toBoolean()
+        }
+        return false
+    }
+    // END
+
     private Boolean isVerbose() {
         if (project.hasProperty('verbose')) {
             return project.property('verbose').toBoolean()
@@ -603,6 +641,21 @@ class FlutterPlugin implements Plugin<Project> {
         if (project.hasProperty('track-widget-creation')) {
             trackWidgetCreationValue = project.property('track-widget-creation').toBoolean()
         }
+        // BD ADD: START
+        Boolean liteValue = false
+        if (project.hasProperty('lite')) {
+            liteValue = project.property('lite').toBoolean()
+        }
+
+        Boolean liteGlobalValue = false
+        if (project.hasProperty('lite-global')) {
+            liteGlobalValue = project.property('lite-global').toBoolean()
+        }
+        Boolean liteShareSkiaValue = false
+        if (project.hasProperty('lite-share-skia')) {
+            liteShareSkiaValue = project.property('lite-share-skia').toBoolean()
+        }
+        // END
         String extraFrontEndOptionsValue = null
         if (project.hasProperty('extra-front-end-options')) {
             extraFrontEndOptionsValue = project.property('extra-front-end-options')
@@ -669,6 +722,11 @@ class FlutterPlugin implements Plugin<Project> {
                 intermediateDir project.file("${project.buildDir}/${AndroidProject.FD_INTERMEDIATES}/flutter/${variant.name}/")
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
+                // BD ADD: START
+                useLite liteValue
+                useLiteGlobal liteGlobalValue
+                useLiteShareSkia liteShareSkiaValue
+                // END
                 splitDebugInfo splitDebugInfoValue
                 treeShakeIcons treeShakeIconsOptionsValue
                 dartObfuscation dartObfuscationValue
@@ -869,6 +927,13 @@ abstract class BaseFlutterTask extends DefaultTask {
     String fileSystemScheme
     @Input
     Boolean trackWidgetCreation
+    // BD ADD: START
+    @Optional @Input
+    Boolean useLite
+    @Optional @Input
+    Boolean useLiteGlobal
+    Boolean useLiteShareSkia
+    // END
     @Optional @Input
     List<String> targetPlatformValues
     File sourceDir
@@ -969,6 +1034,18 @@ abstract class BaseFlutterTask extends DefaultTask {
             if (extraFrontEndOptions != null) {
                 args "--ExtraFrontEndOptions=${extraFrontEndOptions}"
             }
+            // BD ADD: START
+            if (useLite) {
+                args "--lite"
+            }
+
+            if (useLiteGlobal) {
+                args "--lite-global"
+            }
+            if (useLiteShareSkia) {
+                args "--lite-share-skia"
+            }
+            // END
             args ruleNames
         }
     }

@@ -40,9 +40,16 @@ class DevelopmentArtifact {
 
   // Artifacts used for internal builds.
   static const DevelopmentArtifact androidInternalBuild = DevelopmentArtifact._('android_internal_build');
+  // BD ADD: START
+  static const DevelopmentArtifact androidGenSnapshotLite = DevelopmentArtifact._('android_gen_snapshot_lite');
+  static const DevelopmentArtifact androidInternalBuildLite = DevelopmentArtifact._('android_internal_build_lite');
+  // END
 
   /// Artifacts required for iOS development.
   static const DevelopmentArtifact iOS = DevelopmentArtifact._('ios');
+
+  // BD ADD:
+  static const DevelopmentArtifact iOSLite = DevelopmentArtifact._('ios-lite');
 
   /// Artifacts required for web development.
   static const DevelopmentArtifact web = DevelopmentArtifact._('web', feature: flutterWebFeature);
@@ -73,7 +80,13 @@ class DevelopmentArtifact {
     androidGenSnapshot,
     androidMaven,
     androidInternalBuild,
+    // BD ADD: START
+    androidGenSnapshotLite,
+    androidInternalBuildLite,
+    // END
     iOS,
+    // BD ADD:
+    iOSLite,
     web,
     macOS,
     windows,
@@ -117,6 +130,11 @@ class Cache {
       _artifacts.add(AndroidInternalBuildArtifacts(this));
 
       _artifacts.add(IOSEngineArtifacts(this));
+      // BD ADD: START
+      _artifacts.add(AndroidGenSnapshotLiteArtifacts(this));
+      _artifacts.add(AndroidInternalBuildLiteArtifacts(this));
+      _artifacts.add(IOSEngineLiteArtifacts(this));
+      // END
       _artifacts.add(FlutterWebSdk(this));
       _artifacts.add(FlutterSdk(this));
       _artifacts.add(WindowsEngineArtifacts(this, platform: _platform));
@@ -1070,6 +1088,60 @@ class AndroidMavenArtifacts extends ArtifactSet {
   String get name => 'android-maven-artifacts';
 }
 
+// BD ADD: START
+
+class AndroidInternalBuildLiteArtifacts extends EngineCachedArtifact {
+  AndroidInternalBuildLiteArtifacts(Cache cache) : super(
+    'android-internal-build-artifacts-lite',
+    cache,
+    DevelopmentArtifact.androidInternalBuildLite,
+  );
+
+  @override
+  List<String> getPackageDirs() => const <String>[];
+
+  @override
+  List<List<String>> getBinaryDirs() {
+    return _androidLiteBinaryDirs;
+  }
+
+  @override
+  List<String> getLicenseDirs() { return <String>[]; }
+}
+
+class AndroidGenSnapshotLiteArtifacts extends EngineCachedArtifact {
+  AndroidGenSnapshotLiteArtifacts(Cache cache) : super(
+    'android-sdk-lite',
+    cache,
+    DevelopmentArtifact.androidGenSnapshotLite,
+  );
+
+  @override
+  List<String> getPackageDirs() => const <String>[];
+
+  @override
+  List<List<String>> getBinaryDirs() {
+    return <List<String>>[
+      if (cache.includeAllPlatforms) ...<List<String>>[
+        ..._osxBinaryDirs,
+        ..._linuxBinaryDirs,
+        ..._windowsBinaryDirs,
+        ..._dartSdks,
+      ] else if (globals.platform.isWindows)
+        ..._windowsBinaryDirs
+      else if (globals.platform.isMacOS)
+          ..._osxLiteBinaryDirs
+        else if (globals.platform.isLinux)
+            ..._linuxBinaryDirs,
+    ];
+  }
+
+  @override
+  List<String> getLicenseDirs() { return <String>[]; }
+}
+
+// END
+
 class IOSEngineArtifacts extends EngineCachedArtifact {
   IOSEngineArtifacts(Cache cache) : super(
     'ios-sdk',
@@ -1098,6 +1170,41 @@ class IOSEngineArtifacts extends EngineCachedArtifact {
     return <String>[];
   }
 }
+
+// BD ADD: START
+class IOSEngineLiteArtifacts extends EngineCachedArtifact {
+  IOSEngineLiteArtifacts(Cache cache) : super(
+    'ios-lite-sdk',
+    cache,
+    DevelopmentArtifact.iOSLite,
+  );
+
+  @override
+  List<List<String>> getBinaryDirs() {
+    return <List<String>>[
+      if (globals.platform.isMacOS || cache.includeAllPlatforms)
+        ..._iosBinaryLiteDirs,
+    ];
+  }
+
+  @override
+  List<String> getLicenseDirs() {
+    if (cache.includeAllPlatforms || globals.platform.isMacOS) {
+      return const <String>[
+//        'ios-release-lite',
+//        'ios-release-liteg',
+        'ios-release-lites',
+        'ios-dynamicart-release-lites'];
+    }
+    return const <String>[];
+  }
+
+  @override
+  List<String> getPackageDirs() {
+    return <String>[];
+  }
+}
+// END
 
 /// A cached artifact containing Gradle Wrapper scripts and binaries.
 ///
@@ -1447,6 +1554,15 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-x64-release/darwin-x64', 'android-x64-release/darwin-x64.zip'],
 ];
 
+// BD ADD: START
+const List<List<String>> _osxLiteBinaryDirs = <List<String>>[
+//  <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
+//  <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
+//  <String>['android-arm-release-liteg/darwin-x64', 'android-arm-release-liteg/darwin-x64.zip'],
+//  <String>['android-arm64-release-liteg/darwin-x64', 'android-arm64-release-liteg/darwin-x64.zip'],
+];
+// END
+
 const List<List<String>> _linuxBinaryDirs = <List<String>>[
   <String>['android-arm-profile/linux-x64', 'android-arm-profile/linux-x64.zip'],
   <String>['android-arm-release/linux-x64', 'android-arm-release/linux-x64.zip'],
@@ -1471,6 +1587,15 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios-release', 'ios-release/artifacts.zip'],
 ];
 
+// BD ADD: START
+const List<List<String>> _iosBinaryLiteDirs = <List<String>>[
+//  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
+//  <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
+  <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
+  <String>['ios-dynamicart-release-lites', 'ios-dynamicart-release-lites/artifacts.zip'],
+];
+// END
+
 const List<List<String>> _androidBinaryDirs = <List<String>>[
   <String>['android-x86', 'android-x86/artifacts.zip'],
   <String>['android-x64', 'android-x64/artifacts.zip'],
@@ -1485,6 +1610,15 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
   // BD DEL:
   // <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],
 ];
+
+// BD ADD: START
+const List<List<String>> _androidLiteBinaryDirs = <List<String>>[
+//  <String>['android-arm-release-lite', 'android-arm-release-lite/artifacts.zip'],
+//  <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
+//  <String>['android-arm-release-liteg', 'android-arm-release-liteg/artifacts.zip'],
+//  <String>['android-arm64-release-liteg', 'android-arm64-release-liteg/artifacts.zip'],
+];
+// END
 
 const List<List<String>> _dartSdks = <List<String>> [
   <String>['darwin-x64', 'dart-sdk-darwin-x64.zip'],

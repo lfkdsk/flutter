@@ -39,6 +39,8 @@ AssertExists() {
 }
 
 BuildApp() {
+  # BD ADD:
+  RunCommand env
   local project_path="${SOURCE_ROOT}/.."
   if [[ -n "$FLUTTER_APPLICATION_PATH" ]]; then
     project_path="${FLUTTER_APPLICATION_PATH}"
@@ -69,15 +71,44 @@ BuildApp() {
     fi
   fi
 
+  # BD ADD: START
+  # ios lite 版本标记
+  local lite_flag=""
+  local lite_suffix=""
+  if [[  -n "$LITE" ]]; then
+      lite_flag="--lite"
+      lite_suffix="-lite"
+  fi
+  if [[  -n "$LITE_GLOBAL" ]]; then
+      lite_flag="--lite-global"
+      lite_suffix="-liteg"
+  fi
+  if [[  -n "$LITE_SHARE_SKIA" ]]; then
+      lite_flag="--lite-share-skia"
+      lite_suffix="-lites"
+  fi
+  # END
+
   # Use FLUTTER_BUILD_MODE if it's set, otherwise use the Xcode build configuration name
   # This means that if someone wants to use an Xcode build config other than Debug/Profile/Release,
   # they _must_ set FLUTTER_BUILD_MODE so we know what type of artifact to build.
   local build_mode="$(echo "${FLUTTER_BUILD_MODE:-${CONFIGURATION}}" | tr "[:upper:]" "[:lower:]")"
   local artifact_variant="unknown"
+  # BD ADD: START
+  if [  "$lite_suffix" == "-lites" -a  "$build_mode" != "release" ]; then
+     echo "Current share skia only support for release"
+     lite_suffix="-lite"
+  fi
+  # END
   case "$build_mode" in
-    *release*) build_mode="release"; artifact_variant="ios-release";;
+    # BD MOD: START
+    # *release*) build_mode="release"; artifact_variant="ios-release";;
+    # *profile*) build_mode="profile"; artifact_variant="ios-profile";;
+    # *debug*) build_mode="debug"; artifact_variant="ios";;
+    *release*) build_mode="release"; artifact_variant="ios-release"${lite_suffix};;
     *profile*) build_mode="profile"; artifact_variant="ios-profile";;
     *debug*) build_mode="debug"; artifact_variant="ios";;
+    # END
     *)
       EchoError "========================================================================"
       EchoError "ERROR: Unknown FLUTTER_BUILD_MODE: ${build_mode}."
@@ -191,6 +222,7 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     --DartDefines="${DART_DEFINES}"                                       \
     --ExtraFrontEndOptions="${EXTRA_FRONT_END_OPTIONS}"                   \
     "${build_mode}_ios_bundle_flutter_assets"
+    ${lite_flag}
 
   # BD ADD: START
   if [[ "$compress_size_flag" != "" ]]; then

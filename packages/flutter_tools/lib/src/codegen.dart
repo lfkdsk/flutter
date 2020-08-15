@@ -99,6 +99,11 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     List<String> dartDefines,
     @required BuildMode buildMode,
     @required PackageConfig packageConfig,
+    // BD ADD: START
+    bool lite = false,
+    bool liteGlobal = false,
+    bool liteShareSkia = false,
+    // END
   }) async {
     final FlutterProject flutterProject = FlutterProject.current();
     final CodegenDaemon codegenDaemon = await codeGenerator.daemon(flutterProject);

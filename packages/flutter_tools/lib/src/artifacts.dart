@@ -12,6 +12,17 @@ import 'build_info.dart';
 import 'cache.dart';
 import 'globals.dart' as globals;
 
+// BD ADD:
+import 'base/common.dart';
+
+// BD ADD: START
+enum EngineMode {
+  normal,
+  lite,
+  lite_global,
+  lite_share_skia
+}
+// END
 enum Artifact {
   /// The tool which compiles a dart kernel file into native code.
   genSnapshot,
@@ -80,6 +91,14 @@ enum Artifact {
   fontSubset,
   constFinder,
 }
+
+// BD ADD: START
+EngineMode kEngineMode = EngineMode.normal;
+
+void setEngineMode(EngineMode engineMode) {
+  kEngineMode = engineMode;
+}
+// END
 
 String _artifactToFileName(Artifact artifact, [ TargetPlatform platform, BuildMode mode ]) {
   final String exe = platform == TargetPlatform.windows_x64 ? '.exe' : '';
@@ -231,42 +250,62 @@ class CachedArtifacts implements Artifacts {
     switch (platform) {
       case TargetPlatform.android_arm:
       case TargetPlatform.android_arm64:
+        // BD ADD
+        return _getAndroidArtifactPath(artifact, platform, mode, engineMode: kEngineMode);
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
-        return _getAndroidArtifactPath(artifact, platform, mode);
+         return _getAndroidArtifactPath(artifact, platform, mode);
       case TargetPlatform.ios:
-        return _getIosArtifactPath(artifact, platform, mode);
+        // BD MOD:
+        // return _getIosArtifactPath(artifact, platform, mode);
+        return _getIosArtifactPath(artifact, platform, mode, kEngineMode);
       case TargetPlatform.darwin_x64:
       case TargetPlatform.linux_x64:
       case TargetPlatform.windows_x64:
-        return _getDesktopArtifactPath(artifact, platform, mode);
+        // BD MOD:
+        //return _getDesktopArtifactPath(artifact, platform, mode);
+        return _getDesktopArtifactPath(artifact, platform, mode, kEngineMode);
       case TargetPlatform.fuchsia_arm64:
       case TargetPlatform.fuchsia_x64:
-        return _getFuchsiaArtifactPath(artifact, platform, mode);
+        // BD MOD:
+        //return _getFuchsiaArtifactPath(artifact, platform, mode);
+        return _getFuchsiaArtifactPath(artifact, platform, mode, kEngineMode);
       case TargetPlatform.tester:
       case TargetPlatform.web_javascript:
       default: // could be null, but that can't be specified as a case.
-        return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform), mode);
+        // BD MOD:
+        //return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform), mode);
+        return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform), mode, engineMode: kEngineMode);
     }
   }
 
   @override
   String getEngineType(TargetPlatform platform, [ BuildMode mode ]) {
-    return _fileSystem.path.basename(_getEngineArtifactsPath(platform, mode));
+    // BD MOD
+    // return _fileSystem.path.basename(_getEngineArtifactsPath(platform, mode));
+    return _fileSystem.path.basename(_getEngineArtifactsPath(platform, kEngineMode, mode));
   }
 
-  String _getDesktopArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  // BD MOD
+  //String _getDesktopArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  String _getDesktopArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, EngineMode engineMode) {
     // When platform is null, a generic host platform artifact is being requested
     // and not the gen_snapshot for darwin as a target platform.
     if (platform != null && artifact == Artifact.genSnapshot) {
-      final String engineDir = _getEngineArtifactsPath(platform, mode);
+      // BD MOD:
+      // final String engineDir = _getEngineArtifactsPath(platform, mode);
+      final String engineDir = _getEngineArtifactsPath(platform, engineMode, mode);
       return _fileSystem.path.join(engineDir, _artifactToFileName(artifact));
     }
-    return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform), mode);
+    // BD MOD:
+    // return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform), mode);
+    return _getHostArtifactPath(artifact, platform ?? _currentHostPlatform(_platform), mode, engineMode: engineMode);
   }
 
-  String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
-    final String engineDir = _getEngineArtifactsPath(platform, mode);
+  // BD MOD:
+  // String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  String _getAndroidArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, { EngineMode engineMode = EngineMode.normal }) {
+    final String engineDir = _getEngineArtifactsPath(platform, engineMode, mode);
     switch (artifact) {
       case Artifact.frontendServerSnapshotForEngineDartSdk:
         assert(mode != BuildMode.debug, 'Artifact $artifact only available in non-debug mode.');
@@ -276,17 +315,23 @@ class CachedArtifacts implements Artifacts {
         final String hostPlatform = getNameForHostPlatform(getCurrentHostPlatform());
         return _fileSystem.path.join(engineDir, hostPlatform, _artifactToFileName(artifact));
       default:
-        return _getHostArtifactPath(artifact, platform, mode);
+        // BD MOD:
+        // return _getHostArtifactPath(artifact, platform, mode);
+        return _getHostArtifactPath(artifact, platform, mode, engineMode: engineMode);
     }
   }
 
-  String _getIosArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  // BD MOD: LinXueBin
+  // String _getIosArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  String _getIosArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, EngineMode engineMode) {
     switch (artifact) {
       case Artifact.genSnapshot:
       case Artifact.flutterFramework:
       case Artifact.frontendServerSnapshotForEngineDartSdk:
         final String artifactFileName = _artifactToFileName(artifact);
-        final String engineDir = _getEngineArtifactsPath(platform, mode);
+        // BD MOD:
+        //final String engineDir = _getEngineArtifactsPath(platform, mode);
+        final String engineDir = _getEngineArtifactsPath(platform, engineMode, mode);
         return _fileSystem.path.join(engineDir, artifactFileName);
       case Artifact.idevicescreenshot:
       case Artifact.idevicesyslog:
@@ -299,11 +344,16 @@ class CachedArtifacts implements Artifacts {
         final String artifactFileName = _artifactToFileName(artifact);
         return _cache.getArtifactDirectory('usbmuxd').childFile(artifactFileName).path;
       default:
-        return _getHostArtifactPath(artifact, platform, mode);
+        // BD MOD:
+        // return _getHostArtifactPath(artifact, platform, mode);
+        return _getHostArtifactPath(artifact, platform, mode, engineMode: engineMode);
     }
   }
 
-  String _getFuchsiaArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+
+  // BD MOD:
+  // String _getFuchsiaArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  String _getFuchsiaArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, EngineMode engineMode) {
     final String root = _fileSystem.path.join(
       _cache.getArtifactDirectory('flutter_runner').path,
       'flutter',
@@ -328,21 +378,26 @@ class CachedArtifacts implements Artifacts {
         final String artifactFileName = _artifactToFileName(artifact, platform, mode);
         return _fileSystem.path.join(root, runtime, artifactFileName);
       default:
-        return _getHostArtifactPath(artifact, platform, mode);
+        // BD MOD:
+        // return _getHostArtifactPath(artifact, platform, mode);
+        return _getHostArtifactPath(artifact, platform, mode, engineMode: engineMode);
     }
   }
 
   String _getFlutterPatchedSdkPath(BuildMode mode) {
     final String engineArtifactsPath = _cache.getArtifactDirectory('engine').path;
     return _fileSystem.path.join(engineArtifactsPath, 'common',
-        mode == BuildMode.release ? 'flutter_patched_sdk_product' : 'flutter_patched_sdk');
+        (mode == BuildMode.release)
+        ? 'flutter_patched_sdk_product' : 'flutter_patched_sdk');
   }
 
   String _getFlutterWebSdkPath() {
     return _cache.getWebSdkDirectory().path;
   }
 
-  String _getHostArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  // BD MOD:
+  // String _getHostArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode) {
+  String _getHostArtifactPath(Artifact artifact, TargetPlatform platform, BuildMode mode, { EngineMode engineMode = EngineMode.normal }) {
     assert(platform != null);
     switch (artifact) {
       case Artifact.genSnapshot:
@@ -429,7 +484,9 @@ class CachedArtifacts implements Artifacts {
     }
   }
 
-  String _getEngineArtifactsPath(TargetPlatform platform, [ BuildMode mode ]) {
+  // BD MOD:
+  // String _getEngineArtifactsPath(TargetPlatform platform, [ BuildMode mode ]) {
+  String _getEngineArtifactsPath(TargetPlatform platform, EngineMode engineMode, [ BuildMode mode ]) {
     final String engineDir = _cache.getArtifactDirectory('engine').path;
     final String platformName = getNameForTargetPlatform(platform);
     switch (platform) {
@@ -453,10 +510,41 @@ class CachedArtifacts implements Artifacts {
       case TargetPlatform.ios:
       case TargetPlatform.android_arm:
       case TargetPlatform.android_arm64:
+        // BD MOD: START
+        //  assert(mode != null, 'Need to specify a build mode for platform $platform.');
+        //  final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+        // return fs.path.join(engineDir, platformName + suffix);
+        String liteSuffix = '';
+        if ( engineMode == EngineMode.lite ) {
+          liteSuffix = '-lite';
+        } else if (engineMode == EngineMode.lite_global) {
+          liteSuffix = '-liteg';
+        } else if (engineMode == EngineMode.lite_share_skia) {
+          if ((mode == BuildMode.release)
+              && platform == TargetPlatform.ios) {
+            liteSuffix = '-lites';
+          } else {
+            liteSuffix = '';
+            globals.printError(
+                'Now, --lite-share-skia now only support for ios-release !\nOtherwise we will fall back to normal mode.');
+          }
+        }
+        if ((liteSuffix != '' && mode != BuildMode.release)
+            && !(liteSuffix == '-lites')) {
+          globals.printError(
+              'Now, --lite or --lite-global now only support for release mode !\nOtherwise we will fall to normal mode.');
+          liteSuffix = '';
+        }
+        assert(mode != null, 'Need to specify a build mode for platform $platform.');
+        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-').replaceAll('_', '-')}' : '';
+        return _fileSystem.path.join(engineDir, platformName + suffix + liteSuffix);
+        // END
       case TargetPlatform.android_x64:
       case TargetPlatform.android_x86:
         assert(mode != null, 'Need to specify a build mode for platform $platform.');
-        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+	// BD MOD:
+        // final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-').replaceAll('_', '-')}' : '';
         return _fileSystem.path.join(engineDir, platformName + suffix);
       case TargetPlatform.android:
         assert(false, 'cannot use TargetPlatform.android to look up artifacts');

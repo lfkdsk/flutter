@@ -19,6 +19,9 @@ import '../cache.dart';
 import '../ios/xcodeproj.dart';
 import '../project.dart';
 
+// BD ADD
+import '../base/context.dart';
+
 const String noCocoaPodsConsequence = '''
   CocoaPods is used to retrieve the iOS and macOS platform side's plugin code that responds to your plugin usage on the Dart side.
   Without CocoaPods, plugins will not work on iOS or macOS.
@@ -337,8 +340,19 @@ class CocoaPods {
 
   Future<void> _runPodInstall(XcodeBasedProject xcodeProject, String engineDirectory) async {
     final Status status = _logger.startProgress('Running pod install...', timeout: _timeoutConfiguration.slowOperation);
-    final ProcessResult result = await _processManager.run(
-      <String>['pod', 'install', '--verbose'],
+    // BD ADD: START
+    List<String> pod_command = <String>['pod', 'install', '--verbose']; // default command
+    if(Bundler.get_isBundled()){ // detected --bundler used
+      // printStatus('bundle exec pod install');
+      pod_command = <String>['bundle', 'exec', 'pod', 'install', '--verbose'];
+    }
+    // END
+    // BD MOD: START
+    // final ProcessResult result = await _processManager.run(
+      // <String>['pod', 'install', '--verbose'],
+    final ProcessResult result = await _processManager.runSync(
+      pod_command,
+    // END
       workingDirectory: _fileSystem.path.dirname(xcodeProject.podfile.path),
       environment: <String, String>{
         'FLUTTER_FRAMEWORK_DIR': engineDirectory,

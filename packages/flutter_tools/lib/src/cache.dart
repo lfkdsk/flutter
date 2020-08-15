@@ -18,6 +18,9 @@ import 'base/process.dart';
 import 'features.dart';
 import 'globals.dart' as globals;
 
+// BD ADD:
+import 'package:yaml/yaml.dart';
+
 /// A tag for a set of development artifacts that need to be cached.
 class DevelopmentArtifact {
 
@@ -332,6 +335,15 @@ class Cache {
     _hasWarnedAboutStorageOverride = true;
   }
 
+  /// BD ADD: START
+  String get customEngineRevision {
+    _customEngineRevision ??= getVersionFor('ttengine');
+    return _customEngineRevision;
+  }
+  String _customEngineRevision;
+
+  /// END
+
   /// Return the top-level directory in the cache; this is `bin/cache`.
   Directory getRoot() {
     if (_rootOverride != null) {
@@ -394,6 +406,12 @@ class Cache {
   }
 
   String getVersionFor(String artifactName) {
+ // BD ADD: START
+    if (artifactName != null && artifactName == 'engine') {
+      artifactName = 'ttengine';
+    }
+    // END
+
     final File versionFile = _fileSystem.file(_fileSystem.path.join(
       _rootOverride?.path ?? flutterRoot,
       'bin',
@@ -458,6 +476,13 @@ class Cache {
     if (!_lockEnabled) {
       return;
     }
+
+    /// BD ADD: START 防止产物下载不完全
+    requiredArtifacts = Set<DevelopmentArtifact>.of(requiredArtifacts);
+    requiredArtifacts.add(DevelopmentArtifact.iOS);
+    requiredArtifacts.add(DevelopmentArtifact.universal);
+    /// END
+
     for (final ArtifactSet artifact in _artifacts) {
       if (!requiredArtifacts.contains(artifact.developmentArtifact)) {
         _logger.printTrace('Artifact $artifact is not required, skipping update.');
@@ -480,6 +505,8 @@ class Cache {
         rethrow;
       }
     }
+    /// BD ADD:
+    this.setStampFor(customEngineName, customEngineRevision);
   }
 
   Future<bool> areRemoteArtifactsAvailable({
@@ -512,6 +539,25 @@ class Cache {
     return exists;
   }
 }
+
+/// BD ADD: START
+YamlMap _customEngineConfig;
+
+YamlMap get customEngineConfig {
+  _customEngineConfig ??= loadYaml(globals.fs
+    .file(globals.fs.path
+    .join(Cache.flutterRoot, 'bin', 'internal', 'tt_engine.yaml'))
+    .readAsStringSync()) as YamlMap;
+  return _customEngineConfig;
+}
+
+const String customEngineName = 'tt_engine';
+/// String get customEngineVersion => customEngineConfig['ref'];
+
+YamlList get customEngineArtifacts => customEngineConfig['artifacts'] as YamlList;
+
+String get customEngineDownloadUrl => customEngineConfig['url'] as String;
+/// END
 
 /// Representation of a set of artifacts used by the tool.
 abstract class ArtifactSet {
@@ -557,6 +603,8 @@ abstract class CachedArtifact extends ArtifactSet {
 
   Directory get location => cache.getArtifactDirectory(name);
   String get version => cache.getVersionFor(name);
+  /// BD ADD:
+  String get customEngineVersion => cache.customEngineRevision;
 
   // Whether or not to bypass normal platform filtering for this artifact.
   bool get ignorePlatformFiltering {
@@ -692,6 +740,11 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
   @override
   bool isUpToDateInner() {
+    /// BD ADD: START
+    if (customEngineVersion != cache.getStampFor(customEngineName)) {
+      return false;
+    }
+    /// END
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (final String pkgName in getPackageDirs()) {
       final String pkgPath = globals.fs.path.join(pkgDir.path, pkgName);
@@ -722,7 +775,21 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
     final Directory pkgDir = cache.getCacheDir('pkg');
     for (final String pkgName in getPackageDirs()) {
-      await artifactUpdater.downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      /// BD MOD: START
+      /// await artifactUpdater.downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      final String pkgPath = globals.fs.path.join(pkgDir.path, pkgName);
+      final Directory dir = globals.fs.directory(pkgPath);
+      if (dir.existsSync())
+        dir.deleteSync(recursive: true);
+      if (customEngineArtifacts.contains(pkgName)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        globals.printStatus('Downloading from TT ' + customEngineUrl + pkgName + '.zip');
+        await artifactUpdater.downloadZipArchive('Downloading package $pkgName...',
+          Uri.parse(customEngineUrl + pkgName + '.zip'), pkgDir);
+      } else {
+        await artifactUpdater.downloadZipArchive('Downloading package $pkgName...', Uri.parse(url + pkgName + '.zip'), pkgDir);
+      }
+      /// END
     }
 
     for (final List<String> toolsDir in getBinaryDirs()) {
@@ -732,8 +799,16 @@ abstract class EngineCachedArtifact extends CachedArtifact {
 
       // Avoid printing things like 'Downloading linux-x64 tools...' multiple times.
       final String friendlyName = urlPath.replaceAll('/artifacts.zip', '').replaceAll('.zip', '');
-      await artifactUpdater.downloadZipArchive('Downloading $friendlyName tools...', Uri.parse(url + urlPath), dir);
-
+      /// BD MOD: START
+      /// await artifactUpdater.downloadZipArchive('Downloading $friendlyName tools...', Uri.parse(url + urlPath), dir);
+      if (customEngineArtifacts.contains(cacheDir)) {
+        final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+        globals.printStatus('Downloading from TT ' + customEngineUrl + urlPath);
+        await artifactUpdater.downloadZipArchive(
+            'Downloading $cacheDir tools...', Uri.parse(customEngineUrl + urlPath), dir);
+      } else
+        await artifactUpdater.downloadZipArchive('Downloading $friendlyName tools...', Uri.parse(url + urlPath), dir);
+      /// END
       _makeFilesExecutable(dir);
 
       const List<String> frameworkNames = <String>['Flutter', 'FlutterMacOS'];

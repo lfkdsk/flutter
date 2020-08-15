@@ -19,7 +19,9 @@ FLUTTER_ROOT="$(dirname "$(dirname "$(dirname "${BASH_SOURCE[0]}")")")"
 DART_SDK_PATH="$FLUTTER_ROOT/bin/cache/dart-sdk"
 DART_SDK_PATH_OLD="$DART_SDK_PATH.old"
 ENGINE_STAMP="$FLUTTER_ROOT/bin/cache/engine-dart-sdk.stamp"
-ENGINE_VERSION=`cat "$FLUTTER_ROOT/bin/internal/engine.version"`
+# BD MOD:
+# ENGINE_VERSION=`cat "$FLUTTER_ROOT/bin/internal/engine.version"`
+ENGINE_VERSION=`cat "$FLUTTER_ROOT/bin/internal/ttengine.version"`
 
 if [ ! -f "$ENGINE_STAMP" ] || [ "$ENGINE_VERSION" != `cat "$ENGINE_STAMP"` ]; then
   command -v curl > /dev/null 2>&1 || {
@@ -84,7 +86,9 @@ if [ ! -f "$ENGINE_STAMP" ] || [ "$ENGINE_VERSION" != `cat "$ENGINE_STAMP"` ]; t
     FIND=find
   fi
 
+  # BD MOD:
   DART_SDK_BASE_URL="${FLUTTER_STORAGE_BASE_URL:-https://storage.googleapis.com}"
+  DART_SDK_BASE_URL="http://ios.bytedance.net/wlapi/tosDownload/toutiao.ios.arch"
   DART_SDK_URL="$DART_SDK_BASE_URL/flutter_infra/flutter/$ENGINE_VERSION/$DART_ZIP_NAME"
 
   # if the sdk path exists, copy it to a temporary location

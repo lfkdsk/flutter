@@ -39,6 +39,17 @@ android {
 }
 
 // BD ADD: START
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+// END
+
+// BD ADD: START
 class BdFlutterConfigExtension {
     def needArmeabi
 }
@@ -50,6 +61,8 @@ apply plugin: FlutterPlugin
 
 class FlutterPlugin implements Plugin<Project> {
     private static final String DEFAULT_MAVEN_HOST = "https://storage.googleapis.com";
+    // BD ADD:
+    private static final String MAVEN_REPO      = "http://tosv.byted.org/obj/toutiao.ios.arch/flutter/framework/";
 
     // The platforms that can be passed to the `--Ptarget-platform` flag.
     private static final String PLATFORM_ARM32  = "android-arm";
@@ -103,6 +116,7 @@ class FlutterPlugin implements Plugin<Project> {
     private String localEngineSrcPath
     private Properties localProperties
     private String engineVersion
+    private String engineCid
 
     @Override
     void apply(Project project) {
@@ -149,9 +163,10 @@ class FlutterPlugin implements Plugin<Project> {
             throw new GradleException("flutter.sdk must point to the Flutter SDK directory")
         }
 
+        engineCid = Paths.get(flutterRoot.absolutePath, "bin", "internal", "ttengine.version").toFile().text.trim()
         engineVersion = useLocalEngine()
             ? "+" // Match any version since there's only one.
-            : "1.0.0-" + Paths.get(flutterRoot.absolutePath, "bin", "internal", "engine.version").toFile().text.trim()
+            : "1.0.0-" + engineCid
 
         String flutterExecutableName = Os.isFamily(Os.FAMILY_WINDOWS) ? "flutter.bat" : "flutter"
         flutterExecutable = Paths.get(flutterRoot.absolutePath, "bin", flutterExecutableName).toFile();
@@ -212,7 +227,10 @@ class FlutterPlugin implements Plugin<Project> {
         String hostedRepository = System.env.FLUTTER_STORAGE_BASE_URL ?: DEFAULT_MAVEN_HOST
         String repository = useLocalEngine()
             ? project.property('local-engine-repo')
-            : "$hostedRepository/download.flutter.io"
+            // BD MOD
+            // : "$hostedRepository/download.flutter.io"
+            : MAVEN_REPO
+
         project.rootProject.allprojects {
             repositories {
                 maven {

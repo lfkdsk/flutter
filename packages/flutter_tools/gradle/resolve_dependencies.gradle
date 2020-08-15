@@ -17,17 +17,25 @@ import java.nio.file.Paths
 String storageUrl = System.getenv('FLUTTER_STORAGE_BASE_URL') ?: "https://storage.googleapis.com"
 
 repositories {
-    google()
-    jcenter()
+    // BD MOD: START
+    // google()
+    // jcenter()
+    // maven {
+    //     url "$storageUrl/download.flutter.io"
+    // }
     maven {
-        url "$storageUrl/download.flutter.io"
+        url 'http://ttandroid.byted.org/repository/bd_framework/'
     }
+    maven {
+        url 'http://maven.byted.org/repository/android_public/'
+    }
+    // END
 }
 
 File flutterRoot = projectDir.parentFile.parentFile.parentFile
 
 assert flutterRoot.isDirectory()
-String engineVersion = Paths.get(flutterRoot.absolutePath, "bin", "internal", "engine.version")
+String engineVersion = Paths.get(flutterRoot.absolutePath, "bin", "internal", "ttengine.version")
         .toFile().text.trim()
 
 configurations {

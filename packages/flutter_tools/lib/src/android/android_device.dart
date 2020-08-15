@@ -563,18 +563,30 @@ class AndroidDevice extends Device {
     }
 
     AndroidArch androidArch;
+    // BD ADD
+    final List<AndroidArch> androidArchs = [];
     switch (devicePlatform) {
       case TargetPlatform.android_arm:
-        androidArch = AndroidArch.armeabi_v7a;
+        // BD MOD
+//        androidArch = AndroidArch.armeabi_v7a;
+        androidArchs.add(AndroidArch.armeabi_v7a);
         break;
       case TargetPlatform.android_arm64:
-        androidArch = AndroidArch.arm64_v8a;
+        // BD MOD
+        // androidArch = AndroidArch.arm64_v8a;
+        androidArchs.add(AndroidArch.armeabi_v7a);
+        androidArchs.add(AndroidArch.arm64_v8a);
+        // END
         break;
       case TargetPlatform.android_x64:
-        androidArch = AndroidArch.x86_64;
+        // BD MOD
+        // androidArch = AndroidArch.x86_64;
+        androidArchs.add(AndroidArch.x86_64);
         break;
       case TargetPlatform.android_x86:
-        androidArch = AndroidArch.x86;
+        // BD MOD
+        // androidArch = AndroidArch.x86;
+        androidArchs.add(AndroidArch.x86);
         break;
       default:
         _logger.printError('Android platforms are only supported.');
@@ -589,7 +601,9 @@ class AndroidDevice extends Device {
           target: mainPath,
           androidBuildInfo: AndroidBuildInfo(
             debuggingOptions.buildInfo,
-            targetArchs: <AndroidArch>[androidArch],
+            // BD MOD
+            // targetArchs: <AndroidArch>[androidArch],
+            targetArchs: androidArchs,
             fastStart: debuggingOptions.fastStart
           ),
       );

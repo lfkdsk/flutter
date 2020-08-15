@@ -98,6 +98,9 @@ Future<XcodeBuildResult> buildXcodeProject({
   bool codesign = true,
   String deviceID,
   bool configOnly = false,
+
+  // BD ADD:
+  bool compressSize = false,
 }) async {
   if (!upgradePbxProjWithFlutterAssets(app.project, globals.logger)) {
     return XcodeBuildResult(success: false);
@@ -186,6 +189,8 @@ Future<XcodeBuildResult> buildXcodeProject({
     project: project,
     targetOverride: targetOverride,
     buildInfo: buildInfo,
+    // BD ADD:
+    compressSize: compressSize
   );
   await processPodsIfNeeded(project.ios, getIosBuildDirectory(), buildInfo.mode);
   if (configOnly) {
@@ -424,6 +429,17 @@ Future<XcodeBuildResult> buildXcodeProject({
         // (for example, kernel binary files produced from previous run).
         globals.fs.directory(outputDir).deleteSync(recursive: true);
       }
+
+      // BD ADD: START
+      //删除ios包内容中的icudtl.dat文件
+      if(compressSize) {
+        final String icu = '$expectedOutputDirectory/Frameworks/Flutter.framework/icudtl.dat';
+        if(globals.fs.file(icu).existsSync()) {
+          globals.fs.file(icu).deleteSync();
+        }
+      }
+      // END
+
       globals.fsUtils.copyDirectorySync(
         globals.fs.directory(expectedOutputDirectory),
         globals.fs.directory(outputDir),

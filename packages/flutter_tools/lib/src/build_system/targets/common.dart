@@ -65,6 +65,15 @@ const String kFileSystemRoots = 'FileSystemRoots';
 /// The other supported value is armv7, the 32-bit iOS architecture.
 const String kIosArchs = 'IosArchs';
 
+// BD ADD: START
+/// The define to control whether iOS compress mode enabled.
+///
+/// when enabled vmsnapshot & isolatesnapshot will be compressed
+/// in TEXT
+///
+const String kIosCompressSize = 'IosCompressSize';
+// BD END
+
 /// Whether to enable Dart obfuscation and where to save the symbol map.
 const String kDartObfuscation = 'DartObfuscation';
 

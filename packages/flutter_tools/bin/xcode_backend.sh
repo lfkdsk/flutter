@@ -112,6 +112,14 @@ BuildApp() {
 is set to release or run \"flutter build ios --release\", then re-run Archive from Xcode."
   fi
 
+  # BD ADD: START
+  # ios拆包方案标示
+  local compress_size_flag=""
+  if [[  -n "$COMPRESS_SIZE" ]] && [[ "$build_mode" == "release" ]]; then
+      compress_size_flag="true"
+  fi
+  # END
+
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
   local flutter_engine_flag=""
   local local_engine_flag=""
@@ -174,6 +182,11 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     code_size_directory="-dCodeSizeDirectory=${CODE_SIZE_DIRECTORY}"
   fi
 
+  # BD ADD: START
+  local app_framework_dir="${derived_dir}/App.framework"
+  local asset_dir="${app_framework_dir}/${assets_path}"
+  # END
+
   RunCommand "${FLUTTER_ROOT}/bin/flutter"                                \
     ${verbose_flag}                                                       \
     ${flutter_engine_flag}                                                \
@@ -184,18 +197,42 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     -dTargetPlatform=ios                                                  \
     -dTargetFile="${target_path}"                                         \
     -dBuildMode=${build_mode}                                             \
-    -dIosArchs="${ARCHS}"                                                 \
     -dSplitDebugInfo="${SPLIT_DEBUG_INFO}"                                \
     -dTreeShakeIcons="${TREE_SHAKE_ICONS}"                                \
     -dTrackWidgetCreation="${TRACK_WIDGET_CREATION}"                      \
     -dDartObfuscation="${DART_OBFUSCATION}"                               \
     -dEnableBitcode="${bitcode_flag}"                                     \
+    -dIosCompressSize="${compress_size_flag}"                             \
+    -dIosArchs="${ARCHS}"                                                 \
     ${bundle_sksl_path}                                                   \
     ${code_size_directory}                                                \
     --ExtraGenSnapshotOptions="${EXTRA_GEN_SNAPSHOT_OPTIONS}"             \
     --DartDefines="${DART_DEFINES}"                                       \
     --ExtraFrontEndOptions="${EXTRA_FRONT_END_OPTIONS}"                   \
     "${build_mode}_ios_bundle_flutter_assets"
+
+  # BD ADD: START
+  if [[ "$compress_size_flag" != "" ]]; then
+    RunCommand cp -f -- "${flutter_framework}/icudtl.dat" "${app_framework_dir}/icudtl.dat"
+    if [[ -e "${project_path}/.ios" ]]; then
+      RunCommand rm -rf -- "${derived_dir}/engine/Flutter.framework/icudtl.dat"
+    else
+      RunCommand rm -rf -- "${derived_dir}/Flutter.framework/icudtl.dat"
+    fi
+    local current_path=`pwd`
+    RunCommand cd ${app_framework_dir}/
+    zip -q -r flutter_compress_icudtl.zip icudtl.dat
+    zip -q -r flutter_compress_assets.zip ${assets_path}
+    RunCommand rm -f icudtl.dat
+    local dirPath=`dirname ${assets_path}`
+    if [ "${dirPath}" == "." ];then
+      RunCommand rm -rf "${assets_path}"
+    else
+      RunCommand rm -rf "${dirPath}"
+    fi
+    RunCommand cd ${current_path}
+  fi
+  # END
 
   if [[ $? -ne 0 ]]; then
     EchoError "Failed to package ${project_path}."

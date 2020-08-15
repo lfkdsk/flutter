@@ -28,6 +28,8 @@ class AotBuilder {
     @required String mainDartFile,
     bool bitcode = kBitcodeEnabledDefault,
     bool quiet = true,
+    // BD ADD：
+    bool compressSize = false,
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     bool reportTimings = false,
   }) async {

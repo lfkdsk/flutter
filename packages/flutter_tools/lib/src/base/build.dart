@@ -118,6 +118,8 @@ class AOTSnapshotter {
     @required String splitDebugInfo,
     @required bool dartObfuscation,
     bool quiet = false,
+    // BD ADD:
+    bool compressSize = false
   }) async {
     // TODO(cbracken): replace IOSArch with TargetPlatform.ios_{armv7,arm64}.
     assert(platform != TargetPlatform.ios || darwinArch != null);
@@ -141,6 +143,16 @@ class AOTSnapshotter {
       _logger.printTrace('Extra gen_snapshot options: $extraGenSnapshotOptions');
       genSnapshotArgs.addAll(extraGenSnapshotOptions);
     }
+    // BD ADD: START
+    if (platform != TargetPlatform.ios) {
+      compressSize = false;
+    }
+    // END
+
+    // BD ADD: START
+    String isolateSnapshotData;
+    String vmSnapshotData;
+    // END
 
     final String assembly = _fileSystem.path.join(outputDir.path, 'snapshot_assembly.S');
     if (platform == TargetPlatform.ios || platform == TargetPlatform.darwin_x64) {
@@ -149,6 +161,17 @@ class AOTSnapshotter {
         '--assembly=$assembly',
         '--strip'
       ]);
+
+      // BD ADD: START
+      if (compressSize) {
+        isolateSnapshotData = _fileSystem.path.join(
+            outputDir.path, 'isolate_snapshot_data');
+        vmSnapshotData = _fileSystem.path.join(
+            outputDir.path, 'vm_snapshot_data');
+        genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
+        genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
+      }
+      // END
     } else {
       final String aotSharedLibrary = _fileSystem.path.join(outputDir.path, 'app.so');
       genSnapshotArgs.addAll(<String>[
@@ -215,6 +238,11 @@ class AOTSnapshotter {
         outputPath: outputDir.path,
         bitcode: bitcode,
         quiet: quiet,
+	// BD ADD: START
+        compressSize: compressSize,
+        isolateSnapshotData: isolateSnapshotData,
+        vmSnapshotData: vmSnapshotData
+	// END
       );
       if (result.exitCode != 0) {
         return result.exitCode;
@@ -231,7 +259,12 @@ class AOTSnapshotter {
     @required String assemblyPath,
     @required String outputPath,
     @required bool bitcode,
-    @required bool quiet
+    @required bool quiet,
+    // BD ADD: START
+    bool compressSize = false,
+    String isolateSnapshotData,
+    String vmSnapshotData,
+    // END
   }) async {
     final String targetArch = getNameForDarwinArch(appleArch);
     if (!quiet) {
@@ -281,6 +314,18 @@ class AOTSnapshotter {
       '-o', appLib,
       assemblyO,
     ];
+
+    // BD ADD: START
+    if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
+        await processUtils.run(<String>['rm', '-f', '$isolateSnapshotData.gz']);
+        await processUtils.run(<String>['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
+
+        await processUtils.run(<String>['rm', '-f', '$vmSnapshotData.gz']);
+        await processUtils.run(<String>['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
+    }
+    // END
     final RunResult linkResult = await _xcode.clang(linkArgs);
     if (linkResult.exitCode != 0) {
       _logger.printError('Failed to link AOT snapshot. Linker terminated with exit code ${compileResult.exitCode}');

@@ -690,6 +690,11 @@ class FakeFlutterVersion implements FlutterVersion {
   @override
   String get frameworkRevision => null;
 
+  // BD ADD: START
+  @override
+  String get bdFrameworkVersion => null;
+  // END
+
   @override
   String get frameworkRevisionShort => null;
 
@@ -874,6 +879,11 @@ class FakeCache implements Cache {
 
   @override
   String get engineRevision => null;
+
+  // BD ADD: START
+  @override
+  String get customEngineRevision => null;
+  // END
 
   @override
   Directory getArtifactDirectory(String name) {

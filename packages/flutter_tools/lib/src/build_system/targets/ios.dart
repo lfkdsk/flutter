@@ -68,6 +68,8 @@ abstract class AotAssemblyBase extends Target {
     }
     final String codeSizeDirectory = environment.defines[kCodeSizeDirectory];
 
+    // BD ADD
+    final bool compressSize = environment.defines[kIosCompressSize] == 'true';
     // If we're building multiple iOS archs the binaries need to be lipo'd
     // together.
     final List<Future<int>> pending = <Future<int>>[];
@@ -95,6 +97,8 @@ abstract class AotAssemblyBase extends Target {
         splitDebugInfo: splitDebugInfo,
         dartObfuscation: dartObfuscation,
         extraGenSnapshotOptions: archExtraGenSnapshotOptions,
+        //BD ADD
+        compressSize: compressSize,
       ));
     }
     final List<int> results = await Future.wait(pending);

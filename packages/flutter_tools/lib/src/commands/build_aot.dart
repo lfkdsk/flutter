@@ -28,6 +28,11 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
         allowed: <String>['android-arm', 'android-arm64', 'ios', 'android-x64'],
       )
       ..addFlag('quiet', defaultsTo: false)
+      // BD ADD: START
+      ..addFlag('compress-size',
+        help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
+        negatable: false,)
+      // END
       ..addMultiOption('ios-arch',
         splitCommas: true,
         defaultsTo: defaultIOSArchs.map<String>(getNameForDarwinArch),
@@ -70,6 +75,12 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
 
     aotBuilder ??= AotBuilder();
 
+    // BD ADD: START
+    final bool compressSize = (buildInfo.mode == BuildMode.release) &&
+        platform == TargetPlatform.ios
+        ? boolArg('compress-size')
+        : false;
+    // END
     await aotBuilder.build(
       platform: platform,
       outputPath: outputPath,
@@ -79,6 +90,10 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       quiet: boolArg('quiet'),
       iosBuildArchs: stringsArg('ios-arch').map<DarwinArch>(getIOSArchForName),
       reportTimings: boolArg('report-timings'),
+
+      // BD ADD: START
+      compressSize: compressSize,
+      // END
     );
     return FlutterCommandResult.success();
   }

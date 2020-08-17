@@ -26,6 +26,8 @@ import '../project.dart';
 import '../reporting/reporting.dart';
 import 'gradle_errors.dart';
 import 'gradle_utils.dart';
+// BD ADD:
+import 'package:flutter_tools/src/calculate_build_info.dart';
 
 /// The directory where the APK artifact is generated.
 @visibleForTesting
@@ -525,6 +527,8 @@ Future<void> buildGradleApp({
   if (buildInfo.codeSizeDirectory != null) {
     await _performCodeSizeAnalysis('apk', apkFile, androidBuildInfo);
   }
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 Future<void> _performCodeSizeAnalysis(
@@ -712,6 +716,8 @@ Future<void> buildGradleAar({
     '$successMark Built ${globals.fs.path.relative(repoDirectory.path)}.',
     color: TerminalColor.green,
   );
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 /// Prints how to consume the AAR from a host app.
@@ -877,6 +883,8 @@ Future<void> buildPluginsAsAar(
       throwToolExit('The plugin $pluginName could not be built due to the issue above.');
     }
   }
+  // BD ADD:
+  await FlutterBuildInfo.instance.reportInfo();
 }
 
 /// Returns the APK files for a given [FlutterProject] and [AndroidBuildInfo].

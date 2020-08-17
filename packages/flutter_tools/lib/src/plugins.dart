@@ -18,6 +18,8 @@ import 'features.dart';
 import 'globals.dart' as globals;
 import 'platform_plugins.dart';
 import 'project.dart';
+// BD ADD:
+import 'calculate_build_info.dart';
 
 void _renderTemplateToFile(String template, dynamic context, String filePath) {
   final String renderedTemplate = globals.templateRenderer
@@ -1140,6 +1142,10 @@ Future<void> refreshPluginsList(FlutterProject project, {bool checkProjects = fa
   final bool legacyChanged = _writeFlutterPluginsListLegacy(project, plugins);
 
   final bool changed = _writeFlutterPluginsList(project, plugins);
+
+  // BD ADD:
+  FlutterBuildInfo.instance.depList.addAll(plugins);
+
   if (changed || legacyChanged) {
     createPluginSymlinks(project, force: true);
     if (!checkProjects || project.ios.existsSync()) {

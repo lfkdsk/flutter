@@ -35,6 +35,18 @@ final RegExp _sdkVersionRe = RegExp(r'^ro.build.version.sdk=([0-9]+)$');
 // $ANDROID_SDK_ROOT/platforms/android-22/android.jar
 // $ANDROID_SDK_ROOT/platforms/android-23/android.jar
 // $ANDROID_SDK_ROOT/platforms/android-N/android.jar
+
+// BD ADD: START
+String getAaptPath() {
+  final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+  if (sdk != null && sdk.latestVersion != null
+      && sdk.latestVersion._canRun(sdk.latestVersion.aaptPath) == null) {
+    return sdk.latestVersion.aaptPath;
+  }
+  return null;
+}
+// END
+
 class AndroidSdk {
   AndroidSdk(this.directory) {
     reinitialize();

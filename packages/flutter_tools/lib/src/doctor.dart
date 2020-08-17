@@ -628,15 +628,26 @@ class FlutterValidator extends DoctorValidator {
     ValidationType valid = ValidationType.installed;
     String versionChannel;
     String frameworkVersion;
+    // BD ADD: START
+    String bdFrameworkVersion;
+    String changelog;
+    // END
 
     try {
       final FlutterVersion version = globals.flutterVersion;
       versionChannel = version.channel;
       frameworkVersion = version.frameworkVersion;
+      // BD MOD: START
+      // messages.add(ValidationMessage(userMessages.flutterVersion(frameworkVersion, Cache.flutterRoot)));
+      bdFrameworkVersion = version.bdFrameworkVersion;
+      changelog =
+        'https://code.byted.org/tech_client/flutter/blob/${version.getBranchName()}/CHANGELOG.md';
       messages.add(ValidationMessage(userMessages.flutterVersion(
-        frameworkVersion,
-        Cache.flutterRoot,
-      )));
+        version.frameworkVersion,
+        version.bdFrameworkVersion,
+        Cache.flutterRoot)));
+      messages.add(ValidationMessage(userMessages.flutterChangelog(changelog)));
+      // END
       messages.add(ValidationMessage(userMessages.flutterRevision(
         version.frameworkRevisionShort,
         version.frameworkAge,
@@ -676,6 +687,10 @@ class FlutterValidator extends DoctorValidator {
       statusInfo: userMessages.flutterStatusInfo(
         versionChannel,
         frameworkVersion,
+        // BD ADD: START
+        bdFrameworkVersion, 
+        changelog,
+        // END
         globals.os.name,
         globals.platform.localeName,
       ),

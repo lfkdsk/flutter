@@ -58,6 +58,9 @@ class FlutterVersion {
     );
     _gitTagVersion = GitTagVersion.determine(processUtils, workingDirectory: _workingDirectory, fetchTags: false);
     _frameworkVersion = gitTagVersion.frameworkVersionFor(_frameworkRevision);
+    // BD ADD:
+    _bdFrameworkVersion =
+        BDGitTagVersion.determine(processUtils, workingDirectory: _workingDirectory, fetchTags: false).frameworkVersionFor(_frameworkRevision);
   }
 
   /// Fetchs tags from the upstream Flutter repository and re-calculates the
@@ -155,6 +158,11 @@ class FlutterVersion {
 
   String _frameworkVersion;
   String get frameworkVersion => _frameworkVersion;
+
+  // BD ADD: START
+  String _bdFrameworkVersion;
+  String get bdFrameworkVersion => _bdFrameworkVersion;
+  // END
 
   String get frameworkDate => frameworkCommitDate;
 
@@ -854,6 +862,109 @@ class GitTagVersion {
     return '$x.$y.${z + 1}-0.0.pre.$commits';
   }
 }
+
+// BD ADD: START
+class BDGitTagVersion {
+  const BDGitTagVersion(
+      this.x, this.y, this.z, this.hotfix, this.commits, this.hash, this.suffix);
+  const BDGitTagVersion.unknown()
+      : x = null,
+        y = null,
+        z = null,
+        hotfix = null,
+        commits = 0,
+        hash = '',
+        suffix = '';
+
+  /// The X in bdX.Y.Z-H.
+  final int x;
+
+  /// The Y in bdX.Y.Z-H.
+  final int y;
+
+  /// The Z in bdX.Y.Z-H.
+  final int z;
+
+  /// the F in bdX.Y.Z-H
+  final int hotfix;
+
+  /// Number of commits since the bdX.Y.Z-H tag.
+  final int commits;
+
+  /// The git hash (or an abbreviation thereof) for this commit.
+  final String hash;
+
+  final String suffix;
+
+  // static BDGitTagVersion determine() {
+  //   return parse(
+  //       _runGit('git describe --match bd*.*.* --first-parent --long --tags'));
+  // }
+
+  static BDGitTagVersion determine(ProcessUtils processUtils, {String workingDirectory, bool fetchTags = false}) {
+    return parse(
+        _runGit('git describe --match bd*.*.* --first-parent --long --tags', processUtils, workingDirectory));
+  }
+
+  static BDGitTagVersion parse(String version) {
+    String suffix = '';
+    RegExp versionPattern = RegExp(
+        r'^bd([0-9]+)\.([0-9]+)\.([0-9]+)(?:-([0-9]+))-([0-9]+)-g([a-f0-9]+)$');
+    List<String> parts =
+        versionPattern.matchAsPrefix(version)?.groups(<int>[1, 2, 3, 4, 5, 6]);
+    if (parts == null) {
+      suffix = '-dynamicart';
+      versionPattern = RegExp(
+          r'^bd_([0-9]+)\.([0-9]+)\.([0-9]+)-dynamicart(?:-([0-9]+))-([0-9]+)-g([a-f0-9]+)$');
+      parts = versionPattern.matchAsPrefix(version)?.groups(<int>[1, 2, 3, 4, 5, 6]);
+      if (parts == null) {
+        globals.printTrace('Could not interpret results of "git describe": $version');
+        return const BDGitTagVersion.unknown();
+      }
+    }
+    final List<int> parsedParts = parts
+        .take(5)
+        .map<int>(
+            (String source) => source == null ? null : int.tryParse(source))
+        .toList();
+    return BDGitTagVersion(parsedParts[0], parsedParts[1], parsedParts[2],
+        parsedParts[3], parsedParts[4], parts[5], suffix);
+  }
+
+  String frameworkVersionFor(String revision) {
+    if (x == null || y == null || z == null || !revision.startsWith(hash)) {
+      return '0.0.0-unknown';
+    }
+    if (commits == 0) {
+      if (hotfix != null) {
+        return '$x.$y.$z$suffix-$hotfix';
+      }
+      return '$x.$y.$z$suffix';
+    }
+    if (hotfix != null) {
+      return '$x.$y.$z$suffix-${hotfix + 1}-pre.$commits';
+    }
+    return '$x.$y.${z + 1}$suffix-pre.$commits';
+  }
+
+  String nextVersion() {
+    if (hotfix != null) {
+      return '$x.$y.$z$suffix-${hotfix + 1}';
+    } else {
+      return '$x.$y.$z$suffix-1';
+    }
+  }
+
+  @override
+  String toString() {
+    if (hotfix != null) {
+      return '$x.$y.$z$suffix-$hotfix';
+    } else {
+      return '$x.$y.$z$suffix';
+    }
+  }
+}
+// END
 
 enum VersionCheckResult {
   /// Unable to check whether a new version is available, possibly due to

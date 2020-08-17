@@ -56,6 +56,7 @@ import 'src/web/web_runner.dart';
 
 // BD ADD: START
 import 'src/commands/analyze_size.dart';
+import 'src/commands/develop.dart';
 // END
 /// Main entry point for commands.
 ///
@@ -104,6 +105,8 @@ Future<void> main(List<String> args) async {
     ConfigCommand(verboseHelp: verboseHelp),
     CreateCommand(),
     DaemonCommand(hidden: !verboseHelp),
+    // BD ADD:
+    DevelopCommand(),
     DevicesCommand(),
     DoctorCommand(verbose: verbose),
     DowngradeCommand(),

@@ -14,6 +14,8 @@ import '../globals.dart' as globals;
 import '../ios/mac.dart';
 import '../runner/flutter_command.dart' show DevelopmentArtifact, FlutterCommandResult;
 import 'build.dart';
+// BD ADD:
+import '../calculate_build_info.dart';
 
 /// Builds an .app for an iOS app to be used for local testing on an iOS device
 /// or simulator. Can only be run on a macOS host. For producing deployment
@@ -127,6 +129,15 @@ class BuildIOSCommand extends BuildSubCommand {
 
     final String typeName = globals.artifacts.getEngineType(TargetPlatform.ios, buildInfo.mode);
     globals.printStatus('Building $app for $logTarget ($typeName)...');
+
+    // BD ADD: START
+    FlutterBuildInfo.instance.platform = 'ios';
+    if (app != null) {
+      FlutterBuildInfo.instance.pkgName = app.toString();
+    }
+    await FlutterBuildInfo.instance.reportInfo();
+    // END
+
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,

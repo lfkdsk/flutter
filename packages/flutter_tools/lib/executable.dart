@@ -58,6 +58,7 @@ import 'src/web/web_runner.dart';
 import 'src/commands/analyze_size.dart';
 import 'src/commands/develop.dart';
 import 'src/artifacts.dart';
+import 'src/calculate_build_info.dart';
 // END
 /// Main entry point for commands.
 ///
@@ -94,6 +95,21 @@ Future<void> main(List<String> args) async {
   setEngineMode(engineMode);
 
   // BD ADD: START
+  if (args.contains('build')) {
+    FlutterBuildInfo.instance.needReport =
+        !args.contains('--debug') && !args.contains('--profile');
+    FlutterBuildInfo.instance.isAot =
+        (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
+    if (FlutterBuildInfo.instance.isAot &&
+        (args.length >= 2 && args[1] == 'ios' || args.contains('ios')
+            || args.contains('--target-platform=ios'))) {
+      FlutterBuildInfo.instance.platform = 'ios';
+    }
+    if (args.contains('--compress-size')) {
+      FlutterBuildInfo.instance.useCompressSize = true;
+    }
+    FlutterBuildInfo.instance.isLite = lite || liteGlobal || liteShareSkia;
+  }
   // print current command
   String cmdStr = '';
   for (String cmd in args) {

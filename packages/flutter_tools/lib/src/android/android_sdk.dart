@@ -57,6 +57,17 @@ String getAdbPath([ AndroidSdk existingSdk ]) {
   }
 }
 
+// BD ADD: START
+String getAaptPath() {
+  final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+  if (sdk != null && sdk.latestVersion != null
+      && sdk.latestVersion._canRun(sdk.latestVersion.aaptPath) == null) {
+    return sdk.latestVersion.aaptPath;
+  }
+  return null;
+}
+// END
+
 /// Locate 'emulator'. Prefer to use one from an Android SDK, if we can locate that.
 /// This should be used over accessing androidSdk.emulatorPath directly because it
 /// will work for those users who have Android Tools installed but

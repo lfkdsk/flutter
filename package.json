@@ -1,0 +1,70 @@
+{
+  "name": "Flutter",
+  "version": "1.12.13-4",
+  "description": "Bytedance Flutter SDK",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "cz-conventional-changelog": "^3.0.2",
+    "husky": "^3.0.5",
+    "standard-version": "^7.0.0",
+    "validate-commit-msg": "^2.14.0"
+  },
+  "scripts": {
+    "release": "standard-version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@code.byted.org:tech_client/flutter.git"
+  },
+  "keywords": [
+    "Flutter"
+  ],
+  "author": "",
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    },
+    "validate-commit-msg": {
+      "types": [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "perf",
+        "test",
+        "build",
+        "ci",
+        "chore",
+        "revert"
+      ],
+      "scope": {
+        "required": false,
+        "allowed": [
+          "*"
+        ],
+        "validate": false,
+        "multiple": false
+      },
+      "warnOnFail": false,
+      "maxSubjectLength": 100,
+      "subjectPattern": ".+",
+      "subjectPatternErrorMsg": "subject does not match subject pattern!",
+      "helpMessage": "",
+      "autoFix": false
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "validate-commit-msg"
+    }
+  },
+  "standard-version": {
+    "issueUrlFormat": "https://jira.bytedance.com/browse/{{id}}",
+    "releaseCommitMessageFormat": "chore(release): bd{{currentTag}}",
+    "compareUrlFormat": "https://code.byted.org/tech_client/flutter/compare/{{previousTag}}...bd{{currentTag}}",
+    "commitUrlFormat": "https://code.byted.org/tech_client/flutter/commit/{{hash}}"
+  }
+}

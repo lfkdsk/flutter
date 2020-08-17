@@ -57,6 +57,9 @@ import 'src/runner/flutter_command.dart';
 import 'src/web/compile.dart';
 import 'src/web/web_runner.dart';
 
+// BD ADD: START
+import 'src/commands/analyze_size.dart';
+// END
 /// Main entry point for commands.
 ///
 /// This function is intended to be used from the `flutter` command line tool.
@@ -95,6 +98,8 @@ Future<void> main(List<String> args) async {
       terminal: globals.terminal,
       artifacts: globals.artifacts,
     ),
+    // BD ADD:
+    AnalyzeSizeCommand(),
     AssembleCommand(),
     AttachCommand(verboseHelp: verboseHelp),
     BuildCommand(verboseHelp: verboseHelp),

@@ -5412,10 +5412,13 @@ abstract class RenderObjectElement extends Element {
       _debugDoingBuild = false;
       return true;
     }());
-    assert(() {
-      _debugUpdateRenderObjectOwner();
-      return true;
-    }());
+    // BD MOD: START
+    // assert(() {
+    //   _debugUpdateRenderObjectOwner();
+    //   return true;
+    // }());
+    _debugUpdateRenderObjectOwner();
+    // END
     assert(_slot == newSlot);
     attachRenderObject(newSlot);
     _dirty = false;
@@ -5442,10 +5445,13 @@ abstract class RenderObjectElement extends Element {
   }
 
   void _debugUpdateRenderObjectOwner() {
-    assert(() {
-      _renderObject.debugCreator = DebugCreator(this);
-      return true;
-    }());
+    // BD MOD: START
+    // assert(() {
+    //   _renderObject.debugCreator = DebugCreator(this);
+    //   return true;
+    // }());
+    _renderObject.debugCreator = DebugCreator(this);
+    // END
   }
 
   @override

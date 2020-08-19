@@ -1122,15 +1122,18 @@ class TextTreeRenderer {
     String prefixOtherLines,
     TextTreeConfiguration parentConfiguration,
   }) {
-    if (kReleaseMode) {
-      return '';
-    } else {
+    // BD DEL: START
+    // if (kReleaseMode) {
+    //   return '';
+    // } else {
+    // END
       return _debugRender(
           node,
           prefixLineOne: prefixLineOne,
           prefixOtherLines: prefixOtherLines,
           parentConfiguration: parentConfiguration);
-    }
+    // BD DEL:
+    // }
   }
 
   String _debugRender(
@@ -1493,7 +1496,9 @@ abstract class DiagnosticsNode {
   ///
   /// If `minLevel` is [DiagnosticLevel.hidden] no diagnostics will be filtered.
   /// If `minLevel` is [DiagnosticLevel.off] all diagnostics will be filtered.
-  bool isFiltered(DiagnosticLevel minLevel) => kReleaseMode || level.index < minLevel.index;
+  // BD MOD:
+  // bool isFiltered(DiagnosticLevel minLevel) => kReleaseMode || level.index < minLevel.index;
+  bool isFiltered(DiagnosticLevel minLevel) => level.index < minLevel.index;
 
   /// Priority level of the diagnostic used to control which diagnostics should
   /// be shown and filtered.
@@ -1504,7 +1509,9 @@ abstract class DiagnosticsNode {
   /// the value returned here but other factors also influence it. For example,
   /// whether an exception is thrown computing a property value
   /// [DiagnosticLevel.error] is returned.
-  DiagnosticLevel get level => kReleaseMode ? DiagnosticLevel.hidden : DiagnosticLevel.info;
+  // BD MOD:
+  // DiagnosticLevel get level => kReleaseMode ? DiagnosticLevel.hidden : DiagnosticLevel.info;
+  DiagnosticLevel get level => DiagnosticLevel.info;
 
   /// Whether the name of the property should be shown when showing the default
   /// view of the tree.
@@ -1563,7 +1570,8 @@ abstract class DiagnosticsNode {
   @mustCallSuper
   Map<String, Object> toJsonMap(DiagnosticsSerializationDelegate delegate) {
     Map<String, Object> result = <String, Object>{};
-    assert(() {
+    // BD DEL:
+    // assert(() {
       final bool hasChildren = getChildren().isNotEmpty;
       result = <String, Object>{
         'description': toDescription(),
@@ -1604,8 +1612,10 @@ abstract class DiagnosticsNode {
             delegate,
           ),
       };
-      return true;
-    }());
+      // BD DEL: START
+      // return true;
+      // }());
+      // END
     return result;
   }
 
@@ -1656,7 +1666,8 @@ abstract class DiagnosticsNode {
     String result = super.toString();
     assert(style != null);
     assert(minLevel != null);
-    assert(() {
+    // BD DEL:
+    // assert(() {
       if (_isSingleLine(style)) {
         result = toStringDeep(
             parentConfiguration: parentConfiguration, minLevel: minLevel);
@@ -1672,8 +1683,10 @@ abstract class DiagnosticsNode {
               : '$name$_separator $description';
         }
       }
-      return true;
-    }());
+      // BD DEL: START
+      // return true;
+      // }());
+      // END
     return result;
   }
 
@@ -1740,7 +1753,8 @@ abstract class DiagnosticsNode {
     DiagnosticLevel minLevel = DiagnosticLevel.debug,
   }) {
     String result = '';
-    assert(() {
+    // BD DEL:
+    // assert(() {
       result = TextTreeRenderer(
         minLevel: minLevel,
         wrapWidth: 65,
@@ -1751,8 +1765,10 @@ abstract class DiagnosticsNode {
         prefixOtherLines: prefixOtherLines,
         parentConfiguration: parentConfiguration,
       );
-      return true;
-    }());
+      // BD DEL: START
+      // return true;
+      // }());
+      // END
     return result;
   }
 }
@@ -2935,30 +2951,41 @@ class DiagnosticableNode<T extends Diagnosticable> extends DiagnosticsNode {
   ///
   /// It will cache the result to prevent duplicate operation.
   DiagnosticPropertiesBuilder get builder {
-    if (kReleaseMode) {
-      return null;
-    } else {
-      assert(() {
+    // BD DEL: START
+    // if (kReleaseMode) {
+    //   return null;
+    // } else {
+    //   assert(() {
+    // END
         if (_cachedBuilder == null) {
           _cachedBuilder = DiagnosticPropertiesBuilder();
           value?.debugFillProperties(_cachedBuilder);
         }
-        return true;
-      }());
+     // BD DEL: START
+     //   return true;
+     // }());
+     // END
       return _cachedBuilder;
-    }
+     // BD DEL:
+     // }
   }
 
   @override
   DiagnosticsTreeStyle get style {
-    return kReleaseMode ? DiagnosticsTreeStyle.none : super.style ?? builder.defaultDiagnosticsTreeStyle;
+    // BD MOD:
+    // return kReleaseMode ? DiagnosticsTreeStyle.none : super.style ?? builder.defaultDiagnosticsTreeStyle;
+    return super.style ?? builder.defaultDiagnosticsTreeStyle;
   }
 
   @override
-  String get emptyBodyDescription => (kReleaseMode || kProfileMode) ? '' : builder.emptyBodyDescription;
+  // BD MOD:
+  // String get emptyBodyDescription => (kReleaseMode || kProfileMode) ? '' : builder.emptyBodyDescription;
+  String get emptyBodyDescription => builder.emptyBodyDescription;
 
   @override
-  List<DiagnosticsNode> getProperties() => (kReleaseMode || kProfileMode) ? const <DiagnosticsNode>[] : builder.properties;
+  // BD MOD:
+  // List<DiagnosticsNode> getProperties() => (kReleaseMode || kProfileMode) ? const <DiagnosticsNode>[] : builder.properties;
+  List<DiagnosticsNode> getProperties() => builder.properties;
 
   @override
   List<DiagnosticsNode> getChildren() {
@@ -2968,10 +2995,13 @@ class DiagnosticableNode<T extends Diagnosticable> extends DiagnosticsNode {
   @override
   String toDescription({ TextTreeConfiguration parentConfiguration }) {
     String result = '';
-    assert(() {
+    // BD DEL:
+    // assert(() {
       result = value.toStringShort();
-      return true;
-    }());
+    // BD DEL: START
+    //   return true;
+    // }());
+    // END
     return result;
   }
 }
@@ -3051,10 +3081,13 @@ class DiagnosticPropertiesBuilder {
 
   /// Add a property to the list of properties.
   void add(DiagnosticsNode property) {
-    assert(() {
-      properties.add(property);
-      return true;
-    }());
+    // BD MOD: START
+    // assert(() {
+    //   properties.add(property);
+    //   return true;
+    // }());
+    properties.add(property);
+    // END
   }
 
   /// List of properties accumulated so far.
@@ -3381,11 +3414,14 @@ abstract class DiagnosticableTree with Diagnosticable {
     String joiner = ', ',
     DiagnosticLevel minLevel = DiagnosticLevel.debug,
   }) {
-    if (kReleaseMode) {
-      return toString();
-    }
+    // BD DELETE: START
+    // if (kReleaseMode) {
+    //   return toString();
+    // }
+    // END
     String shallowString;
-    assert(() {
+    // BD DEL:
+    // assert(() {
       final StringBuffer result = StringBuffer();
       result.write(toString());
       result.write(joiner);
@@ -3396,8 +3432,10 @@ abstract class DiagnosticableTree with Diagnosticable {
             .join(joiner),
       );
       shallowString = result.toString();
-      return true;
-    }());
+    // BD DEL: START
+    //   return true;
+    // }());
+    // END
     return shallowString;
   }
 
@@ -3474,11 +3512,14 @@ mixin DiagnosticableTreeMixin implements DiagnosticableTree {
     String joiner = ', ',
     DiagnosticLevel minLevel = DiagnosticLevel.debug,
   }) {
-    if (kReleaseMode) {
-      return toString();
-    }
+    // BD DELETE: START
+    // if (kReleaseMode) {
+    //   return toString();
+    // }
+    // END
     String shallowString;
-    assert(() {
+    // BD DEL:
+    // assert(() {
       final StringBuffer result = StringBuffer();
       result.write(toStringShort());
       result.write(joiner);
@@ -3489,8 +3530,10 @@ mixin DiagnosticableTreeMixin implements DiagnosticableTree {
             .join(joiner),
       );
       shallowString = result.toString();
-      return true;
-    }());
+    // BD DEL: START
+    //  return true;
+    // }());
+    // END
     return shallowString;
   }
 

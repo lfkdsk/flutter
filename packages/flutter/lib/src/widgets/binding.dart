@@ -1247,4 +1247,12 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, SchedulerBi
       WidgetsFlutterBinding();
     return WidgetsBinding.instance;
   }
+  
+  // BD ADD: START
+  @override
+  void handleMemoryPressure() {
+    super.handleMemoryPressure();
+    PaintingBinding.instance.imageCache.clear();
+  }
+  // END
 }

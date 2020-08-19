@@ -86,6 +86,8 @@ class ManifestAssetBundle implements AssetBundle {
   static const String _kAssetManifestJson = 'AssetManifest.json';
   static const String _kFontSetMaterial = 'material';
   static const String _kNoticeFile = 'NOTICES';
+  // BD ADD:
+  static const String _KFlutterVersion = 'flutter_version';
 
   @override
   bool wasBuiltOnce() => _lastBuildTimestamp != null;
@@ -304,6 +306,8 @@ class ManifestAssetBundle implements AssetBundle {
     _setIfChanged(_kAssetManifestJson, assetManifest);
     _setIfChanged(kFontManifestJson, fontManifest);
     _setIfChanged(_kNoticeFile, licenses);
+    // BD ADD:
+    entries[_KFlutterVersion] = DevFSFileContent(globals.fs.file(globals.fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
     return 0;
   }
 

@@ -604,10 +604,12 @@ class FlutterErrorDetails with Diagnosticable {
   /// In release mode, this always returns a [DiagnosticsNode.message] with a
   /// formatted version of the exception.
   DiagnosticsNode get summary {
-    String formatException() => exceptionAsString().split('\n')[0].trimLeft();
-    if (kReleaseMode) {
-      return DiagnosticsNode.message(formatException());
-    }
+    // BD DEL: START
+    // String formatException() => exceptionAsString().split('\n')[0].trimLeft();
+    // if (kReleaseMode) {
+    //   return DiagnosticsNode.message(formatException());
+    // }
+    // END
     final Diagnosticable? diagnosticable = _exceptionToDiagnosticable();
     DiagnosticsNode? summary;
     if (diagnosticable != null) {
@@ -615,7 +617,9 @@ class FlutterErrorDetails with Diagnosticable {
       debugFillProperties(builder);
       summary = builder.properties.cast<DiagnosticsNode?>().firstWhere((DiagnosticsNode? node) => node!.level == DiagnosticLevel.summary, orElse: () => null);
     }
-    return summary ?? ErrorSummary(formatException());
+    // BD MOD:
+    // return summary ?? ErrorSummary(formatException());
+    return summary ?? ErrorSummary(exceptionAsString().split('\n')[0].trimLeft());
   }
 
   @override
@@ -913,6 +917,14 @@ class FlutterError extends Error with DiagnosticableTreeMixin implements Asserti
   static FlutterExceptionHandler presentError = dumpErrorToConsole;
 
   static int _errorCount = 0;
+
+  // BD ADD: START
+  static int get errorCount => _errorCount;
+
+  static set errorCount(int newCount) {
+    _errorCount = newCount;
+  }
+  // END
 
   /// Resets the count of errors used by [dumpErrorToConsole] to decide whether
   /// to show a complete error message or an abbreviated one.

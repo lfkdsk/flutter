@@ -259,7 +259,9 @@ class KernelSnapshot extends Target {
       ),
       aot: buildMode.isPrecompiled,
       buildMode: buildMode,
-      trackWidgetCreation: trackWidgetCreation && buildMode == BuildMode.debug,
+      // BD MOD:
+      // trackWidgetCreation: trackWidgetCreation && buildMode == BuildMode.debug,
+      trackWidgetCreation: trackWidgetCreation,
       targetModel: targetModel,
       outputFilePath: environment.buildDir.childFile('app.dill').path,
       packagesPath: packagesFile.path,

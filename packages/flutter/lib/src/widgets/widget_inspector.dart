@@ -1458,7 +1458,10 @@ mixin WidgetInspectorService {
     final String file = Uri.parse(location.file).path;
 
     // By default check whether the creation location was within package:flutter.
-    if (_pubRootDirectories == null) {
+    // if use flutterw, can't judge by _pubRootDirectories
+    // BD MOD
+    // if (_pubRootDirectories == null) {
+    if (_pubRootDirectories == null || file.contains('.flutterw/cache/dist')) {
       // TODO(chunhtai): Make it more robust once
       // https://github.com/flutter/flutter/issues/32660 is fixed.
       return !file.contains('packages/flutter/');
@@ -1470,6 +1473,31 @@ mixin WidgetInspectorService {
     }
     return false;
   }
+
+  // BD ADD: START
+  /// 业务层创建的Widget，返回CreateLocation
+  /// 非业务层创建的Widget或者无法获取Location，返回null
+  String getLocationCreatedByLocalProject(Object value) {
+    final _Location creationLocation = _getCreationLocation(value);
+    if (creationLocation == null || creationLocation.file == null) {
+      return null;
+    }
+    final String file = Uri.parse(creationLocation.file).path;
+
+    // By default check whether the creation location was within package:flutter.
+    // if use flutterw, can't judge by _pubRootDirectories
+    if (_pubRootDirectories == null || file.contains('.flutterw/cache/dist')) {
+      return (file.contains('packages/flutter/') ||
+          file.contains('.pub-cache/')) ? null : creationLocation.toString();
+    }
+    for (String directory in _pubRootDirectories) {
+      if (file.startsWith(directory) && !(file.contains('.pub-cache/'))) {
+        return creationLocation.toString();
+      }
+    }
+    return null;
+  }
+  // END
 
   /// Wrapper around `json.encode` that uses a ring of cached values to prevent
   /// the Dart garbage collector from collecting objects between when
@@ -2914,25 +2942,23 @@ String _describeCreationLocation(Object object) {
   final _Location location = _getCreationLocation(object);
   return location?.toString();
 }
-
-/// BD ADD:
-/// Element向上遍历，寻找第一个由业务创建的Widget，返回创建地址
+// BD ADD: START
+///Element向上遍历，寻找第一个由业务创建的Widget，返回创建地址
 String getCreationLocationForError(Element element) {
-  // if (element == null) {
-  //   return 'none';
-  // }
-  // String location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(element);
-  // if (location != null) {
-  //   return location;
-  // }
-  // element?.visitAncestorElements((ancestor) {
-  //   location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(ancestor);
-  //   return location == null;
-  // });
-  // return location ?? 'none';
-  return 'none';
+  if (element == null) {
+    return 'none';
+  }
+  String location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(element);
+  if (location != null) {
+    return location;
+  }
+  element?.visitAncestorElements((ancestor) {
+    location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(ancestor);
+    return location == null;
+  });
+  return location ?? 'none';
 }
-
+// END
 
 /// BD ADD:
 /// simplify location string

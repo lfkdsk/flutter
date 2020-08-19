@@ -58,7 +58,7 @@ class Performance {
   /// 获取堆快照
   static bool requestHeapSnapshot(String outFilePath){
     File outFile=File(outFilePath);
-    if(outFile.existsSync()){
+    if(!outFile.existsSync()){
       outFile.createSync(recursive:true);
     }
     return engine.requestHeapSnapshot(outFilePath);

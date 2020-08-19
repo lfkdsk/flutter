@@ -15,6 +15,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+// BD ADD:
+import 'package:flutter/widgets.dart';
 
 import 'app.dart';
 import 'debug.dart';
@@ -1243,8 +1245,18 @@ class WidgetsFlutterBinding extends BindingBase with GestureBinding, SchedulerBi
   /// binding instance to a [TestWidgetsFlutterBinding], not a
   /// [WidgetsFlutterBinding].
   static WidgetsBinding ensureInitialized() {
-    if (WidgetsBinding.instance == null)
+    if (WidgetsBinding.instance == null) {
       WidgetsFlutterBinding();
+      // BD ADD: START
+      final VoidCallback preCallback = ui.performance.exitApp;
+      ui.performance.exitApp = () {
+        if (preCallback != null) {
+          preCallback();
+        }
+        runApp(Container());
+      };
+      // END
+    }
     return WidgetsBinding.instance;
   }
   

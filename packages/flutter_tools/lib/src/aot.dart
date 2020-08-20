@@ -18,6 +18,9 @@ import 'globals.dart' as globals;
 import 'ios/bitcode.dart';
 import 'project.dart';
 
+// BD ADD:
+import 'package:flutter_tools/src/calculate_build_info.dart';
+
 /// Builds AOT snapshots given a platform, build mode and a path to a Dart
 /// library.
 class AotBuilder {
@@ -161,6 +164,8 @@ class AotBuilder {
     } else {
       globals.printStatus(builtMessage);
     }
+    // BD ADD:
+    await FlutterBuildInfo.instance.reportInfoWhenAot();
     return;
   }
 }

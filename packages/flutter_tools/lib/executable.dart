@@ -110,6 +110,8 @@ Future<void> main(List<String> args) async {
     }
     FlutterBuildInfo.instance.isLite = lite || liteGlobal || liteShareSkia;
   }
+  FlutterBuildInfo.instance.isVerbose = verbose;
+  FlutterBuildInfo.instance.parseCommand(args);
   // print current command
   String cmdStr = '';
   for (String cmd in args) {

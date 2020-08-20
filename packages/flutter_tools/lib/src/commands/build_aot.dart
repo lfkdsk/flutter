@@ -93,7 +93,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
 
       // BD ADD: START
       compressSize: compressSize,
-      trackWidgetCreation: boolArg('track-widget-creation'),
+      // trackWidgetCreation: boolArg('track-widget-creation'),
       useLite: boolArg('lite'),
       useLiteGlobal: boolArg('lite-global'),
       useLiteShareSkia: boolArg('lite-share-skia'),

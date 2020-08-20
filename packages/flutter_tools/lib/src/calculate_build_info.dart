@@ -3,9 +3,11 @@ import 'package:flutter_tools/src/platform_plugins.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_tools/src/android/android_sdk.dart';
+import 'package:flutter_tools/src/base/file_system.dart';
 import 'package:flutter_tools/src/base/process.dart';
 import 'package:flutter_tools/src/plugins.dart';
 import 'package:intl/intl.dart';
+import 'package:yaml/yaml.dart' as yaml;
 import 'cache.dart';
 import 'version.dart';
 
@@ -47,7 +49,95 @@ class FlutterBuildInfo {
   bool isLite = false;
   bool useCompressSize = false;
   List<Plugin> depList = List<Plugin>();
+  bool isVerbose = true;
   String reportTime = '';
+  String cmdName = '';
+  String cmdParams = '';
+  String projectType = '';
+  String projectVersion = '';
+  String projectBranch = '';
+  String flutterwVersion = '';
+  int eventTime = 0;
+
+  void parseCommand(List<String> args) {
+    if (args.length == 1) {
+      cmdName = args[0];
+    } else if (args.length >= 2) {
+        String _cmdStr = '';
+        for (int i = 0; i < args.length; i++) {
+          if (cmdName.isEmpty) {
+            if (!args[i].startsWith('-')) {
+              cmdName = args[i];
+            }
+          } else {
+            _cmdStr += args[i] + ' ';
+          }
+        }
+        cmdParams = _cmdStr;
+        if (isVerbose) {
+          print('parseCommand cmdName: $cmdName, cmdParams: $cmdParams');
+        }
+    }
+  }
+
+  yaml.YamlMap loadYaml(String projectDir, String fileName) {
+    final File targetFile = fs.file(fs.path.join(projectDir, fileName));
+    if (!targetFile.existsSync()) {
+      return null;
+    }
+    final dynamic yamlFile = yaml.loadYaml(targetFile.readAsStringSync());
+    if (yamlFile is yaml.YamlMap) {
+      return yamlFile;
+    } else {
+      return null;
+    }
+  }
+
+  void getPkgNameAndVersion() {
+    final String directoryPath = runSafeCmd(<String>['pwd']);
+    if (directoryPath == null) {
+      return;
+    }
+    final yaml.YamlMap pubSpecYaml = loadYaml(directoryPath, 'pubspec.yaml');
+    if (pubSpecYaml != null && pubSpecYaml['name'] != null) {
+      final dynamic _packageName = pubSpecYaml['name'];
+      if (_packageName is String) {
+        pkgName = _packageName;
+      } else {
+        print('pubspec.yaml is malformed.');
+      }
+    }
+    if (pubSpecYaml != null && pubSpecYaml['version'] != null) {
+      final dynamic _version = pubSpecYaml['version'];
+      if (_version is String) {
+        projectVersion = _version;
+      } else {
+        print('pubspec.yaml is malformed.');
+      }
+    }
+  }
+
+  void getProjectType() {
+    String directoryPath = runSafeCmd(<String>['pwd']);
+    if (directoryPath == null) {
+      return;
+    }
+    yaml.YamlMap metadata = loadYaml(directoryPath, '.metadata');
+    if (metadata == null) {
+      // ignore: flutter_style_todos
+      // FIXME: If can’t find the file, go back to the previous level and continue to find it.
+      directoryPath = directoryPath.substring(0, directoryPath.lastIndexOf('/'));
+      metadata = loadYaml(directoryPath, '.metadata');
+    }
+    if (metadata != null && metadata['project_type'] != null) {
+      final dynamic _projectType = metadata['project_type'];
+      if (_projectType is String) {
+        projectType = _projectType;
+      } else {
+        print('metadata is malformed.');
+      }
+    }
+  }
 
   void extractBuildInfo() {
     // get ip
@@ -66,6 +156,9 @@ class FlutterBuildInfo {
 
     // get dirs
     projectDir = runSafeCmd(<String>['pwd']);
+
+    // get branch
+    projectBranch = runSafeCmd(<String>['git', 'branch', '--show-current']);
 
     // get projectGitUrl
     projectGitUrl =
@@ -91,6 +184,23 @@ class FlutterBuildInfo {
     }
     engineCid = runSafeCmd(
         <String>['cat', '${Cache.flutterRoot}/bin/internal/ttengine.version']);
+
+    String _flutterwVersion = runSafeCmd(<String>['./flutterw', '--version']);
+    _flutterwVersion ??= runSafeCmd(<String>['../flutterw', '--version']);
+    if (_flutterwVersion != null) {
+      final RegExp reg = new RegExp('\\d+\\.\\d+\\.\\d+');
+      final Iterable<Match> matches = reg.allMatches(_flutterwVersion);
+      if (matches.isNotEmpty) {
+        if (isVerbose) {
+          for (Match m in matches) {
+            print(m.group(0));
+          }
+        }
+        flutterwVersion = matches.first.group(0);
+      }
+    }
+    getPkgNameAndVersion();
+    getProjectType();
   }
 
   String extractIpFromString(String result) {
@@ -159,15 +269,20 @@ class FlutterBuildInfo {
   }
 
   Future<void> reportInfo() async {
-    if (!needReport) {
-      return;
-    }
+    // if (!needReport) {
+    //   return;
+    // }
     await initializeDateFormatting();
     final DateTime now = DateTime.now();
     final DateFormat inputFormat = DateFormat('yyyy-MM-dd-HH:mm:ss');
     reportTime = inputFormat.format(now);
+    eventTime = now.millisecondsSinceEpoch;
     extractBuildInfo();
-    final String result = buildReportJson();
+    // final String result = buildReportJson();
+    final String result = buildReportJsonForAnalysis();
+    if (isVerbose) {
+      print('reportInfo result: $result');
+    }
     final String newReportTime =
         reportTime.replaceAll(':', '_').replaceAll('-', '_');
     String newIp = 'unkonwn_ip';
@@ -176,12 +291,16 @@ class FlutterBuildInfo {
     }
     final String newFrameworkVersion =
     frameworkVersion.replaceAll('\.', '_').replaceAll('-', '_').replaceAll('+', '_');
-    await findIndexAndUploadResult(
-        result, 'v_${newFrameworkVersion}_ip_${newIp}_t_$newReportTime.json');
+    // await findIndexAndUploadResult(
+    try {
+      await uploadInfoToCloud(
+                    result, 'v_${newFrameworkVersion}_ip_${newIp}_t_$newReportTime.json');
+    } on Error {
+    }
   }
 
   Future<void> reportInfoWhenAot() async {
-    if (needReport && isAot) {
+    if (isAot) {
       await reportInfo();
     }
   }
@@ -285,5 +404,71 @@ class FlutterBuildInfo {
         .catchError((Object error) {
       return null;
     });
+  }
+
+  Future<void> uploadInfoToCloud(String jsonResult,
+      String fileName) {
+    final Map<String, String> headers = Map();
+    headers['content-type'] = 'application/json';
+    const String url = 'https://cloudapi.bytedance.net/faas/services/tt7urg/invoke/flutterw_statistic_upload';
+    return http.post(url, headers: headers, body: jsonResult)
+        .timeout(const Duration(seconds: 5))
+        .then((resp) {
+          if (resp != null && resp.body != null) {
+            if (resp.body.contains('error')) {
+              print('upload info failed! ${resp.body}');
+            } else {
+              print('upload info succeed!');
+            }
+          }
+        })
+        .catchError((Object error) {
+      return null;
+    });
+  }
+
+  String buildReportJsonForAnalysis() {
+    List<Map<String, String>> list = new List();
+    for (Plugin plugin in depList) {
+      final Map<String, String> map = new Map<String, String>();
+      map['name'] = plugin.name;
+      map['path'] = plugin.path;
+      if (plugin.platforms != null) {
+        plugin.platforms.values.forEach((pv){
+          if (pv is AndroidPlugin) {
+            map['androidPackage'] = pv.package;
+            map['pluginClass'] = pv.pluginClass;
+          } else if (pv is IOSPlugin ) {
+            map['iosPrefix'] = pv.classPrefix;
+            map['pluginClass'] = pv.pluginClass;
+          }
+        });
+      }
+      list.add(map);
+    }
+    final Map<String, Object> depMap = {'dep_list': list};
+    final Map<String, dynamic> map = Map<String, dynamic>();
+    map['event_time'] = eventTime;
+    map['user_uniq_id'] = ip;
+    map['proj_name'] = pkgName;
+    map['proj_type'] = projectType;
+    map['proj_version'] = projectVersion;
+    map['flutter_version'] = frameworkVersion;
+    map['cmd_name'] = cmdName;
+    map['cmd_params'] = cmdParams;
+    map['git_user'] = userEmail;
+    map['git_branch'] = projectBranch;
+    map['git_url'] = projectGitUrl;
+    map['engine_cid'] = engineCid;
+    map['framework_cid'] = frameworkCid;
+    map['pwd'] = projectDir;
+    map['flutterw_version'] = flutterwVersion;
+    // TODO: Need to fill with correct value.
+    map['cmd_duration'] = -1;
+    map['error_stack'] = 'be_null';
+    map['cmd_exit_code'] = -1;
+    map['extra'] = '';
+    Map<String, Object> content = {'event_name':'flutter_basic', 'event_data': map};
+    return json.encode(content).toString();
   }
 }

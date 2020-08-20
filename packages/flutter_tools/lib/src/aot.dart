@@ -21,6 +21,9 @@ import 'globals.dart';
 import 'ios/bitcode.dart';
 import 'project.dart';
 
+// BD ADD:
+import 'package:flutter_tools/src/calculate_build_info.dart';
+
 /// Builds AOT snapshots given a platform, build mode and a path to a Dart
 /// library.
 class AotBuilder {
@@ -65,6 +68,8 @@ class AotBuilder {
         buildMode: buildMode,
         quiet: quiet,
       );
+      // BD ADD:
+      await FlutterBuildInfo.instance.reportInfoWhenAot();
       return;
     }
 
@@ -133,7 +138,6 @@ class AotBuilder {
             return buildExitCode;
           });
         });
-
         // Merge arch-specific App.frameworks into a multi-arch App.framework.
         if ((await Future.wait<int>(exitCodes.values)).every((int buildExitCode) => buildExitCode == 0)) {
           final Iterable<String> dylibs = iosBuilds.values.map<String>(
@@ -178,7 +182,6 @@ class AotBuilder {
       return;
     }
     status?.stop();
-
     if (outputPath == null) {
       throwToolExit(null);
     }
@@ -189,6 +192,8 @@ class AotBuilder {
     } else {
       printStatus(builtMessage);
     }
+    // BD ADD:
+    await FlutterBuildInfo.instance.reportInfoWhenAot();
     return;
   }
 

@@ -81,19 +81,19 @@ class _ObjectMirror {
   }
 }
 
-@pragma('vm:entry-point')
-class _InstanceMirror extends _ObjectMirror {
-  @pragma('vm:entry-point')
-  _InstanceMirror._(dynamic reflectee) : super._(reflectee);
-
-  /// 处理实例方法调用
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    var res = _UnpackInvocation.unpack(invocation);
-    return engine.instanceInvoke(
-        reflectee, res.invokeType, res.functionName, res.arguments, res.names);
-  }
-}
+//@pragma('vm:entry-point')
+//class _InstanceMirror extends _ObjectMirror {
+//  @pragma('vm:entry-point')
+//  _InstanceMirror._(dynamic reflectee) : super._(reflectee);
+//
+//  /// 处理实例方法调用
+//  @override
+//  dynamic noSuchMethod(Invocation invocation) {
+//    var res = _UnpackInvocation.unpack(invocation);
+//    return engine.instanceInvoke(
+//        reflectee, res.invokeType, res.functionName, res.arguments, res.names);
+//  }
+//}
 
 @pragma('vm:entry-point')
 class _LibraryMirror extends _ObjectMirror {

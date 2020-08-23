@@ -1,5 +1,82 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
+typedef CustomVoidCallback = void Function();
+
+@pragma("vm:entry-point")
+int hostField = 12;
+
+@pragma("vm:entry-point")
+var hostCallback = (){
+  print("hostCallback invoke");
+};
+
+@pragma("vm:entry-point")
+void initHost(int a, String s, {String h}) {
+  print("invoke initHost ${a}, ${s}, ${h}");
+}
+
+@pragma("vm:entry-point")
+Future<int> hostTestAsync() {
+  var completer = Completer<int>();
+  Future.delayed(Duration(seconds: 5),(){
+    completer.complete(100);
+  });
+  return completer.future;
+}
+
+abstract class AbstractTestHost {
+  @pragma("vm:entry-point")
+  factory AbstractTestHost(int va,
+      {String vb, double vc, CustomVoidCallback vcb}) {
+    return TestHost(va, vb: vb, vc: vc, vcb: vcb);
+  }
+}
+
+class TestHost implements AbstractTestHost {
+
+  int a = 0;
+  String b;
+  double c = 0;
+  CustomVoidCallback cb;
+
+  @pragma("vm:entry-point")
+  static int sa = 10;
+
+  @pragma("vm:entry-point")
+  static CustomVoidCallback scb;
+
+  @pragma("vm:entry-point")
+  TestHost(int va, {String vb, double vc, CustomVoidCallback vcb}) {
+    a = va;
+    b = vb;
+    c = vc;
+    cb = vcb;
+  }
+
+  @pragma("vm:entry-point")
+  TestHost.th(int va, {String vb, double vc, CustomVoidCallback vcb}) {
+    a = va;
+    b = vb;
+    c = vc;
+    cb = vcb;
+  }
+
+  @pragma("vm:entry-point")
+  void testHost(int v1, [int v2]) {
+    print("testHost:${v1}, ${v2}, ${a}, ${b}, ${c}");
+  }
+
+  @pragma("vm:entry-point")
+  int testHost2(int v1, [int v2, int v3]) {
+    return v1 + v2 + v3 + a;
+  }
+
+  @pragma("vm:entry-point")
+  static void staticTestHost(int v1, [int v2]) {
+    print("staticTestHost:${v1}, ${v2}");
+  }
+}
 
 void main() {
   runApp(MyApp());

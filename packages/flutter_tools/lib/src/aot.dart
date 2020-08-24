@@ -35,6 +35,9 @@ class AotBuilder {
     bool compressSize = false,
     bool trackWidgetCreation = false,
     bool useLite = false,
+    bool isDynamicart = false,
+    bool isMinimumSize = false,
+    List<String> dynamicPlugins = null,
     bool useLiteGlobal = false,
     bool useLiteShareSkia = false,
     // END

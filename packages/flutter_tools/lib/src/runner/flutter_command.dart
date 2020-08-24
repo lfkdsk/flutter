@@ -475,6 +475,51 @@ abstract class FlutterCommand extends Command<void> {
     );
   }
 
+  // BD ADD: START
+  List<String> getDynamicPlugins() {
+    final String dynamicPluginContent = stringArg('dynamic-aot-plugins');
+    List<String> dynamicPlugins;
+    if (dynamicPluginContent.isNotEmpty) {
+      dynamicPlugins = dynamicPluginContent.split(',');
+    }
+    if (dynamicPlugins != null) {
+      for (String item in dynamicPlugins) {
+        if (!item.startsWith('package:') || !item.endsWith('/')) {
+          throwToolExit('dynamic-aot-plugins的格式不正确,每个条目以,分割,并且以package开头,以/结尾');
+        }
+      }
+    }
+    return dynamicPlugins;
+  }
+
+  // dynamicart模式下会将可能用到的代码打成机器码，默认会包含完整的dart sdk和flutter sdk
+  // 如果某些plugin对性能要求特别高（例如动画引擎）无法接受解释执行，需要以机器码形式随包下发
+  // 那可以在编译宿主时使用此参数
+  void addDynamicartModeFlags(){
+    // 注意：是 dynamicart 不是 dynamic，不要搞混了
+    // 动态化所基于的bd_1.5.4上已经有dynamic参数。
+    // dynamic参数是Flutter官方做了一半放出来最终又删除了的动态化模式，性能并不过关
+    // dynamicart参数是字节跳动自研的AOT+解释执行的动态化模式
+    // 两层含义：
+    // 1. dynamic + art = 动态化的艺术
+    // 2. d(ynamic)art = 动态化的Dart
+    argParser..addFlag('dynamicart',
+        negatable: false,
+        help: '开启动态化, 目前只支持release模式.');
+    argParser..addOption('dynamic-aot-plugins',
+        defaultsTo: '',
+        hide: true,
+        help: '需要keep的plugin的包名，格式为package:xxx/');
+  }
+
+  void addDynamicModeFlags(){
+    argParser..addOption('dynamic-aot-plugins',
+        defaultsTo: '',
+        hide: true,
+        help: '需要keep的plugin的包名，格式为package:xxx/');
+  }
+  // END
+
   void addShrinkingFlag() {
     argParser.addFlag('shrink',
       negatable: true,
@@ -563,6 +608,23 @@ abstract class FlutterCommand extends Command<void> {
       throw UsageException('Only one of --debug, --profile, --jit-release, '
                            'or --release can be specified.', null);
     }
+
+    // BD ADD: START
+    final bool isDynamicartFlag = argParser.options.containsKey('dynamicart')
+        ? boolArg('dynamicart')
+        : false;
+    if (isDynamicartFlag) {
+      if (boolArg('debug')) {
+        throw ToolExit('Error: --dynamicart requires --release or --profile.');
+      }
+      if (boolArg('release')) {
+        return BuildMode.dynamicartRelease;
+      } else {
+        return BuildMode.dynamicartProfile;
+      }
+    }
+    // END
+
     if (debugResult) {
       return BuildMode.debug;
     }
@@ -708,6 +770,8 @@ abstract class FlutterCommand extends Command<void> {
       packagesPath: globalResults['packages'] as String ?? '.packages',
       nullSafetyMode: nullSafetyMode,
       // BD ADD: START
+      dynamicPlugins: argParser.options.containsKey('dynamic-aot-plugins')
+          ? stringArg('dynamic-aot-plugins') : null,
       lite: argParser.options.containsKey('lite')
           ? boolArg('lite')
           : false,

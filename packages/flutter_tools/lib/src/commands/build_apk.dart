@@ -37,6 +37,10 @@ class BuildApkCommand extends BuildSubCommand {
     addEnableExperimentation(hide: !verboseHelp);
     addBuildPerformanceFile(hide: !verboseHelp);
     addNullSafetyModeOptions(hide: !verboseHelp);
+
+    // BD ADD:
+    addDynamicartModeFlags();
+
     argParser
       ..addFlag('split-per-abi',
         negatable: false,

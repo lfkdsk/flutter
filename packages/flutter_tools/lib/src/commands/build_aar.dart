@@ -20,22 +20,39 @@ import 'build.dart';
 
 class BuildAarCommand extends BuildSubCommand {
   BuildAarCommand({ @required bool verboseHelp }) {
+    // BD MOD: START
+    //argParser
+    //  ..addFlag(
+    //    'debug',
+    //    defaultsTo: true,
+    //    help: 'Build a debug version of the current project.',
+    //  )
+    //  ..addFlag(
+    //    'profile',
+    //    defaultsTo: true,
+    //    help: 'Build a version of the current project specialized for performance profiling.',
+    //  )
+    //  ..addFlag(
+    //    'release',
+    //    defaultsTo: true,
+    //    help: 'Build a release version of the current project.',
+    //  );
     argParser
       ..addFlag(
         'debug',
-        defaultsTo: true,
         help: 'Build a debug version of the current project.',
       )
       ..addFlag(
         'profile',
-        defaultsTo: true,
         help: 'Build a version of the current project specialized for performance profiling.',
       )
       ..addFlag(
         'release',
-        defaultsTo: true,
         help: 'Build a release version of the current project.',
       );
+    // END
+    // BD ADD:
+    addDynamicartModeFlags();
     addTreeShakeIconsFlag();
     usesFlavorOption();
     usesBuildNumberOption();
@@ -141,19 +158,67 @@ class BuildAarCommand extends BuildSubCommand {
       ? stringArg('build-number')
       : '1.0';
 
-    for (final String buildMode in const <String>['debug', 'profile', 'release']) {
-      if (boolArg(buildMode)) {
-        androidBuildInfo.add(
-          AndroidBuildInfo(
-            getBuildInfo(forcedBuildMode: BuildMode.fromName(buildMode)),
-            targetArchs: targetArchitectures,
-          )
-        );
+    // BD MOD: START
+   // for (String buildMode in const <String>['debug', 'profile', 'release']) {
+   // if (boolArg(buildMode)) {
+   //     androidBuildInfo.add(
+   //         AndroidBuildInfo(
+   //           BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor')),
+   //          targetArchs: targetArchitectures,
+   //         )
+   //     );
+   //   }
+   // }
+   // if (androidBuildInfo.isEmpty) {
+   //   throwToolExit('Please specify a build mode and try again.');
+    //}
+    BuildMode mode = null;
+    bool isDynamicart;
+    if (argParser.options.containsKey('dynamicart')) {
+      isDynamicart = boolArg('dynamicart');
+    } else {
+      isDynamicart = false;
+    }
+    if (isDynamicart) {
+      if (boolArg('debug')) {
+        throw ToolExit('Error: --dynamicart requires --release or --profile.');
+      }
+      if (boolArg('release')) {
+        mode = BuildMode.dynamicartRelease;
+      } else {
+        mode = BuildMode.dynamicartProfile;
       }
     }
-    if (androidBuildInfo.isEmpty) {
-      throwToolExit('Please specify a build mode and try again.');
+
+    void buildAndroidBuildInfo(bool f(String buildMode)){
+      for (String buildMode in const <String>['debug', 'profile', 'release']) {
+        if (f(buildMode)) {
+          androidBuildInfo.add(
+              AndroidBuildInfo(
+                BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor')),
+                targetArchs: targetArchitectures,
+              )
+          );
+        }
+      }
     }
+    if (mode == null) {
+      buildAndroidBuildInfo((String buildMode) => boolArg(buildMode));
+    } else {
+      androidBuildInfo.add(
+          AndroidBuildInfo(
+            BuildInfo(mode, stringArg('flavor')),
+            targetArchs: targetArchitectures,
+          )
+      );
+    }
+
+
+
+    if (androidBuildInfo.isEmpty) {
+      buildAndroidBuildInfo((String buildMode) => true);
+    }
+    // END
 
     await androidBuilder.buildAar(
       project: _getProject(),

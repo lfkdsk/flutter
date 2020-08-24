@@ -393,8 +393,21 @@ class FlutterCommandRunner extends CommandRunner<void> {
     // BD MOD:
     // final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64'];
     final List<String> suffixes = <String>['_arm', '_arm64', '_x86', '_x64', '_lite', '_liteg', '_lites'];
-    for (final String suffix in suffixes) {
-      tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
+    // BD MOD: START
+    // for (final String suffix in suffixes) {
+    for (String suffix in suffixes) {
+      // tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
+      // 这个函数的逻辑是根据指定的--local-engine=android_release_unopt参数去查找对应的host目录逻辑
+      // 例如指定android_release_unopt_arm时查找的host为截取第一个_后的的字符串然后把架构相关的字符给即为host_release_unopt
+      // 但新加dynamicart之后架构字符串就不在最后面了导致正则匹配不上，需要兼容一下
+      // ORIGIN: tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
+      if(tmpBasename.endsWith(suffix)){
+        tmpBasename = tmpBasename.replaceFirst(RegExp('$suffix\$'), '');
+      }else{
+        suffix = suffix.substring(1);
+        tmpBasename = tmpBasename.replaceFirst(RegExp('${suffix}_'), '');
+      }
+      // END
     }
     return 'host_' + tmpBasename;
   }

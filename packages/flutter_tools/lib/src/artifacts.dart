@@ -387,7 +387,7 @@ class CachedArtifacts implements Artifacts {
   String _getFlutterPatchedSdkPath(BuildMode mode) {
     final String engineArtifactsPath = _cache.getArtifactDirectory('engine').path;
     return _fileSystem.path.join(engineArtifactsPath, 'common',
-        (mode == BuildMode.release)
+        (mode == BuildMode.release || mode == BuildMode.dynamicartRelease)
         ? 'flutter_patched_sdk_product' : 'flutter_patched_sdk');
   }
 
@@ -520,7 +520,7 @@ class CachedArtifacts implements Artifacts {
         } else if (engineMode == EngineMode.lite_global) {
           liteSuffix = '-liteg';
         } else if (engineMode == EngineMode.lite_share_skia) {
-          if ((mode == BuildMode.release)
+          if ((mode == BuildMode.release || mode == BuildMode.dynamicartRelease)
               && platform == TargetPlatform.ios) {
             liteSuffix = '-lites';
           } else {
@@ -530,7 +530,7 @@ class CachedArtifacts implements Artifacts {
           }
         }
         if ((liteSuffix != '' && mode != BuildMode.release)
-            && !(liteSuffix == '-lites')) {
+            && !(liteSuffix == '-lites' && mode == BuildMode.dynamicartRelease)) {
           globals.printError(
               'Now, --lite or --lite-global now only support for release mode !\nOtherwise we will fall to normal mode.');
           liteSuffix = '';
@@ -718,7 +718,9 @@ class LocalEngineArtifacts implements Artifacts {
 
   String _getFlutterPatchedSdkPath(BuildMode buildMode) {
     return _fileSystem.path.join(engineOutPath,
-        buildMode == BuildMode.release ? 'flutter_patched_sdk_product' : 'flutter_patched_sdk');
+        buildMode == BuildMode.release || buildMode == BuildMode.dynamicartRelease
+            ? 'flutter_patched_sdk_product'
+            : 'flutter_patched_sdk');
   }
 
   String _getFlutterWebSdkPath() {

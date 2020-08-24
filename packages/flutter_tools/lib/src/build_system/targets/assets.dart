@@ -48,6 +48,10 @@ Future<Depfile> copyAssets(Environment environment, Directory outputDirectory, {
   final int resultCode = await assetBundle.build(
     manifestPath: pubspecFile.path,
     packagesPath: environment.projectDir.childFile('.packages').path,
+    // BD ADD: START
+    includeManifest: environment.isMinimumSize || environment.isDynamicart ? true : false,
+    isMinimumSize: environment.isMinimumSize,
+    // END
   );
   if (resultCode != 0) {
     throw Exception('Failed to bundle asset files.');

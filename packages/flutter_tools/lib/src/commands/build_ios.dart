@@ -37,6 +37,8 @@ class BuildIOSCommand extends BuildSubCommand {
     addBuildPerformanceFile(hide: !verboseHelp);
     addBundleSkSLPathOption(hide: !verboseHelp);
     addNullSafetyModeOptions(hide: !verboseHelp);
+    // BD ADD:
+    addDynamicartModeFlags();
     argParser
       ..addFlag('simulator',
         help: 'Build for the iOS simulator instead of the device. This changes '
@@ -47,11 +49,16 @@ class BuildIOSCommand extends BuildSubCommand {
         help: 'Codesign the application bundle (only available on device builds).',
       )
       // BD ADD: START
+      ..addFlag('minimum-size',
+          defaultsTo: false,
+          help: '用于ios的dyamicart模式下减少包体积的参数'
+      )
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,
       );
       // END
+
   }
 
   @override
@@ -138,12 +145,33 @@ class BuildIOSCommand extends BuildSubCommand {
     await FlutterBuildInfo.instance.reportInfo();
     // END
 
+    // BD ADD: START
+    final bool isMinimumSize = (buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.release)
+        ? boolArg('minimum-size')
+        : false;
+    List<String> dynamicPlugins;
+    if (boolArg('dynamicart')) {
+      dynamicPlugins = getDynamicPlugins();
+    }
+
+    // compressSize与minimums-ize互斥，优先minimum-size
+    final bool compressSize = (!isMinimumSize && (buildInfo.mode == BuildMode.release || buildInfo.mode == BuildMode.dynamicartRelease))
+        ? boolArg('compress-size')
+        : false;
+    // END
+
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
       buildInfo: buildInfo,
       targetOverride: targetFile,
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
+      // BD ADD START:
+      isDynamicart: buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.dynamicartProfile,
+      isMinimumSize: isMinimumSize,
+      dynamicPlugins: dynamicPlugins,
+      compressSize: compressSize
+      // END
     );
 
     if (!result.success) {

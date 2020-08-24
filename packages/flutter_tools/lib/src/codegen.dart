@@ -100,6 +100,9 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     @required BuildMode buildMode,
     @required PackageConfig packageConfig,
     // BD ADD: START
+    // 父类加了这两个参数, 子类也必须加，不加就编译不通过
+    bool isDynamicart = false,
+    List<String> dynamicPlugins,
     bool lite = false,
     bool liteGlobal = false,
     bool liteShareSkia = false,
@@ -134,6 +137,8 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
       initializeFromDill: initializeFromDill,
       dartDefines: dartDefines,
       packageConfig: packageConfig,
+      // BD ADD:
+      isDynamicart: isDynamicart
     );
   }
 }

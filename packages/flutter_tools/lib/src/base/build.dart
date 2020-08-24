@@ -71,6 +71,9 @@ class GenSnapshot {
       snapshotterPath += '_' + getNameForDarwinArch(darwinArch);
     }
 
+    // BD ADD
+    print("snapshot==${<String>[snapshotterPath, ...args].join(' ')}");
+
     return _processUtils.stream(
       <String>[snapshotterPath, ...args],
       mapFunction: (String line) =>  kIgnoredWarnings.contains(line) ? null : line,
@@ -118,8 +121,10 @@ class AOTSnapshotter {
     @required String splitDebugInfo,
     @required bool dartObfuscation,
     bool quiet = false,
-    // BD ADD:
+    // BD ADD: START
+    bool isMinimumSize = false,
     bool compressSize = false
+    // END
   }) async {
     // TODO(cbracken): replace IOSArch with TargetPlatform.ios_{armv7,arm64}.
     assert(platform != TargetPlatform.ios || darwinArch != null);
@@ -149,6 +154,12 @@ class AOTSnapshotter {
     }
     // END
 
+    // BD ADD:
+    if (buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile) {
+      genSnapshotArgs.add('--dynamicart');
+    }
+    // END
+
     // BD ADD: START
     String isolateSnapshotData;
     String vmSnapshotData;
@@ -161,6 +172,17 @@ class AOTSnapshotter {
         '--assembly=$assembly',
         '--strip'
       ]);
+
+      // BD ADD: START
+      if (isMinimumSize) {
+        final String isolateSnapshotData = _fileSystem.path.join(
+            outputDir.path, 'isolate_snapshot_data');
+        final String vmSnapshotData = _fileSystem.path.join(
+            outputDir.path, 'vm_snapshot_data');
+        genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
+        genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
+      }
+      // END
 
       // BD ADD: START
       if (compressSize) {
@@ -314,6 +336,18 @@ class AOTSnapshotter {
       '-o', appLib,
       assemblyO,
     ];
+
+    // BD ADD: START
+    if (compressSize && isolateSnapshotData != null && vmSnapshotData != null) {
+        await processUtils.run(<String>['rm', '-f', '$isolateSnapshotData.gz']);
+        await processUtils.run(<String>['gzip', '--best', '-S', '.gz', '$isolateSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__isolate_data,$isolateSnapshotData.gz');
+
+        await processUtils.run(<String>['rm', '-f', '$vmSnapshotData.gz']);
+        await processUtils.run(<String>['gzip', '--best', '-S', '.gz', '$vmSnapshotData']);
+        linkArgs.add('-Wl,-sectcreate,__BD_DATA,__vm_data,$vmSnapshotData.gz');
+    }
+    // END
     final RunResult linkResult = await _xcode.clang(linkArgs);
     if (linkResult.exitCode != 0) {
       _logger.printError('Failed to link AOT snapshot. Linker terminated with exit code ${compileResult.exitCode}');

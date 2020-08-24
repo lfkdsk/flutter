@@ -67,6 +67,14 @@ const List<Target> _kDefaultTargets = <Target>[
   DebugBundleWindowsAssets(),
   ProfileBundleWindowsAssets(),
   ReleaseBundleWindowsAssets(),
+  // BD ADD: START
+  androidArmDynamicartProfileBundle,
+  androidArm64DynamicartProfileBundle,
+  androidx64DynamicartProfileBundle,
+  androidArmDynamicartReleaseBundle,
+  androidArm64DynamicartReleaseBundle,
+  androidx64DynamicartReleaseBundle,
+  // END
 ];
 
 /// Assemble provides a low level API to interact with the flutter tool build
@@ -112,6 +120,7 @@ class AssembleCommand extends FlutterCommand {
       help: 'The maximum number of concurrent tasks the build system will run.',
     );
     // BD ADD: START
+    addDynamicartModeFlags();
     argParser.addFlag('lite',
         negatable: false,
         defaultsTo: false,
@@ -189,6 +198,10 @@ class AssembleCommand extends FlutterCommand {
           .childDirectory('.dart_tool')
           .childDirectory('flutter_build'),
       projectDir: flutterProject.directory,
+      // BD ADD: START
+      dynamicPlugins: getDynamicPlugins(),
+      isDynamicart: boolArg('dynamicart'),
+      // END
       defines: _parseDefines(stringsArg('define')),
       inputs: _parseDefines(stringsArg('input')),
       cacheDir: globals.cache.getRoot(),

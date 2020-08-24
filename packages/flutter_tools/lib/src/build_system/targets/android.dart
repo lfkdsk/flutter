@@ -14,6 +14,9 @@ import 'assets.dart';
 import 'common.dart';
 import 'icon_tree_shaker.dart';
 
+// BD ADD
+import 'package:analyzer/dart/ast/ast.dart';
+
 /// Prepares the asset bundle in the format expected by flutter.gradle.
 ///
 /// The vm_snapshot_data, isolate_snapshot_data, and kernel_blob.bin are
@@ -257,6 +260,15 @@ const AndroidAot androidArmRelease = AndroidAot(TargetPlatform.android_arm,  Bui
 const AndroidAot androidArm64Release = AndroidAot(TargetPlatform.android_arm64, BuildMode.release);
 const AndroidAot androidx64Release = AndroidAot(TargetPlatform.android_x64, BuildMode.release);
 
+// BD ADD: START
+const AndroidAot androidArmDynamicartProfile = AndroidAot(TargetPlatform.android_arm,  BuildMode.dynamicartProfile);
+const AndroidAot androidArm64DynamicartProfile = AndroidAot(TargetPlatform.android_arm64, BuildMode.dynamicartProfile);
+const AndroidAot androidx64DynamicartProfile = AndroidAot(TargetPlatform.android_x64, BuildMode.dynamicartProfile);
+const AndroidAot androidArmDynamicartRelease = AndroidAot(TargetPlatform.android_arm,  BuildMode.dynamicartRelease);
+const AndroidAot androidArm64DynamicartRelease = AndroidAot(TargetPlatform.android_arm64, BuildMode.dynamicartRelease);
+const AndroidAot androidx64DynamicartRelease = AndroidAot(TargetPlatform.android_x64, BuildMode.dynamicartRelease);
+// END
+
 /// A rule paired with [AndroidAot] that copies the produced so files into the output directory.
 class AndroidAotBundle extends Target {
   /// Create an [AndroidAotBundle] implementation for a given [targetPlatform] and [buildMode].
@@ -313,3 +325,11 @@ const Target androidx64ProfileBundle = AndroidAotBundle(androidx64Profile);
 const Target androidArmReleaseBundle = AndroidAotBundle(androidArmRelease);
 const Target androidArm64ReleaseBundle = AndroidAotBundle(androidArm64Release);
 const Target androidx64ReleaseBundle = AndroidAotBundle(androidx64Release);
+// BD ADD: START
+const Target androidArmDynamicartProfileBundle = AndroidAotBundle(androidArmDynamicartProfile);
+const Target androidArm64DynamicartProfileBundle = AndroidAotBundle(androidArm64DynamicartProfile);
+const Target androidx64DynamicartProfileBundle = AndroidAotBundle(androidx64DynamicartProfile);
+const Target androidArmDynamicartReleaseBundle = AndroidAotBundle(androidArmDynamicartRelease);
+const Target androidArm64DynamicartReleaseBundle = AndroidAotBundle(androidArm64DynamicartRelease);
+const Target androidx64DynamicartReleaseBundle = AndroidAotBundle(androidx64DynamicartRelease);
+// END

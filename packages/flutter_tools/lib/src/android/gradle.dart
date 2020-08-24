@@ -357,6 +357,13 @@ Future<void> buildGradleApp({
   if (androidBuildInfo.buildInfo.performanceMeasurementFile != null) {
     command.add('-Pperformance-measurement-file=${androidBuildInfo.buildInfo.performanceMeasurementFile}');
   }
+
+  // BD ADD: START
+  if (buildInfo.dynamicPlugins != null) {
+    command.add('-Pdynamic-aot-plugins=${buildInfo.dynamicPlugins}');
+  }
+  // END
+
   command.add(assembleTask);
 
   // BD ADD: START

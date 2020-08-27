@@ -4,7 +4,7 @@ stages:
 app_dill:
   stage: build
   only: 
-    - bd_1.12.13_dynamic_pre_reflection
+    - bd_1.12.13_dynamic_pre
   tags:
     - flutter
   script:

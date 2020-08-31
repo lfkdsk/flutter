@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-18](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-17...bd1.12.13-18) (2020-08-31)
+
+
+### Features
+
+* support report info to cloud platform ([8b97442](https://code.byted.org/tech_client/flutter/commit/8b97442))
+
 ### [1.12.13-17](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-16...bd1.12.13-17) (2020-08-14)
 
 

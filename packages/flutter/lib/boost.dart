@@ -32,21 +32,26 @@ class Boost {
   static const int _kDisableGC = 1 << 0;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-26
+  @Deprecated('Removed from ByteFlutter 1.20')
   static const int _kDisableAA = 1 << 1;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-66
+  @Deprecated('Removed from ByteFlutter 1.20')
   static const int _kDelayFuture = 1 << 2;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-66
+  @Deprecated('Removed from ByteFlutter 1.20')
   static const int _kDelayPlatformMessage = 1 << 3;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-10
   static const int _kUiMessageAtHead = 1 << 4;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-9
+  @Deprecated('Removed from ByteFlutter 1.20')
   static const int _kEnableWaitSwapBuffer = 1 << 5;
 
   /// See also: https://jira.bytedance.com/browse/FLUTTER-80
+  @Deprecated('Removed from ByteFlutter 1.20')
   static const int _kEnableExtendBufferQueue = 1 << 6;
 
   static const int _kNotifyIdle = 1 << 7;
@@ -187,6 +192,12 @@ class Boost {
   /// Notify current isolate force execute gc right now.
   static void forceDartGC() {
     performance.forceGC();
+  }
+
+  /// preload fonts
+  @Deprecated('preloadFontFamilies has been removed from ByteFlutter 1.20')
+  static void preloadFontFamilies(List<String> fontFamilies, Locale locale) {
+    throw 'preloadFontFamilies has been removed from ByteFlutter 1.20';
   }
 
   /// 滚动中回调，每次需要重新赋值，避免无法销毁情况

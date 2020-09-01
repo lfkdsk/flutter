@@ -265,20 +265,6 @@ List<String> _buildModeOptions(BuildMode mode) {
         '-Ddart.vm.product=true',
         '--bytecode-options=source-positions',
       ];
-    // BD ADD:
-    case BuildMode.dynamicartProfile:
-      return <String>[
-        '-Ddart.vm.profile=true',
-        '-Ddart.vm.product=false',
-        '--bytecode-options=source-positions',
-      ];
-    case BuildMode.dynamicartRelease:
-      return <String>[
-        '-Ddart.vm.profile=false',
-        '-Ddart.vm.product=true',
-        '--bytecode-options=source-positions',
-      ];
-    // END
   }
   throw Exception('Unknown BuildMode: $mode');
 }

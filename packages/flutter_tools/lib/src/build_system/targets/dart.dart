@@ -235,7 +235,7 @@ class KernelSnapshot extends Target {
       fileSystemScheme: fileSystemScheme,
       dartDefines: parseDartDefines(environment),
       // BD ADD: START
-      isDynamicart: buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile,
+      isDynamicart: kEngineMode == EngineMode.dynamicart,
       dynamicPlugins: environment.dynamicPlugins,
       // END
     );

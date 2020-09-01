@@ -20,7 +20,8 @@ enum EngineMode {
   normal,
   lite,
   lite_global,
-  lite_share_skia
+  lite_share_skia,
+  dynamicart,
 }
 // END
 enum Artifact {
@@ -354,7 +355,7 @@ class CachedArtifacts extends Artifacts {
   String _getFlutterPatchedSdkPath(BuildMode mode) {
     final String engineArtifactsPath = cache.getArtifactDirectory('engine').path;
     return fs.path.join(engineArtifactsPath, 'common',
-      (mode == BuildMode.release || mode == BuildMode.dynamicartRelease)
+      (mode == BuildMode.release)
         ? 'flutter_patched_sdk_product'
         : 'flutter_patched_sdk'
     );
@@ -458,7 +459,7 @@ class CachedArtifacts extends Artifacts {
         } else if (engineMode == EngineMode.lite_global) {
           liteSuffix = '-liteg';
         } else if (engineMode == EngineMode.lite_share_skia) {
-          if ((mode == BuildMode.release || mode == BuildMode.dynamicartRelease)
+          if ((mode == BuildMode.release)
               && platform == TargetPlatform.ios) {
             liteSuffix = '-lites';
           } else {
@@ -468,13 +469,16 @@ class CachedArtifacts extends Artifacts {
           }
         }
         if ((liteSuffix != '' && mode != BuildMode.release)
-            && !(liteSuffix == '-lites' && mode == BuildMode.dynamicartRelease)) {
+            && !(liteSuffix == '-lites')) {
           printError(
               'Now, --lite or --lite-global now only support for release mode !\nOtherwise we will fall to normal mode.');
           liteSuffix = '';
         }
         assert(mode != null, 'Need to specify a build mode for platform $platform.');
-        final String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-').replaceAll('_', '-')}' : '';
+        String suffix = mode != BuildMode.debug ? '-${snakeCase(getModeName(mode), '-')}' : '';
+        if(engineMode == EngineMode.dynamicart) {
+          suffix = mode != BuildMode.debug ? '-dynamicart-${snakeCase(getModeName(mode), '-')}' : '';
+        }
         return fs.path.join(engineDir, platformName + suffix + liteSuffix);
         // END
       case TargetPlatform.android_x64:
@@ -590,7 +594,7 @@ class LocalEngineArtifacts extends Artifacts {
 
   String _getFlutterPatchedSdkPath(BuildMode buildMode) {
     return fs.path.join(engineOutPath,
-        buildMode == BuildMode.release || buildMode == BuildMode.dynamicartRelease
+        buildMode == BuildMode.release
             ? 'flutter_patched_sdk_product'
             : 'flutter_patched_sdk');
   }

@@ -345,7 +345,7 @@ Future<void> buildGradleApp({
   command.add(assembleTask);
 
   // BD ADD: START
-  if (buildInfo.dynamicart != null) {
+  if (buildInfo.dynamicart) {
     command.add('-Pdynamicart=true');
   }
   if (buildInfo.dynamicPlugins != null) {
@@ -575,7 +575,7 @@ Future<void> buildGradleAar({
   command.add(aarTask);
 
   // BD ADD: START
-  if (androidBuildInfo.buildInfo.dynamicart != null) {
+  if (androidBuildInfo.buildInfo.dynamicart) {
     command.add('-Pdynamicart=true');
   }
   if (androidBuildInfo.buildInfo.dynamicPlugins != null) {
@@ -960,7 +960,7 @@ Directory _getLocalEngineRepo({
   );
 
   String buildMode = androidBuildInfo.buildInfo.modeName;
-  if(kEngineMode == EngineMode.dynamicart){
+  if(kEngineMode == EngineMode.dynamicart && (androidBuildInfo.buildInfo.mode == BuildMode.release || androidBuildInfo.buildInfo.mode == BuildMode.profile)){
     buildMode = "dynamicart_"+buildMode;
   }
   final String artifactVersion = _getLocalArtifactVersion(

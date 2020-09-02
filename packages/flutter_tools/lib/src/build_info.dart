@@ -21,7 +21,7 @@ class BuildInfo {
     this.buildNumber,
     this.buildName,
     // BD ADD: START
-    this.dynamicart,
+    this.dynamicart = false,
     this.dynamicPlugins,
     this.lite = false,
     this.liteGlobal = false,

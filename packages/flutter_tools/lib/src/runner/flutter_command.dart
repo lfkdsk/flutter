@@ -451,21 +451,6 @@ abstract class FlutterCommand extends Command<void> {
                            'or --release can be specified.', null);
     }
 
-//    // BD ADD: START
-//    final bool isDynamicartFlag = argParser.options.containsKey('dynamicart')
-//        ? boolArg('dynamicart')
-//        : false;
-//    if (isDynamicartFlag) {
-//      if (!boolArg('debug')) {
-//        if (boolArg('release')) {
-//          return BuildMode.dynamicartRelease;
-//        } else {
-//          return BuildMode.dynamicartProfile;
-//        }
-//      }
-//
-//    }
-//    // END
 
     if (debugResult) {
       return BuildMode.debug;

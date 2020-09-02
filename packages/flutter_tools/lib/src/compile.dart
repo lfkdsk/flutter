@@ -296,6 +296,8 @@ class KernelCompiler {
     bool lite = false,
     bool liteGlobal = false,
     bool liteShareSkia = false,
+    bool isDynamicDill = false,
+    String hostDillPath
     // END
   }) async {
     final String frontendServer = artifacts.getArtifactPath(
@@ -341,6 +343,7 @@ class KernelCompiler {
       ],
       // BD ADD: START
       if (isDynamicart) '--dynamicart',
+      if (isDynamicDill) '--dynamic',
       // END
       if (packagesPath != null) ...<String>[
         '--packages',
@@ -386,6 +389,11 @@ class KernelCompiler {
       }
       command.addAll(['--dynamic-aot-plugins', buffer.toString()]);
     }
+
+    if(hostDillPath != null && hostDillPath.isNotEmpty){
+      command.addAll(<String>['--host-dill', hostDillPath]);
+    }
+    print("kernelcompiler:${command.join(' ')}");
     // END
     printTrace(command.join(' '));
     final Process server = await processManager

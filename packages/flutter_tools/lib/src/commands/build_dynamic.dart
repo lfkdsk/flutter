@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show FileSystemEntity, Process;
+import 'dart:io' show FileSystemEntity, Process, ProcessResult, ProcessStartMode, sleep, stderr, stdout;
 import 'package:archive/archive.dart';
 
 // ignore: implementation_imports
@@ -45,6 +45,7 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..addFlag('verify', defaultsTo: true)
       ..addFlag('encrypt', defaultsTo: true)
       ..addOption('manifest', defaultsTo: defaultManifestPath)
+      ..addOption('package-name', defaultsTo: "qrcode_test")
       ..addMultiOption(
       'define',
       abbr: 'd',
@@ -179,6 +180,40 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..createSync(recursive: true)
       ..writeAsBytesSync(ZipEncoder().encode(update), flush: true);
     print('build dynamic success');
+
+    if(buildMode==BuildMode.debug){
+      final String packageName = stringArg('package-name');
+      final File appJsFile = fs.file('${Cache.flutterRoot}/bin/internal/app.js');
+      appJsFile.copySync(fs.path.join(getPatchBuildDirectory(), 'app.js'));
+      final File indexHtmlFile = fs.file('${Cache.flutterRoot}/bin/internal/index.html');
+      String content = indexHtmlFile.readAsStringSync();
+      content = content.replaceAll("PACKAGE_NAME", packageName);
+      File newIndexHtmlFile = fs.file(fs.path.join(getPatchBuildDirectory(), 'index.html'));
+      newIndexHtmlFile.writeAsStringSync(content);
+      Process process = await Process.start("killall",["node"], workingDirectory: getPatchBuildDirectory())
+          .catchError((dynamic error, StackTrace stack) {
+        print('Failed to kill all node $error, $stack');
+      });
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+      await process.exitCode;
+
+      process = await Process.start("npm",["install", "express", "--save"], workingDirectory: getPatchBuildDirectory())
+          .catchError((dynamic error, StackTrace stack) {
+        print('Failed to install express $error, $stack');
+      });
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+      await process.exitCode;
+
+      process = await Process.start("node",["app.js"], workingDirectory: getPatchBuildDirectory(), mode: ProcessStartMode.detachedWithStdio)
+          .catchError((dynamic error, StackTrace stack) {
+        print('Failed to start app.js  $error, $stack');
+      });
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+      sleep(Duration(seconds: 3));
+    }
   }
 }
 

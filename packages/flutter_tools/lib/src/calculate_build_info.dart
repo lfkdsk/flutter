@@ -93,6 +93,15 @@ class FlutterBuildInfo {
     }
   }
 
+  String readFileAsString(String projectDir,String fileName){
+    final File targetFile = fs.file(fs.path.join(projectDir, fileName));
+    if (!targetFile.existsSync()) {
+      return null;
+    } else {
+      return targetFile.readAsStringSync();
+    }
+  }
+
   void getPkgNameAndVersion() {
     final String directoryPath = runSafeCmd(<String>['pwd']);
     if (directoryPath == null) {
@@ -185,8 +194,8 @@ class FlutterBuildInfo {
     engineCid = runSafeCmd(
         <String>['cat', '${Cache.flutterRoot}/bin/internal/ttengine.version']);
 
-    String _flutterwVersion = runSafeCmd(<String>['./flutterw', '--version']);
-    _flutterwVersion ??= runSafeCmd(<String>['../flutterw', '--version']);
+    String _flutterwVersion = readFileAsString(fs.path.join(projectDir,'.flutterw','cache'), '.version');
+    _flutterwVersion ??= readFileAsString(fs.path.join(projectDir,'..','.flutterw','cache'), '.version');
     if (_flutterwVersion != null) {
       final RegExp reg = new RegExp('\\d+\\.\\d+\\.\\d+');
       final Iterable<Match> matches = reg.allMatches(_flutterwVersion);

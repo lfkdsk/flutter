@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-19](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-18...bd1.12.13-19) (2020-09-06)
+
+
+### Bug Fixes
+
+* **android:** Fix AlertDialogs built by platform views ([426d8ed](https://code.byted.org/tech_client/flutter/commit/426d8ed)), closes [#17511](https://jira.bytedance.com/browse/17511)
+* fix the build issue when getting flutterw version ([20a1334](https://code.byted.org/tech_client/flutter/commit/20a1334))
+
 ### [1.12.13-18](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-17...bd1.12.13-18) (2020-08-31)
 
 

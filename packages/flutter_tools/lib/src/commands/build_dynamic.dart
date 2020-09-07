@@ -45,7 +45,8 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..addFlag('verify', defaultsTo: true)
       ..addFlag('encrypt', defaultsTo: true)
       ..addOption('manifest', defaultsTo: defaultManifestPath)
-      ..addOption('package-name', defaultsTo: "qrcode_test")
+      ..addOption('package-name', defaultsTo: null)
+      ..addFlag("start-paused", defaultsTo: false)
       ..addMultiOption(
       'define',
       abbr: 'd',
@@ -67,9 +68,16 @@ class BuildDynamicCommand extends BuildSubCommand {
     final bool verbose = boolArg('verbose') ?? false;
     final bool verify = boolArg('verify') ?? true;
     final bool encrypt = boolArg('encrypt') ?? true;
+    final bool startPaused = boolArg("start-paused")??false;
     final Map<String, String> defines = _parseDefines(stringsArg('define'));
+    final String packageName = stringArg('package-name');
     defaultBuildMode = BuildMode.release;
     BuildMode buildMode = getBuildMode();
+    if(buildMode==BuildMode.debug){
+      if(packageName==null){
+        throwToolExit("package-name can't be null when in debug build mode!");
+      }
+    }
 
     FlutterManifest flutterManifest;
     try {
@@ -125,7 +133,7 @@ class BuildDynamicCommand extends BuildSubCommand {
         assetDirPath: getPatchAssetBuildDirectory(),
         originResource: originResource);
 
-    final String packageName = flutterManifest.appName;
+    final String appName = flutterManifest.appName;
     final String versionCode = flutterManifest.appVersion;
 
     final Map<String, Map<String, String>> versionMap = <String, Map<String, String>>{};
@@ -155,14 +163,18 @@ class BuildDynamicCommand extends BuildSubCommand {
         versionMap[key] = version;
       }
     }
-
     final Map<String, dynamic> jsonObject = <String, dynamic>{};
-    jsonObject['packageName'] = packageName == null ? '' : packageName;
+    jsonObject['packageName'] = appName == null ? '' : appName;
     jsonObject['version'] = versionCode == null ? '' : versionCode;
     jsonObject['dependencies'] = versionMap;
     final File manifestFile =
         fs.file(fs.path.join(getPatchBuildDirectory(), 'manifest.json'));
     manifestFile.writeAsStringSync(json.encode(jsonObject));
+
+    if(buildMode==BuildMode.debug && startPaused){
+      fs.file(fs.path.join(getPatchAssetBuildDirectory(), 'start-paused')).writeAsStringSync("123456789");
+    }
+
     final List<File> files = List();
     traverseFiles(getPatchBuildDirectory(), files);
     final Archive update = Archive();
@@ -182,14 +194,16 @@ class BuildDynamicCommand extends BuildSubCommand {
     print('build dynamic success');
 
     if(buildMode==BuildMode.debug){
-      final String packageName = stringArg('package-name');
+
       final File appJsFile = fs.file('${Cache.flutterRoot}/bin/internal/app.js');
       appJsFile.copySync(fs.path.join(getPatchBuildDirectory(), 'app.js'));
+
       final File indexHtmlFile = fs.file('${Cache.flutterRoot}/bin/internal/index.html');
       String content = indexHtmlFile.readAsStringSync();
       content = content.replaceAll("PACKAGE_NAME", packageName);
       File newIndexHtmlFile = fs.file(fs.path.join(getPatchBuildDirectory(), 'index.html'));
       newIndexHtmlFile.writeAsStringSync(content);
+
       Process process = await Process.start("killall",["node"], workingDirectory: getPatchBuildDirectory())
           .catchError((dynamic error, StackTrace stack) {
         print('Failed to kill all node $error, $stack');

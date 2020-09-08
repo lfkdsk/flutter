@@ -72,7 +72,7 @@ class GenSnapshot {
     }
 
     // BD ADD
-    print("snapshot==${<String>[snapshotterPath, ...args].join(' ')}");
+    print("snapshot=== ${<String>[snapshotterPath, ...args].join(' ')}\n");
 
     return _processUtils.stream(
       <String>[snapshotterPath, ...args],
@@ -155,7 +155,7 @@ class AOTSnapshotter {
     // END
 
     // BD ADD:
-    if (buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile) {
+    if (kEngineMode & ENGINE_DYNAMICART!=0) {
       genSnapshotArgs.add('--dynamicart');
     }
     // END

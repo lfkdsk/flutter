@@ -269,7 +269,7 @@ class KernelSnapshot extends Target {
       dartDefines: decodeDartDefines(environment.defines, kDartDefines),
       packageConfig: packageConfig,
       // BD ADD: START
-      isDynamicart: buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile,
+      isDynamicart: (kEngineMode & ENGINE_DYNAMICART!=0),
       dynamicPlugins: environment.dynamicPlugins,
       // END
     );

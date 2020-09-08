@@ -125,6 +125,11 @@ class AotBuilder {
       fileSystem: globals.fs,
       logger: globals.logger,
       processManager: globals.processManager,
+      // BD ADD: START
+      compressSize: compressSize,
+      isDynamicart: isDynamicart,
+      isMinimumSize: isMinimumSize,
+      // END
     );
     final BuildResult result = await globals.buildSystem.build(target, environment);
     status?.stop();

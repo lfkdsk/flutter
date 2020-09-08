@@ -67,6 +67,8 @@ Directory getRepoDirectory(Directory buildDirectory) {
 String _taskFor(String prefix, BuildInfo buildInfo) {
   final String buildType = camelCase(buildInfo.modeName);
   final String productFlavor = buildInfo.flavor ?? '';
+  print("buildType : ${buildType}");
+  print("productFlavor: ${productFlavor}");
   return '$prefix${toTitleCase(productFlavor)}${toTitleCase(buildType)}';
 }
 
@@ -92,7 +94,14 @@ String getAarTaskFor(BuildInfo buildInfo) {
 ///
 /// For example, when [splitPerAbi] is true, multiple APKs are created.
 Iterable<String> _apkFilesFor(AndroidBuildInfo androidBuildInfo) {
-  final String buildType = camelCase(androidBuildInfo.buildInfo.modeName);
+  String buildType = camelCase(androidBuildInfo.buildInfo.modeName);
+  if(androidBuildInfo.buildInfo.dynamicart){
+    if(buildType=='release'){
+      buildType = 'dynamicartRelease';
+    }else if(buildType=='profile'){
+      buildType = 'dynamicartProfile';
+    }
+  }
   final String productFlavor = androidBuildInfo.buildInfo.flavor ?? '';
   final String flavorString = productFlavor.isEmpty ? '' : '-$productFlavor';
   if (androidBuildInfo.splitPerAbi) {
@@ -266,9 +275,17 @@ Future<void> buildGradleApp({
   }
 
   final BuildInfo buildInfo = androidBuildInfo.buildInfo;
-  final String assembleTask = isBuildingBundle
+  globals.printTrace("isBuildingBundle is: ${isBuildingBundle}" );
+  String assembleTask = isBuildingBundle
     ? getBundleTaskFor(buildInfo)
     : getAssembleTaskFor(buildInfo);
+
+  // BD ADD: START
+  if (buildInfo.dynamicart) {
+    assembleTask = assembleTask.replaceAll("Release", "DynamicartRelease");
+    assembleTask = assembleTask.replaceAll("Profile", "DynamicartProfile");
+  }
+  // END
 
   final Status status = globals.logger.startProgress(
     "Running Gradle task '$assembleTask'...",
@@ -295,7 +312,19 @@ Future<void> buildGradleApp({
       'Local Maven repo: ${localEngineRepo.path}'
     );
     command.add('-Plocal-engine-repo=${localEngineRepo.path}');
-    command.add('-Plocal-engine-build-mode=${buildInfo.modeName}');
+    // BD MOD: START
+    if (buildInfo.dynamicart) {
+      var localEngineBuildMode = buildInfo.modeName;
+      if(localEngineBuildMode=="release"){
+        localEngineBuildMode = "dynamicart_release";
+      }else if(localEngineBuildMode=="profile"){
+        localEngineBuildMode = "dynamicart_profile";
+      }
+      command.add('-Plocal-engine-build-mode=${localEngineBuildMode}');
+    }else{
+      command.add('-Plocal-engine-build-mode=${buildInfo.modeName}');
+    }
+    // END
     command.add('-Plocal-engine-out=${localEngineArtifacts.engineOutPath}');
     command.add('-Ptarget-platform=${_getTargetPlatformByLocalEnginePath(
         localEngineArtifacts.engineOutPath)}');
@@ -358,15 +387,15 @@ Future<void> buildGradleApp({
     command.add('-Pperformance-measurement-file=${androidBuildInfo.buildInfo.performanceMeasurementFile}');
   }
 
-  // BD ADD: START
-  if (buildInfo.dynamicPlugins != null) {
-    command.add('-Pdynamic-aot-plugins=${buildInfo.dynamicPlugins}');
-  }
-  // END
-
   command.add(assembleTask);
 
   // BD ADD: START
+  if (buildInfo.dynamicart) {
+    command.add('-Pdynamicart=true');
+  }
+  if (buildInfo.dynamicPlugins != null) {
+    command.add('-Pdynamic-aot-plugins=${buildInfo.dynamicPlugins}');
+  }
   if (buildInfo.lite) {
     command.add('-Plite=true');
   }
@@ -377,7 +406,7 @@ Future<void> buildGradleApp({
     command.add('-Plite-share-skia=true');
   }
   // END
-  print("gradle==${command.join(" ")}");
+  print("gradle=== ${command.join(" ")}\n");
 
   GradleHandledError detectedGradleError;
   String detectedGradleErrorLine;
@@ -551,7 +580,13 @@ Future<void> buildGradleAar({
   }
 
   final BuildInfo buildInfo = androidBuildInfo.buildInfo;
-  final String aarTask = getAarTaskFor(buildInfo);
+  String aarTask = getAarTaskFor(buildInfo);
+  // BD ADD: START
+  if (androidBuildInfo.buildInfo.dynamicart) {
+    aarTask = aarTask.replaceAll("Release", "DynamicartRelease");
+    aarTask = aarTask.replaceAll("Profile", "DynamicartProfile");
+  }
+  // END
   final Status status = globals.logger.startProgress(
     "Running Gradle task '$aarTask'...",
     timeout: timeoutConfiguration.slowOperation,
@@ -608,7 +643,19 @@ Future<void> buildGradleAar({
       'Local Maven repo: ${localEngineRepo.path}'
     );
     command.add('-Plocal-engine-repo=${localEngineRepo.path}');
-    command.add('-Plocal-engine-build-mode=${buildInfo.modeName}');
+    // BD MOD: START
+    if (androidBuildInfo.buildInfo.dynamicart) {
+      var localEngineBuildMode = androidBuildInfo.buildInfo.modeName;
+      if(localEngineBuildMode=="release"){
+        localEngineBuildMode = "dynamicart_release";
+      }else if(localEngineBuildMode=="profile"){
+        localEngineBuildMode = "dynamicart_profile";
+      }
+      command.add('-Plocal-engine-build-mode=${localEngineBuildMode}');
+    }else{
+      command.add('-Plocal-engine-build-mode=${androidBuildInfo.buildInfo.modeName}');
+    }
+    // END
     command.add('-Plocal-engine-out=${localEngineArtifacts.engineOutPath}');
 
     // Copy the local engine repo in the output directory.
@@ -634,6 +681,12 @@ Future<void> buildGradleAar({
   command.add(aarTask);
 
   // BD ADD: START
+  if (androidBuildInfo.buildInfo.dynamicart) {
+    command.add('-Pdynamicart=true');
+  }
+  if (androidBuildInfo.buildInfo.dynamicPlugins != null) {
+    command.add('-Pdynamic-aot-plugins=${androidBuildInfo.buildInfo.dynamicPlugins}');
+  }
   if (androidBuildInfo.buildInfo.lite) {
     command.add('-Plite=true');
   }
@@ -643,6 +696,7 @@ Future<void> buildGradleAar({
   if (androidBuildInfo.buildInfo.liteShareSkia) {
     command.add('-Plite-share-skia=true');
   }
+  print("gradle=== ${command.join(" ")}\n");
   // END
 
   final Stopwatch sw = Stopwatch()..start();
@@ -831,6 +885,8 @@ Future<void> buildPluginsAsAar(
             treeShakeIcons: androidBuildInfo.buildInfo.treeShakeIcons,
             packagesPath: androidBuildInfo.buildInfo.packagesPath,
             // BD ADD: START
+            dynamicart: androidBuildInfo.buildInfo.dynamicart,
+            dynamicPlugins: androidBuildInfo.buildInfo.dynamicPlugins,
             lite: androidBuildInfo.buildInfo.lite,
             liteGlobal: androidBuildInfo.buildInfo.liteGlobal,
             // END
@@ -865,7 +921,16 @@ Iterable<String> findApkFilesModule(
       return <File>[apkFile];
     }
     final BuildInfo buildInfo = androidBuildInfo.buildInfo;
-    final String modeName = camelCase(buildInfo.modeName);
+    String modeName = camelCase(buildInfo.modeName);
+    // TODO: compare with method listApkPaths.
+    if(buildInfo.dynamicart){
+      if(modeName=='release'){
+        modeName = 'dynamicartRelease';
+      }else if(modeName=='profile'){
+        modeName = 'dynamicartProfile';
+      }
+    }
+
     apkFile = apkDirectory
       .childDirectory(modeName)
       .childFile(apkFileName);
@@ -901,7 +966,17 @@ Iterable<String> findApkFilesModule(
 Iterable<String> listApkPaths(
   AndroidBuildInfo androidBuildInfo,
 ) {
-  final String buildType = camelCase(androidBuildInfo.buildInfo.modeName);
+  String buildType = camelCase(androidBuildInfo.buildInfo.modeName);
+
+  final BuildInfo buildInfo = androidBuildInfo.buildInfo;
+  if(buildInfo.dynamicart){
+    if(buildType =='release'){
+      buildType = 'dynamicart_release';
+    }else if(buildType =='profile'){
+      buildType = 'dynamicart_profile';
+    }
+  }
+
   final List<String> apkPartialName = <String>[
     if (androidBuildInfo.buildInfo.flavor?.isNotEmpty ?? false)
       androidBuildInfo.buildInfo.flavor,
@@ -1055,7 +1130,11 @@ Directory _getLocalEngineRepo({
     ShutdownStage.CLEANUP,
   );
 
-  final String buildMode = androidBuildInfo.buildInfo.modeName;
+  String buildMode = androidBuildInfo.buildInfo.modeName;
+  if ((kEngineMode & ENGINE_DYNAMICART !=0) && (androidBuildInfo.buildInfo.mode ==
+      BuildMode.release || androidBuildInfo.buildInfo.mode == BuildMode.profile)) {
+    buildMode = "dynamicart_"+buildMode;
+  }
   final String artifactVersion = _getLocalArtifactVersion(
     globals.fs.path.join(
       engineOutPath,

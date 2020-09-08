@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
+import 'package:flutter_tools/src/artifacts.dart';
 
 import '../application_package.dart';
 import '../base/common.dart';
@@ -146,7 +147,7 @@ class BuildIOSCommand extends BuildSubCommand {
     // END
 
     // BD ADD: START
-    final bool isMinimumSize = (buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.release)
+    final bool isMinimumSize = (buildInfo.mode == BuildMode.release)
         ? boolArg('minimum-size')
         : false;
     List<String> dynamicPlugins;
@@ -155,7 +156,7 @@ class BuildIOSCommand extends BuildSubCommand {
     }
 
     // compressSize与minimums-ize互斥，优先minimum-size
-    final bool compressSize = (!isMinimumSize && (buildInfo.mode == BuildMode.release || buildInfo.mode == BuildMode.dynamicartRelease))
+    final bool compressSize = (!isMinimumSize && (buildInfo.mode == BuildMode.release))
         ? boolArg('compress-size')
         : false;
     // END
@@ -167,7 +168,7 @@ class BuildIOSCommand extends BuildSubCommand {
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
       // BD ADD START:
-      isDynamicart: buildInfo.mode == BuildMode.dynamicartRelease || buildInfo.mode == BuildMode.dynamicartProfile,
+      isDynamicart: (kEngineMode & ENGINE_DYNAMICART !=0),
       isMinimumSize: isMinimumSize,
       dynamicPlugins: dynamicPlugins,
       compressSize: compressSize

@@ -4,6 +4,9 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/compile.dart';
+import 'package:flutter_tools/src/version.dart';
+
 import 'package:meta/meta.dart';
 import 'package:package_config/package_config.dart';
 import 'package:yaml/yaml.dart';
@@ -385,6 +388,25 @@ Map<String,String> getPluginVersion(String packagesPath){
       continue;
     }
     versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+  }
+  // 处理被 aot 的 lib
+  if(kDynamicAotPlugins!=null){
+    RegExp exp = new RegExp(r"package\:(\w+)/.*");
+    kDynamicAotPlugins.forEach((str){
+      var matchRes = exp.firstMatch(str);
+      if(matchRes==null){
+        return;
+      }
+      String key = matchRes.group(1);
+      if(!map.containsKey(key)){
+        return;
+      }
+      final Directory directory = globals.fs.directory(map[key]).parent;
+      final dynamic pubspec = loadYaml(globals.fs
+          .file(globals.fs.path.absolute(directory.path, 'pubspec.yaml'))
+          .readAsStringSync());
+      versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+    });
   }
   return versionMap;
 }

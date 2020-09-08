@@ -19,9 +19,7 @@ import 'build_ios.dart';
 import 'build_ios_framework.dart';
 import 'build_web.dart';
 
-// BD ADD:
-// FIXME: Temporary delete for BD #56
-// import 'build_dynamic.dart';
+import 'build_dynamic.dart';
 
 class BuildCommand extends FlutterCommand {
   BuildCommand({ bool verboseHelp = false }) {
@@ -41,9 +39,8 @@ class BuildCommand extends FlutterCommand {
     addSubcommand(BuildWindowsCommand(verboseHelp: verboseHelp));
     addSubcommand(BuildFuchsiaCommand(verboseHelp: verboseHelp));
 
-    // BD ADD:
-    // FIXME: Temporary delete for BD #56
-    // addSubcommand(BuildDynamicCommand());
+    // BD ADD: START
+    addSubcommand(BuildDynamicCommand());
   }
 
   @override

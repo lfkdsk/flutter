@@ -477,6 +477,9 @@ abstract class FlutterCommand extends Command<void> {
 
   // BD ADD: START
   List<String> getDynamicPlugins() {
+    if(!argParser.options.containsKey('dynamic-aot-plugins')){
+      return null;
+    }
     final String dynamicPluginContent = stringArg('dynamic-aot-plugins');
     List<String> dynamicPlugins;
     if (dynamicPluginContent.isNotEmpty) {
@@ -517,6 +520,8 @@ abstract class FlutterCommand extends Command<void> {
         defaultsTo: '',
         hide: true,
         help: '需要keep的plugin的包名，格式为package:xxx/');
+    argParser..addOption('host-dill',
+        help: 'host dill 文件，处理 mixin 的问题');
   }
   // END
 
@@ -609,21 +614,21 @@ abstract class FlutterCommand extends Command<void> {
                            'or --release can be specified.', null);
     }
 
-    // BD ADD: START
-    final bool isDynamicartFlag = argParser.options.containsKey('dynamicart')
-        ? boolArg('dynamicart')
-        : false;
-    if (isDynamicartFlag) {
-      if (boolArg('debug')) {
-        throw ToolExit('Error: --dynamicart requires --release or --profile.');
-      }
-      if (boolArg('release')) {
-        return BuildMode.dynamicartRelease;
-      } else {
-        return BuildMode.dynamicartProfile;
-      }
-    }
-    // END
+//    // BD ADD: START
+//    final bool isDynamicartFlag = argParser.options.containsKey('dynamicart')
+//        ? boolArg('dynamicart')
+//        : false;
+//    if (isDynamicartFlag) {
+//      if (boolArg('debug')) {
+//        throw ToolExit('Error: --dynamicart requires --release or --profile.');
+//      }
+//      if (boolArg('release')) {
+//        return BuildMode.dynamicartRelease;
+//      } else {
+//        return BuildMode.dynamicartProfile;
+//      }
+//    }
+//    // END
 
     if (debugResult) {
       return BuildMode.debug;
@@ -770,8 +775,10 @@ abstract class FlutterCommand extends Command<void> {
       packagesPath: globalResults['packages'] as String ?? '.packages',
       nullSafetyMode: nullSafetyMode,
       // BD ADD: START
-      dynamicPlugins: argParser.options.containsKey('dynamic-aot-plugins')
-          ? stringArg('dynamic-aot-plugins') : null,
+      dynamicPlugins: getDynamicPlugins()?.join(","),
+      dynamicart: argParser.options.containsKey('dynamicart')
+          ? boolArg('dynamicart')
+          : false,
       lite: argParser.options.containsKey('lite')
           ? boolArg('lite')
           : false,

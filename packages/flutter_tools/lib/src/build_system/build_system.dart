@@ -308,6 +308,7 @@ class Environment {
     List<String>dynamicPlugins,
     bool isDynamicart,
     bool isMinimumSize,
+    bool compressSize,
     // END
     Map<String, String> defines = const <String, String>{},
     Map<String, String> inputs = const <String, String>{},
@@ -789,6 +790,15 @@ class _BuildInstance {
     }
 
     try {
+//      // In 1.20, this will be build and nonConstantLocations will cause exception.
+//      // TODO: handle it later
+//      if (node.target.name == "aot_android_asset_bundle") {
+//        skipped = true;
+//        logger.printTrace('Skipping target: ${node.target.name}');
+//        updateGraph();
+//        return succeeded;
+//      }
+
       // If we're missing a depfile, wait until after evaluating the target to
       // compute changes.
       final bool canSkip = !node.missingDepfile &&

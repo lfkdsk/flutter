@@ -32,6 +32,7 @@ class BuildInfo {
     this.packagesPath = '.packages',
     this.nullSafetyMode = NullSafetyMode.autodetect,
     // BD ADD: START
+    this.dynamicart = false,
     this.dynamicPlugins,
     this.lite = false,
     this.liteGlobal = false,
@@ -91,6 +92,7 @@ class BuildInfo {
   /// On Xcode builds it is used as CFBundleShortVersionString,
   final String buildName;
   // BD ADD:START
+  final bool dynamicart;
   final bool lite;
   final bool liteGlobal;
   final bool liteShareSkia;
@@ -139,13 +141,13 @@ class BuildInfo {
   ///
   /// Exactly one of [isDebug], [isProfile], [isJitRelease],
   /// or [isRelease] is true.
-  bool get isProfile => mode == BuildMode.profile || mode == BuildMode.dynamicartProfile;
+  bool get isProfile => mode == BuildMode.profile;
 
   /// Returns whether a release build is requested.
   ///
   /// Exactly one of [isDebug], [isProfile], [isJitRelease],
   /// or [isRelease] is true.
-  bool get isRelease => mode == BuildMode.release || mode == BuildMode.dynamicartRelease;
+  bool get isRelease => mode == BuildMode.release;
 
   /// Returns whether a JIT release build is requested.
   ///
@@ -238,10 +240,10 @@ class BuildMode {
       case 'jit_release':
         return BuildMode.jitRelease;
     // BD ADD START:
-      case 'dynamicart_release':
-        return BuildMode.dynamicartRelease;
-      case 'dynamicart_profile':
-        return BuildMode.dynamicartProfile;
+//      case 'dynamicart_release':
+//        return BuildMode.dynamicartRelease;
+//      case 'dynamicart_profile':
+//        return BuildMode.dynamicartProfile;
     // END
     }
     throw ArgumentError('$value is not a supported build mode');
@@ -260,8 +262,8 @@ class BuildMode {
   static const BuildMode jitRelease = BuildMode._('jit_release');
 
   // BD ADD START:
-  static const BuildMode dynamicartRelease = BuildMode._('dynamicart_release');
-  static const BuildMode dynamicartProfile = BuildMode._('dynamicart_profile');
+//  static const BuildMode dynamicartRelease = BuildMode._('dynamicart_release');
+//  static const BuildMode dynamicartProfile = BuildMode._('dynamicart_profile');
   // END
 
   static const List<BuildMode> values = <BuildMode>[
@@ -270,15 +272,15 @@ class BuildMode {
     release,
     jitRelease,
     // BD ADD START:
-    dynamicartRelease,
-    dynamicartProfile
+//    dynamicartRelease,
+//    dynamicartProfile
     // END
   ];
   static const Set<BuildMode> releaseModes = <BuildMode>{
     release,
     jitRelease,
     // BD ADD START:
-    dynamicartRelease,
+//    dynamicartRelease,
     // END
   };
   static const Set<BuildMode> jitModes = <BuildMode>{

@@ -106,6 +106,8 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     bool lite = false,
     bool liteGlobal = false,
     bool liteShareSkia = false,
+    bool isDynamicDill = false,
+    String hostDillPath
     // END
   }) async {
     final FlutterProject flutterProject = FlutterProject.current();
@@ -138,7 +140,13 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
       dartDefines: dartDefines,
       packageConfig: packageConfig,
       // BD ADD:
-      isDynamicart: isDynamicart
+      isDynamicart: isDynamicart,
+      dynamicPlugins : dynamicPlugins,
+      lite :lite,
+      liteGlobal:liteGlobal,
+      liteShareSkia:liteShareSkia,
+      isDynamicDill:isDynamicDill,
+      hostDillPath:hostDillPath
     );
   }
 }

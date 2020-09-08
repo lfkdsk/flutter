@@ -172,50 +172,35 @@ class BuildAarCommand extends BuildSubCommand {
    // if (androidBuildInfo.isEmpty) {
    //   throwToolExit('Please specify a build mode and try again.');
     //}
-    BuildMode mode = null;
-    bool isDynamicart;
-    if (argParser.options.containsKey('dynamicart')) {
-      isDynamicart = boolArg('dynamicart');
-    } else {
-      isDynamicart = false;
-    }
-    if (isDynamicart) {
-      if (boolArg('debug')) {
-        throw ToolExit('Error: --dynamicart requires --release or --profile.');
-      }
-      if (boolArg('release')) {
-        mode = BuildMode.dynamicartRelease;
-      } else {
-        mode = BuildMode.dynamicartProfile;
-      }
-    }
 
     void buildAndroidBuildInfo(bool f(String buildMode)){
       for (String buildMode in const <String>['debug', 'profile', 'release']) {
         if (f(buildMode)) {
           androidBuildInfo.add(
               AndroidBuildInfo(
-                // adapt 1.20
-                // BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor')),
-                getBuildInfo(forcedBuildMode: BuildMode.fromName(buildMode)),
+                BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor'),
+                    // BD ADD: START
+                    dynamicPlugins: getDynamicPlugins()?.join(","),
+                    dynamicart: argParser.options.containsKey('dynamicart')
+                        ? boolArg('dynamicart')
+                        : false,
+                    lite: argParser.options.containsKey('lite')
+                        ? boolArg('lite')
+                        : false,
+                    liteGlobal: argParser.options.containsKey('lite-global')
+                        ? boolArg('lite-global')
+                        : false,
+                    liteShareSkia: argParser.options.containsKey('lite-share-skia')
+                        ? boolArg('lite-share-skia')
+                        : false),
                 targetArchs: targetArchitectures,
               )
           );
         }
       }
     }
-    if (mode == null) {
-      buildAndroidBuildInfo((String buildMode) => boolArg(buildMode));
-    } else {
-      androidBuildInfo.add(
-          AndroidBuildInfo(
-            getBuildInfo(forcedBuildMode: mode),
-            targetArchs: targetArchitectures,
-          )
-      );
-    }
 
-
+    buildAndroidBuildInfo((String buildMode) => boolArg(buildMode));
 
     if (androidBuildInfo.isEmpty) {
       buildAndroidBuildInfo((String buildMode) => true);

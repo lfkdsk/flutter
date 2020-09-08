@@ -65,20 +65,20 @@ class FlutterBuildInfo {
     if (args.length == 1) {
       cmdName = args[0];
     } else if (args.length >= 2) {
-        String _cmdStr = '';
-        for (int i = 0; i < args.length; i++) {
-          if (cmdName.isEmpty) {
-            if (!args[i].startsWith('-')) {
-              cmdName = args[i];
-            }
-          } else {
-            _cmdStr += args[i] + ' ';
+      String _cmdStr = '';
+      for (int i = 0; i < args.length; i++) {
+        if (cmdName.isEmpty) {
+          if (!args[i].startsWith('-')) {
+            cmdName = args[i];
           }
+        } else {
+          _cmdStr += args[i] + ' ';
         }
-        cmdParams = _cmdStr;
-        if (isVerbose) {
-          print('parseCommand cmdName: $cmdName, cmdParams: $cmdParams');
-        }
+      }
+      cmdParams = _cmdStr;
+      if (isVerbose) {
+        print('parseCommand cmdName: $cmdName, cmdParams: $cmdParams');
+      }
     }
   }
 

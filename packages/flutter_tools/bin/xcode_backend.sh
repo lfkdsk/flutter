@@ -150,7 +150,7 @@ BuildApp() {
 
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
 
- if [[ "${dynamicart_flag}" == "YES" ]];
+ if [[ "${dynamicart_flag}" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$build_mode" == "profile" ]]);
  then
  framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/ios-dynamicart-${build_mode}${lite_suffix}"
  else
@@ -233,6 +233,16 @@ BuildApp() {
     track_widget_creation_flag="--track-widget-creation"
   fi
 
+  local dynamic_aot_plugins_command=""
+  if [[ "$dynamic_aot_plugins" != "" ]]; then
+     dynamic_aot_plugins_command="--dynamic-aot-plugins=${dynamic_aot_plugins}"
+  fi
+  local dynamicart_command=""
+  if [[ "$dynamicart_flag" == "YES" ]]; then
+     dynamicart_command="--dynamicart"
+  fi
+
+
   if [[ "${build_mode}" != "debug" ]]; then
     StreamOutput " ├─Building Dart code..."
     # Transform ARCHS to comma-separated list of target architectures.
@@ -251,14 +261,6 @@ BuildApp() {
     local minimum_size_command=""
     if [[ "$minimum_size_flag" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$dynamicart_flag" == "YES" ]]); then
       minimum_size_command="--minimum-size"
-    fi
-    local dynamic_aot_plugins_command=""
-    if [[ "$dynamic_aot_plugins" != "" ]]; then
-     dynamic_aot_plugins_command="--dynamic-aot-plugins=${dynamic_aot_plugins}"
-    fi
-    local dynamicart_command=""
-    if [[ "$dynamicart_flag" == "YES" ]]; then
-     dynamicart_command="--dynamicart"
     fi
     EchoError "========================================================================${dynamic_aot_plugins_command}"
 

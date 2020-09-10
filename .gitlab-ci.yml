@@ -1,0 +1,30 @@
+variables:
+  #  fixed apk url
+  NAME: "flutter 测试"
+  # wanglikun.eric
+  TOKEN: "1ddf40bfe8fd13f16ea7e872a0933bdd676341b3"
+  # bytest infos
+  BIZ: 9998
+  TEMPLATE_ID: 637
+  # apk url
+  URL: "https://voffline.byted.org/download/tos/schedule/iOSPackageBackUp/job/toutiao_android_channel_Normal/283/ttmain/NewsArticle/release/NewsArticle_update_v7.8.3_bc813f7.apk"
+
+  BYTEST_URL: https://bytest-boe.bytedance.net/auto_test/api/v1/task
+  DATA: '{"biz":${BIZ},"template_id":${TEMPLATE_ID},"name":"${NAME}","app":{"url":"${URL}"},"environ_map":{"BRANCH":"${CI_COMMIT_REF_NAME}"}}'
+  AUTH:  "Authorization:Bearer ${TOKEN}"
+  CONTENT: "Content-Type:application/json"
+
+.common: &common
+  only:
+    - bd_1.20.1_pre
+
+stages:
+  - run-benchmark
+
+call-bytest:
+  <<: *common
+  stage: run-benchmark
+  script:
+    - curl -H "${CONTENT}" -H "${AUTH}" -d "${DATA}" ${BYTEST_URL}
+  tags:
+    - flutter

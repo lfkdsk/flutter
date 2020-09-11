@@ -70,7 +70,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     }
 
     final List<String> dynamicPlugins = getDynamicPlugins();
-    final String hostDillPath = '${Cache.flutterRoot}/bin/internal/app.dill';
+    final String hostDillPath = stringArg('host-dill') ?? '${Cache.flutterRoot}/bin/internal/app.dill';
 
     final String packagesPath = fs.path.absolute('.packages');
 

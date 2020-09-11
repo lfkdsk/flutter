@@ -399,6 +399,8 @@ abstract class FlutterCommand extends Command<void> {
         defaultsTo: '',
         hide: true,
         help: '需要keep的plugin的包名，格式为package:xxx/');
+    argParser..addOption('host-dill',
+        help: 'host dill 文件，处理 mixin 的问题');
   }
   // END
 

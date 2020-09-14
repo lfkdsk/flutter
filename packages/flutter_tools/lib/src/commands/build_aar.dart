@@ -157,16 +157,6 @@ class BuildAarCommand extends BuildSubCommand {
     } else {
       isDynamicart = false;
     }
-    if (isDynamicart) {
-      if (boolArg('debug')) {
-        throw ToolExit('Error: --dynamicart requires --release or --profile.');
-      }
-      if (boolArg('release')) {
-        mode = BuildMode.dynamicartRelease;
-      } else {
-        mode = BuildMode.dynamicartProfile;
-      }
-    }
 
     void buildAndroidBuildInfo(bool f(String buildMode)){
       for (String buildMode in const <String>['debug', 'profile', 'release']) {

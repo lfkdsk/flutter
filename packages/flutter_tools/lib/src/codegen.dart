@@ -117,6 +117,8 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
     bool lite = false,
     bool liteGlobal = false,
     bool liteShareSkia = false,
+    bool isDynamicDill = false,
+    String hostDillPath
     // END
   }) async {
     if (fileSystemRoots != null || fileSystemScheme != null || depFilePath != null || targetModel != null || sdkRoot != null || packagesPath != null) {

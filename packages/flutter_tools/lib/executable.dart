@@ -73,6 +73,7 @@ Future<void> main(List<String> args) async {
   final bool muteCommandLogging = help || doctor;
   final bool verboseHelp = help && verbose;
   // BD ADD: START
+  final bool dynamicart = args.contains('--dynamicart');
   final bool lite = args.contains('--lite');
   final bool liteGlobal = args.contains('--lite-global');
   final bool liteShareSkia = args.contains('--lite-share-skia');
@@ -85,8 +86,11 @@ Future<void> main(List<String> args) async {
     engineMode = EngineMode.lite_global;
     print('Currently in lite global mode...');
   } else if (liteShareSkia) {
-      engineMode = EngineMode.lite_share_skia;
-      print('Currently in lite & share skia mode...');
+    engineMode = EngineMode.lite_share_skia;
+    print('Currently in lite & share skia mode...');
+  } else if(dynamicart){
+    engineMode = EngineMode.dynamicart;
+    print('Currently in dynamicart mode...');
   }
   setEngineMode(engineMode);
 

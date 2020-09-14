@@ -341,14 +341,16 @@ Future<void> buildGradleApp({
     // Don't use settings.gradle from the current project since it includes the plugins as subprojects.
     command.add('--settings-file=settings_aar.gradle');
   }
-  // BD ADD: START
-  if (buildInfo.dynamicPlugins != null) {
-    command.add('-Pdynamic-aot-plugins=${buildInfo.dynamicPlugins}');
-  }
-  // END
+
   command.add(assembleTask);
 
   // BD ADD: START
+  if (buildInfo.dynamicart) {
+    command.add('-Pdynamicart=true');
+  }
+  if (buildInfo.dynamicPlugins != null) {
+    command.add('-Pdynamic-aot-plugins=${buildInfo.dynamicPlugins}');
+  }
   if (buildInfo.lite) {
     command.add('-Plite=true');
   }
@@ -573,6 +575,12 @@ Future<void> buildGradleAar({
   command.add(aarTask);
 
   // BD ADD: START
+  if (androidBuildInfo.buildInfo.dynamicart) {
+    command.add('-Pdynamicart=true');
+  }
+  if (androidBuildInfo.buildInfo.dynamicPlugins != null) {
+    command.add('-Pdynamic-aot-plugins=${androidBuildInfo.buildInfo.dynamicPlugins}');
+  }
   if (androidBuildInfo.buildInfo.lite) {
     command.add('-Plite=true');
   }
@@ -761,6 +769,8 @@ Future<void> buildPluginsAsAar(
             BuildMode.release, // Plugins are built as release.
             null, // Plugins don't define flavors.
             // BD ADD: START
+            dynamicart: androidBuildInfo.buildInfo.dynamicart,
+            dynamicPlugins: androidBuildInfo.buildInfo.dynamicPlugins,
             lite: androidBuildInfo.buildInfo.lite,
             liteGlobal: androidBuildInfo.buildInfo.liteGlobal,
             // END
@@ -949,7 +959,10 @@ Directory _getLocalEngineRepo({
     ShutdownStage.CLEANUP,
   );
 
-  final String buildMode = androidBuildInfo.buildInfo.modeName;
+  String buildMode = androidBuildInfo.buildInfo.modeName;
+  if(kEngineMode == EngineMode.dynamicart && (androidBuildInfo.buildInfo.mode == BuildMode.release || androidBuildInfo.buildInfo.mode == BuildMode.profile)){
+    buildMode = "dynamicart_"+buildMode;
+  }
   final String artifactVersion = _getLocalArtifactVersion(
     fs.path.join(
       engineOutPath,

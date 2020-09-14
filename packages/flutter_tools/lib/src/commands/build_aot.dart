@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/artifacts.dart';
+
 import '../aot.dart';
 import '../base/common.dart';
 import '../build_info.dart';
@@ -87,7 +89,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     aotBuilder ??= AotBuilder();
 
     // BD ADD: START
-    final bool compressSize = (buildMode == BuildMode.release || buildMode == BuildMode.dynamicartRelease) &&
+    final bool compressSize = (buildMode == BuildMode.release) &&
         platform == TargetPlatform.ios
         ? boolArg('compress-size') && !boolArg('minimum-size')
         : false;
@@ -120,7 +122,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       extraGenSnapshotOptions: stringsArg(FlutterOptions.kExtraGenSnapshotOptions),
       dartDefines: dartDefines,
       // BD ADD: START
-      isDynamicart: buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile,
+      isDynamicart: kEngineMode == EngineMode.dynamicart,
       dynamicPlugins: dynamicPlugins,
       compressSize: compressSize,
       isMinimumSize: isMinimumSize

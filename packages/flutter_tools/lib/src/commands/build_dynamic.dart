@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show FileSystemEntity, Process;
+import 'dart:io' show FileSystemEntity, Process, ProcessResult, ProcessStartMode, sleep, stderr, stdout;
 import 'package:archive/archive.dart';
 
 // ignore: implementation_imports
@@ -10,8 +10,8 @@ import 'package:flutter_tools/src/base/common.dart';
 import 'package:flutter_tools/src/base/file_system.dart' hide FileSystemEntity;
 import 'package:flutter_tools/src/base/fingerprint.dart';
 import 'package:flutter_tools/src/base/process_manager.dart';
+import 'package:flutter_tools/src/build_system/targets/dart.dart';
 import 'package:flutter_tools/src/dart/package_map.dart';
-import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import '../artifacts.dart';
 import '../asset.dart';
@@ -35,6 +35,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     //            'If the --target option is omitted, but a file name is provided on '
     //            'the command line, then that is used instead.',
     usesTargetOption();
+    addBuildModeFlags();
     usesPubOption();
     addDynamicModeFlags();
     argParser
@@ -43,7 +44,14 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..addFlag('verbose', defaultsTo: false)
       ..addFlag('verify', defaultsTo: true)
       ..addFlag('encrypt', defaultsTo: true)
-      ..addOption('manifest', defaultsTo: defaultManifestPath);
+      ..addOption('manifest', defaultsTo: defaultManifestPath)
+      ..addOption('package-name', defaultsTo: null)
+      ..addFlag("start-paused", defaultsTo: false)
+      ..addMultiOption(
+      'define',
+      abbr: 'd',
+      help: 'Allows passing configuration to a target with --define=target=key=value.',
+    );
   }
 
   @override
@@ -60,6 +68,16 @@ class BuildDynamicCommand extends BuildSubCommand {
     final bool verbose = boolArg('verbose') ?? false;
     final bool verify = boolArg('verify') ?? true;
     final bool encrypt = boolArg('encrypt') ?? true;
+    final bool startPaused = boolArg("start-paused")??false;
+    final Map<String, String> defines = _parseDefines(stringsArg('define'));
+    final String packageName = stringArg('package-name');
+    defaultBuildMode = BuildMode.release;
+    BuildMode buildMode = getBuildMode();
+    if(buildMode==BuildMode.debug){
+      if(packageName==null){
+        throwToolExit("package-name can't be null when in debug build mode!");
+      }
+    }
 
     FlutterManifest flutterManifest;
     try {
@@ -93,11 +111,12 @@ class BuildDynamicCommand extends BuildSubCommand {
         fs.directory(fs.path.join(getBuildDirectory(), 'temp'));
 
     await compileKernel(
+        buildMode: buildMode,
         mainPath: findMainDartFile(targetFile),
         tempPath: tempDir.path,
         packagesPath: PackageMap.globalPackagesPath,
         outputPath: outputPath,
-        trackWidgetCreation: false,
+        defines: defines,
         dynamicPlugins: dynamicPlugins,
         verbose: verbose,
         hostDillPath: hostDillPath,
@@ -114,7 +133,7 @@ class BuildDynamicCommand extends BuildSubCommand {
         assetDirPath: getPatchAssetBuildDirectory(),
         originResource: originResource);
 
-    final String packageName = flutterManifest.appName;
+    final String appName = flutterManifest.appName;
     final String versionCode = flutterManifest.appVersion;
 
     final Map<String, Map<String, String>> versionMap = <String, Map<String, String>>{};
@@ -144,14 +163,18 @@ class BuildDynamicCommand extends BuildSubCommand {
         versionMap[key] = version;
       }
     }
-
     final Map<String, dynamic> jsonObject = <String, dynamic>{};
-    jsonObject['packageName'] = packageName == null ? '' : packageName;
+    jsonObject['packageName'] = appName == null ? '' : appName;
     jsonObject['version'] = versionCode == null ? '' : versionCode;
     jsonObject['dependencies'] = versionMap;
     final File manifestFile =
         fs.file(fs.path.join(getPatchBuildDirectory(), 'manifest.json'));
     manifestFile.writeAsStringSync(json.encode(jsonObject));
+
+    if(buildMode==BuildMode.debug && startPaused){
+      fs.file(fs.path.join(getPatchAssetBuildDirectory(), 'start-paused')).writeAsStringSync("123456789");
+    }
+
     final List<File> files = List();
     traverseFiles(getPatchBuildDirectory(), files);
     final Archive update = Archive();
@@ -169,6 +192,74 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..createSync(recursive: true)
       ..writeAsBytesSync(ZipEncoder().encode(update), flush: true);
     print('build dynamic success');
+
+    if(buildMode==BuildMode.debug){
+
+      final File appJsFile = fs.file('${Cache.flutterRoot}/bin/internal/app.js');
+      appJsFile.copySync(fs.path.join(getPatchBuildDirectory(), 'app.js'));
+
+      final File indexHtmlFile = fs.file('${Cache.flutterRoot}/bin/internal/index.html');
+      String content = indexHtmlFile.readAsStringSync();
+      content = content.replaceAll("PACKAGE_NAME", packageName);
+      File newIndexHtmlFile = fs.file(fs.path.join(getPatchBuildDirectory(), 'index.html'));
+      newIndexHtmlFile.writeAsStringSync(content);
+
+      Process process = await Process.start("killall",["node"], workingDirectory: getPatchBuildDirectory())
+          .catchError((dynamic error, StackTrace stack) {
+        print('Failed to kill all node $error, $stack');
+      });
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+      await process.exitCode;
+
+      process = await Process.start("npm",["install", "express", "--save"], workingDirectory: getPatchBuildDirectory())
+          .catchError((dynamic error, StackTrace stack) {
+        print('Failed to install express $error, $stack');
+      });
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+      await process.exitCode;
+
+      process = await Process.start("node",["app.js"], workingDirectory: getPatchBuildDirectory(), mode: ProcessStartMode.detachedWithStdio)
+          .catchError((dynamic error, StackTrace stack) {
+        print('Failed to start app.js  $error, $stack');
+      });
+      stdout.addStream(process.stdout);
+      stderr.addStream(process.stderr);
+      sleep(Duration(seconds: 3));
+    }
+  }
+}
+
+Map<String, String> _parseDefines(List<String> values) {
+  final Map<String, String> results = <String, String>{};
+  for (String chunk in values) {
+    final List<String> parts = chunk.split('=');
+    if (parts.length != 2) {
+      throwToolExit('Improperly formatted define flag: $chunk');
+    }
+    final String key = parts[0];
+    final String value = parts[1];
+    results[key] = value;
+  }
+  return results;
+}
+
+List<String> parseDartDefines2(Map<String, String> defines) {
+  if (!defines.containsKey(kDartDefines)) {
+    return const <String>[];
+  }
+
+  final String dartDefinesJson = defines[kDartDefines];
+  try {
+    final List<Object> parsedDefines = jsonDecode(dartDefinesJson) as List<Object>;
+    return parsedDefines.cast<String>();
+  } on FormatException catch (_) {
+    throw Exception(
+        'The value of -D$kDartDefines is not formatted correctly.\n'
+            'The value must be a JSON-encoded list of strings but was:\n'
+            '$dartDefinesJson'
+    );
   }
 }
 
@@ -189,58 +280,61 @@ void traverseFiles(String path, List<File> list) {
 }
 
 Future<bool> compileKernel({
+  @required BuildMode buildMode,
   @required String mainPath,
   @required String packagesPath,
   @required String outputPath,
   @required String tempPath,
-  @required bool trackWidgetCreation,
+  Map<String, String> defines = const <String, String>{},
   List<String> extraFrontEndOptions = const <String>[],
   List<String> dynamicPlugins,
   bool verbose: false,
   String hostDillPath,
   bool encrypt: true
 }) async {
+
+  print('Compiling Dart to kernel: $mainPath');
   final Directory outputDir = fs.directory(outputPath);
   outputDir.createSync(recursive: true);
   //app.dill文件的临时目录
   final Directory tempDir =
       fs.directory(fs.path.join(getBuildDirectory(), 'temp'));
-
   tempDir.createSync(recursive: true);
 
-  print('Compiling Dart to kernel: $mainPath');
-
-  if ((extraFrontEndOptions != null) && extraFrontEndOptions.isNotEmpty)
-    printTrace('Extra front-end options: $extraFrontEndOptions');
-
+  final FlutterProject flutterProject = FlutterProject.current();
   final String depfilePath = fs.path.join(tempPath, 'kernel_compile.d');
-  final CompilerOutput compilerOutput = await compile(
-      sdkRoot: artifacts.getArtifactPath(Artifact.flutterPatchedSdkPath,
-          mode: BuildMode.release),
-      mainPath: mainPath,
-      packagesPath: packagesPath,
-      outputFilePath: getKernelPathForTransformerOptions(
-        fs.path.join(tempPath, 'app.dill'),
-        trackWidgetCreation: trackWidgetCreation,
-      ),
-      depFilePath: depfilePath,
-      extraFrontEndOptions: extraFrontEndOptions,
-      linkPlatformKernelIn: true,
-      aot: true,
-      trackWidgetCreation: trackWidgetCreation,
-      targetProductVm: true,
-      dynamicPlugins: dynamicPlugins,
-      verbose: verbose,
-      hostDillPath: hostDillPath
+
+  final KernelCompiler compiler = await kernelCompilerFactory.create(
+    FlutterProject.fromDirectory(flutterProject.directory),
   );
 
-  // Write path to frontend_server, since things need to be re-generated when that changes.
-  final String frontendPath = artifacts
-      .getArtifactPath(Artifact.frontendServerSnapshotForEngineDartSdk);
-  await fs
-      .directory(tempDir)
-      .childFile('frontend_server.d')
-      .writeAsString('frontend_server.d: $frontendPath\n');
+  final CompilerOutput compilerOutput = await compiler.compile(
+    sdkRoot: artifacts.getArtifactPath(
+      Artifact.flutterPatchedSdkPath,
+      platform: getTargetPlatformForName(defines[kTargetPlatform]),
+      mode: buildMode,
+    ),
+    aot: buildMode.isPrecompiled,
+    buildMode: buildMode,
+    trackWidgetCreation: true,
+    targetModel: TargetModel.flutter,
+    outputFilePath: getKernelPathForTransformerOptions(
+        fs.path.join(tempPath, 'app.dill'),
+        trackWidgetCreation: true,
+      ),
+    packagesPath: packagesPath,
+    linkPlatformKernelIn:buildMode.isPrecompiled,
+    mainPath: mainPath,
+    depFilePath: depfilePath,
+    extraFrontEndOptions: extraFrontEndOptions,
+    fileSystemRoots: defines[kFileSystemRoots]?.split(','),
+    fileSystemScheme: defines[kFileSystemScheme],
+    dartDefines: parseDartDefines2(defines),
+    dynamicPlugins: dynamicPlugins,
+    isDynamicDill: true,
+    hostDillPath: hostDillPath
+  );
+
   final String path = compilerOutput?.outputFilename;
   if (path == null) {
     throwToolExit('Compiler failed on $mainPath');
@@ -258,7 +352,7 @@ Future<bool> compileKernel({
           fs.file(fs.path.join(flutterAssetPath.path, 'kb'));
     } else {
       file =
-          fs.file(fs.path.join(flutterAssetPath.path, 'kernel_blob.bin'));
+          fs.file(fs.path.join(flutterAssetPath.path, 'kb.origin'));
     }
 
     file.parent.createSync(recursive: true);
@@ -439,160 +533,6 @@ List<Font> parseFont(String content) {
     fonts.add(Font(family, fontAssets));
   }
   return fonts;
-}
-
-Future<CompilerOutput> compile({
-  String sdkRoot,
-  String mainPath,
-  String outputFilePath,
-  String depFilePath,
-  TargetModel targetModel = TargetModel.flutter,
-  bool linkPlatformKernelIn = false,
-  bool aot = false,
-  @required bool trackWidgetCreation,
-  List<String> extraFrontEndOptions,
-  String packagesPath,
-  List<String> fileSystemRoots,
-  String fileSystemScheme,
-  bool targetProductVm = false,
-  String initializeFromDill,
-  List<String> dynamicPlugins,
-  bool verbose: false,
-  String hostDillPath
-}) async {
-   final String frontendServer = artifacts
-      .getArtifactPath(Artifact.frontendServerSnapshotForEngineDartSdk);
-
-  FlutterProject flutterProject;
-  if (fs.file('pubspec.yaml').existsSync()) {
-    flutterProject = await FlutterProject.current();
-  }
-
-  // TODO(cbracken): eliminate pathFilter.
-  // Currently the compiler emits buildbot paths for the core libs in the
-  // depfile. None of these are available on the local host.
-  Fingerprinter fingerprinter;
-  if (depFilePath != null) {
-    fingerprinter = Fingerprinter(
-      fingerprintPath: '$depFilePath.fingerprint',
-      paths: <String>[mainPath],
-      properties: <String, String>{
-        'entryPoint': mainPath,
-        'trackWidgetCreation': trackWidgetCreation.toString(),
-        'linkPlatformKernelIn': linkPlatformKernelIn.toString(),
-        'engineHash': Cache.instance.engineRevision,
-        'buildersUsed':
-        '${flutterProject != null ? flutterProject.hasBuilders : false}',
-      },
-      depfilePaths: <String>[depFilePath],
-      pathFilter: (String path) => !path.startsWith('/b/build/slave/'),
-    );
-
-    if (await fingerprinter.doesFingerprintMatch()) {
-      printTrace('Skipping kernel compilation. Fingerprint match.');
-      return CompilerOutput(outputFilePath, 0, /* sources */ null);
-    }
-  }
-
-  // This is a URI, not a file path, so the forward slash is correct even on Windows.
-  if (!sdkRoot.endsWith('/')) sdkRoot = '$sdkRoot/';
-  final String engineDartPath =
-  artifacts.getArtifactPath(Artifact.engineDartBinary);
-  if (!processManager.canRun(engineDartPath)) {
-    throwToolExit('Unable to find Dart binary at $engineDartPath');
-  }
-  final List<String> command = <String>[
-    engineDartPath,
-    frontendServer,
-    '--sdk-root',
-    sdkRoot,
-    '--target=$targetModel',
-    '--dynamic'
-  ];
-  if (trackWidgetCreation) command.add('--track-widget-creation');
-  if (!linkPlatformKernelIn) command.add('--no-link-platform');
-  if (aot) {
-    command.add('--aot');
-    command.add('--tfa');
-  }
-  if (verbose) {
-    command.add('--verbose');
-  }
-  if (targetProductVm) {
-    command.add('-Ddart.vm.product=true');
-  }
-
-  Uri mainUri;
-  if (packagesPath != null) {
-    command.addAll(<String>['--packages', packagesPath]);
-    mainUri = PackageUriMapper.findUri(
-        mainPath, packagesPath, fileSystemScheme, fileSystemRoots);
-  }
-
-  if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
-    final StringBuffer buffer = StringBuffer();
-    for (int i = 0; i < dynamicPlugins.length; i++) {
-      buffer.write(dynamicPlugins[i]);
-      if (i != dynamicPlugins.length - 1) {
-        buffer.write(',');
-      }
-    }
-    command.addAll(
-        <String>['--dynamic-aot-plugins', buffer.toString()]);
-  }
-
-  if (outputFilePath != null) {
-    command.addAll(<String>['--output-dill', outputFilePath]);
-  }
-  if (depFilePath != null &&
-      (fileSystemRoots == null || fileSystemRoots.isEmpty)) {
-    command.addAll(<String>['--depfile', depFilePath]);
-  }
-  if (fileSystemRoots != null) {
-    for (String root in fileSystemRoots) {
-      command.addAll(<String>['--filesystem-root', root]);
-    }
-  }
-  if (fileSystemScheme != null) {
-    command.addAll(<String>['--filesystem-scheme', fileSystemScheme]);
-  }
-  if (initializeFromDill != null) {
-    command.addAll(<String>['--initialize-from-dill', initializeFromDill]);
-  }
-
-  if(hostDillPath != null && hostDillPath.isNotEmpty){
-    command.addAll(<String>['--host-dill', hostDillPath]);
-  }
-
-//  command.addAll(await TransformerHooks.getTransformerParams());
-
-  if (extraFrontEndOptions != null) command.addAll(extraFrontEndOptions);
-
-  command.add(mainUri?.toString() ?? mainPath);
-
-
-  printTrace(command.join(' '));
-  final Process server = await processManager
-      .start(command)
-      .catchError((dynamic error, StackTrace stack) {
-    printError('Failed to start frontend server $error, $stack');
-  });
-
-  final StdoutHandler _stdoutHandler = StdoutHandler();
-
-  server.stderr.transform<String>(utf8.decoder).listen(printError);
-  server.stdout
-      .transform<String>(utf8.decoder)
-      .transform<String>(const LineSplitter())
-      .listen(_stdoutHandler.handler);
-  final int exitCode = await server.exitCode;
-  if (exitCode == 0) {
-    if (fingerprinter != null) {
-      await fingerprinter.writeFingerprint();
-    }
-    return _stdoutHandler.compilerOutput.future;
-  }
-  return null;
 }
 
 void _encrypt(List<int> data) {

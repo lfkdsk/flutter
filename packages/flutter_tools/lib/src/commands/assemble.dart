@@ -50,14 +50,6 @@ const List<Target> _kDefaultTargets = <Target>[
   androidArmReleaseBundle,
   androidArm64ReleaseBundle,
   androidx64ReleaseBundle,
-  // BD ADD: START
-  androidArmDynamicartProfileBundle,
-  androidArm64DynamicartProfileBundle,
-  androidx64DynamicartProfileBundle,
-  androidArmDynamicartReleaseBundle,
-  androidArm64DynamicartReleaseBundle,
-  androidx64DynamicartReleaseBundle,
-  // END
 ];
 
 /// Assemble provides a low level API to interact with the flutter tool build

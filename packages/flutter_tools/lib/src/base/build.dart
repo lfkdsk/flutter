@@ -142,7 +142,7 @@ class AOTSnapshotter {
     // END
 
     // BD ADD:
-    if (buildMode == BuildMode.dynamicartRelease || buildMode == BuildMode.dynamicartProfile) {
+    if (kEngineMode == EngineMode.dynamicart) {
       genSnapshotArgs.add('--dynamicart');
     }
     // END

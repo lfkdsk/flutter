@@ -181,22 +181,6 @@ class FlutterPlugin implements Plugin<Project> {
                     matchingFallbacks = ["debug", "release"]
                 }
             }
-
-            // BD ADD: START
-            // flutter run/build aot命令都是执行的gradle命令的--dynamicart参数映射到gradle命令上
-            dynamicartProfile {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            dynamicartRelease {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            // END
         }
 
         if (shouldShrinkResources(project)) {
@@ -254,6 +238,9 @@ class FlutterPlugin implements Plugin<Project> {
             }
         }
         // BD ADD: START
+        if (useDynamicart() && (flutterBuildMode == "release" || flutterBuildMode== "profile")) {
+            flutterBuildMode = "dynamicart_"+flutterBuildMode
+        }
         String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
         if (flutterBuildMode != "release") {
             liteSuffix=''
@@ -367,6 +354,9 @@ class FlutterPlugin implements Plugin<Project> {
                 return
             }
             // BD ADD START
+            if (useDynamicart() && (flutterBuildMode == "release" || flutterBuildMode== "profile")) {
+                flutterBuildMode = "dynamicart_"+flutterBuildMode
+            }
             String liteSuffix = useLite() ? "_lite" : (useLiteGlobal() ? "_liteg" : "")
             if (flutterBuildMode != "release") {
                 liteSuffix=''
@@ -386,15 +376,6 @@ class FlutterPlugin implements Plugin<Project> {
                 profile {
                     initWith debug
                 }
-                // BD ADD:
-                // 上面的buildTypes是给主工程加的，Android插件模块打包的话需要在这里重新加一次
-                dynamicartRelease {
-                    initWith debug
-                }
-                dynamicartProfile {
-                    initWith debug
-                }
-                // END
             }
             pluginProject.android.buildTypes.each addEmbeddingCompileOnlyDependency
             pluginProject.android.buildTypes.whenObjectAdded addEmbeddingCompileOnlyDependency
@@ -536,6 +517,20 @@ class FlutterPlugin implements Plugin<Project> {
     }
 
     // BD ADD: START
+    private Boolean useDynamicart() {
+        if (project.hasProperty('dynamicart')) {
+            return project.property('dynamicart').toBoolean()
+        }
+        return false
+    }
+
+    private String dynamicPlugins() {
+        if (project.hasProperty('dynamic-aot-plugins')) {
+            return project.property('dynamic-aot-plugins').toString()
+        }
+        return ""
+    }
+
     private Boolean useLite() {
         if (project.hasProperty('lite')) {
             return project.property('lite').toBoolean()
@@ -644,12 +639,6 @@ class FlutterPlugin implements Plugin<Project> {
     private static String buildModeFor(buildType) {
         if (buildType.name == "profile") {
             return "profile"
-        // BD ADD: START
-        } else if (buildType.name == "dynamicartRelease") {
-            return "dynamicart_release"
-        } else if (buildType.name == "dynamicartProfile") {
-            return "dynamicart_profile"
-        // END
         } else if (buildType.debuggable) {
             return "debug"
         }
@@ -692,6 +681,10 @@ class FlutterPlugin implements Plugin<Project> {
             trackWidgetCreationValue = project.property('track-widget-creation').toBoolean()
         }
         // BD ADD: START
+        Boolean dynamicartValue = false
+        if (project.hasProperty('dynamicart')) {
+            dynamicartValue = project.property('dynamicart').toBoolean()
+        }
         Boolean liteValue = false
         if (project.hasProperty('lite')) {
             liteValue = project.property('lite').toBoolean()
@@ -751,6 +744,7 @@ class FlutterPlugin implements Plugin<Project> {
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
                 // BD ADD: START
+                useDynamicart dynamicartValue
                 dynamicPlugins dynamicPluginValue
                 useLite liteValue
                 useLiteGlobal liteGlobalValue
@@ -902,6 +896,8 @@ abstract class BaseFlutterTask extends DefaultTask {
     Boolean trackWidgetCreation
     // BD ADD: START
     @Optional @Input
+    Boolean useDynamicart
+    @Optional @Input
     Boolean useLite
     @Optional @Input
     Boolean useLiteGlobal
@@ -970,7 +966,7 @@ abstract class BaseFlutterTask extends DefaultTask {
                 args "--lite"
             }
 
-            if (buildMode == "dynamicart_release" || buildMode == "dynamicart_profile") {
+            if (useDynamicart) {
                 args "--dynamicart"
                 if (dynamicPlugins != null) {
                     args "--dynamic-aot-plugins", dynamicPlugins
@@ -1010,9 +1006,7 @@ class FlutterTask extends BaseFlutterTask {
     CopySpec getSnapshots() {
         return project.copySpec {
             from "${intermediateDir}"
-            // BD MOD:
-            // BEFORE: if (buildMode == 'release' || buildMode == 'profile') {
-            if (buildMode == 'release' || buildMode == 'profile' || buildMode == 'dynamicartRelease' || buildMode == 'dynamicartProfile') {
+            if (buildMode == 'release' || buildMode == 'profile') {
                 targetPlatformValues.each {
                     include "${PLATFORM_ARCH_MAP[targetArch]}/app.so"
                 }

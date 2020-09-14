@@ -453,21 +453,6 @@ abstract class FlutterCommand extends Command<void> {
                            'or --release can be specified.', null);
     }
 
-    // BD ADD: START
-    final bool isDynamicartFlag = argParser.options.containsKey('dynamicart')
-        ? boolArg('dynamicart')
-        : false;
-    if (isDynamicartFlag) {
-      if (boolArg('debug')) {
-        throw ToolExit('Error: --dynamicart requires --release or --profile.');
-      }
-      if (boolArg('release')) {
-        return BuildMode.dynamicartRelease;
-      } else {
-        return BuildMode.dynamicartProfile;
-      }
-    }
-    // END
 
     if (debugResult) {
       return BuildMode.debug;
@@ -549,6 +534,9 @@ abstract class FlutterCommand extends Command<void> {
       // BD ADD: START
       dynamicPlugins: argParser.options.containsKey('dynamic-aot-plugins')
           ? stringArg('dynamic-aot-plugins') : null,
+      dynamicart: argParser.options.containsKey('dynamicart')
+          ? boolArg('dynamicart')
+          : false,
       lite: argParser.options.containsKey('lite')
           ? boolArg('lite')
           : false,

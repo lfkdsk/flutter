@@ -150,38 +150,36 @@ class BuildAarCommand extends BuildSubCommand {
    // if (androidBuildInfo.isEmpty) {
    //   throwToolExit('Please specify a build mode and try again.');
     //}
-    BuildMode mode = null;
-    bool isDynamicart;
-    if (argParser.options.containsKey('dynamicart')) {
-      isDynamicart = boolArg('dynamicart');
-    } else {
-      isDynamicart = false;
-    }
 
     void buildAndroidBuildInfo(bool f(String buildMode)){
       for (String buildMode in const <String>['debug', 'profile', 'release']) {
         if (f(buildMode)) {
           androidBuildInfo.add(
               AndroidBuildInfo(
-                BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor')),
+                BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor'),
+                  // BD ADD: START
+                  dynamicPlugins: argParser.options.containsKey('dynamic-aot-plugins')
+                      ? stringArg('dynamic-aot-plugins') : null,
+                  dynamicart: argParser.options.containsKey('dynamicart')
+                      ? boolArg('dynamicart')
+                      : false,
+                  lite: argParser.options.containsKey('lite')
+                      ? boolArg('lite')
+                      : false,
+                  liteGlobal: argParser.options.containsKey('lite-global')
+                      ? boolArg('lite-global')
+                      : false,
+                  liteShareSkia: argParser.options.containsKey('lite-share-skia')
+                      ? boolArg('lite-share-skia')
+                      : false),
                 targetArchs: targetArchitectures,
               )
           );
         }
       }
     }
-    if (mode == null) {
-      buildAndroidBuildInfo((String buildMode) => boolArg(buildMode));
-    } else {
-      androidBuildInfo.add(
-          AndroidBuildInfo(
-            BuildInfo(mode, stringArg('flavor')),
-            targetArchs: targetArchitectures,
-          )
-      );
-    }
 
-
+    buildAndroidBuildInfo((String buildMode) => boolArg(buildMode));
 
     if (androidBuildInfo.isEmpty) {
       buildAndroidBuildInfo((String buildMode) => true);

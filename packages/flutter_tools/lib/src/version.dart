@@ -789,7 +789,9 @@ class GitTagVersion {
     // recent tag and number of commits past.
     return parse(
       _runGit(
-        'git describe --match *.*.* --first-parent --long --tags',
+        // BD MOD
+        // 'git describe --match *.*.* --first-parent --long --tags',
+        'git describe --match *.*.* --exclude bd*.*.* --first-parent --long --tags',
         processUtils,
         workingDirectory,
       )

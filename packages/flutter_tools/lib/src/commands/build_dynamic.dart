@@ -109,7 +109,10 @@ class BuildDynamicCommand extends BuildSubCommand {
 
     final Directory tempDir =
         fs.directory(fs.path.join(getBuildDirectory(), 'temp'));
-
+    List<String> extraFrontEndOptions = [];
+    if(buildMode!=BuildMode.debug){
+      extraFrontEndOptions.add("--no-embed-source-text");
+    }
     await compileKernel(
         buildMode: buildMode,
         mainPath: findMainDartFile(targetFile),
@@ -120,7 +123,8 @@ class BuildDynamicCommand extends BuildSubCommand {
         dynamicPlugins: dynamicPlugins,
         verbose: verbose,
         hostDillPath: hostDillPath,
-        encrypt: encrypt);
+        encrypt: encrypt,
+        extraFrontEndOptions:extraFrontEndOptions);
 
     final AssetBundle assets = await buildAssets(
       manifestPath: manifestPath,

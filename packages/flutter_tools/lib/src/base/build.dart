@@ -69,7 +69,7 @@ class GenSnapshot {
       outputFilter = (String line) => line != kStripWarning ? line : null;
     }
 
-    print("snapshot==${<String>[snapshotterPath, ...args].join(' ')}");
+    print("snapshot=== ${<String>[snapshotterPath, ...args].join(' ')}\n");
     return processUtils.stream(
       <String>[snapshotterPath, ...args],
       mapFunction: outputFilter,

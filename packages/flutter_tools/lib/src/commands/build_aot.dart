@@ -122,7 +122,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       extraGenSnapshotOptions: stringsArg(FlutterOptions.kExtraGenSnapshotOptions),
       dartDefines: dartDefines,
       // BD ADD: START
-      isDynamicart: kEngineMode == EngineMode.dynamicart,
+      isDynamicart: boolArg('dynamicart'),
       dynamicPlugins: dynamicPlugins,
       compressSize: compressSize,
       isMinimumSize: isMinimumSize

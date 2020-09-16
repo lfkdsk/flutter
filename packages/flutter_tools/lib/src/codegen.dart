@@ -160,7 +160,13 @@ class CodeGeneratingKernelCompiler implements KernelCompiler {
       initializeFromDill: initializeFromDill,
       dartDefines: dartDefines,
       // BD ADD:
-      isDynamicart: isDynamicart
+      isDynamicart: isDynamicart,
+      dynamicPlugins : dynamicPlugins,
+      lite :lite,
+      liteGlobal:liteGlobal,
+      liteShareSkia:liteShareSkia,
+      isDynamicDill:isDynamicDill,
+      hostDillPath:hostDillPath
     );
   }
 }

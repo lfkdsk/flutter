@@ -115,7 +115,7 @@ Future<void> main(List<String> args) async {
   for (String cmd in args) {
     cmdStr += ' ' + cmd;
   }
-  print('current cmd: flutter $cmdStr');
+  print('exec=== flutter $cmdStr \n');
   // END
 
   /**

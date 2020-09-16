@@ -148,7 +148,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     final int majorVersion = int.parse(list[0]);
     final int minorVersion = int.parse(list[1]);
     dynamicartVersionJson['minVersion'] = '$majorVersion.$minorVersion.0';
-    dynamicartVersionJson['maxVersion'] = '${majorVersion+1}.$minorVersion.0';
+    dynamicartVersionJson['maxVersion'] = '${majorVersion+1}.0.0';
     versionMap['dynamicart'] = dynamicartVersionJson;
 
     if (verify) {
@@ -162,7 +162,7 @@ class BuildDynamicCommand extends BuildSubCommand {
         final int minorVersion = int.parse(list[1]);
 
         version['minVersion'] = '$majorVersion.$minorVersion.0';
-        version['maxVersion'] = '${majorVersion+1}.$minorVersion.0';
+        version['maxVersion'] = '${majorVersion+1}.0.0';
 
         versionMap[key] = version;
       }

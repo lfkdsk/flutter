@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/cache.dart';
 import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import 'package:usage/uuid/uuid.dart';
@@ -389,11 +390,13 @@ class KernelCompiler {
       }
       command.addAll(['--dynamic-aot-plugins', buffer.toString()]);
     }
-
+    if(isDynamicart){
+      hostDillPath = '${Cache.flutterRoot}/bin/internal/app.dill';
+    }
     if(hostDillPath != null && hostDillPath.isNotEmpty){
       command.addAll(<String>['--host-dill', hostDillPath]);
     }
-    print("kernelcompiler:${command.join(' ')}");
+    print("kernelcompiler=== ${command.join(' ')}\n");
     // END
     printTrace(command.join(' '));
     final Process server = await processManager

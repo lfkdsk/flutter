@@ -912,16 +912,21 @@ class RenderParagraph extends RenderBox
       );
 
       if (info.isPlaceholder) {
-        final SemanticsNode childNode = children.elementAt(placeholderIndex++);
-        final TextParentData parentData = child.parentData as TextParentData;
-        childNode.rect = Rect.fromLTWH(
-          childNode.rect.left,
-          childNode.rect.top,
-          childNode.rect.width * parentData.scale,
-          childNode.rect.height * parentData.scale,
-        );
-        newChildren.add(childNode);
-        child = childAfter(child);
+        // BD MOD: START
+        // if (children.isNotEmpty) {
+        if (children.isNotEmpty && placeholderIndex < children.length - 1) {
+        // END
+          final SemanticsNode childNode = children.elementAt(placeholderIndex++);
+          final TextParentData parentData = child.parentData as TextParentData;
+          childNode.rect = Rect.fromLTWH(
+            childNode.rect.left,
+            childNode.rect.top,
+            childNode.rect.width * parentData.scale,
+            childNode.rect.height * parentData.scale,
+          );
+          newChildren.add(childNode);
+          child = childAfter(child);
+        }
       } else {
         final SemanticsConfiguration configuration = SemanticsConfiguration()
           ..sortKey = OrdinalSortKey(ordinal++)

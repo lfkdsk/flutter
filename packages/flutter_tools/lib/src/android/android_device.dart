@@ -509,6 +509,61 @@ class AndroidDevice extends Device {
     return true;
   }
 
+  /// BD ADD
+  Future<bool> pushFile(String sourceFile, String destDir) async {
+    if (!await _checkForSupportedAdbVersion() ||
+        !await _checkForSupportedAndroidVersion()) {
+      return false;
+    }
+    String uninstallOut;
+    try {
+      final RunResult uninstallResult = await processUtils.run(
+        adbCommandForDevice(<String>['push', sourceFile, destDir]),
+        throwOnError: true,
+      );
+      uninstallOut = uninstallResult.stdout;
+    } catch (error) {
+      _logger.printError('adb push failed: $error');
+      return false;
+    }
+    _logger.printStatus('adb push: ${uninstallOut.trim()}');
+    return uninstallOut.contains('1 file pushed');
+  }
+
+  /// BD ADD
+  Future<void> createDirOnDevice(String dirPath) async {
+    if (!await _checkForSupportedAdbVersion() ||
+        !await _checkForSupportedAndroidVersion()) {
+      return;
+    }
+    try {
+      await processUtils.run(
+        adbCommandForDevice(<String>['shell', 'mkdir', dirPath]),
+        throwOnError: true,
+      );
+    } catch (error) {
+      _logger.printError('adb shell mkdir failed: $error');
+      return false;
+    }
+  }
+
+  /// BD ADD
+  Future<void> deleteDirOnDevice(String dirPath) async {
+    if (!await _checkForSupportedAdbVersion() ||
+        !await _checkForSupportedAndroidVersion()) {
+      return;
+    }
+    try {
+      await processUtils.run(
+        adbCommandForDevice(<String>['shell', 'rm -rf', dirPath]),
+        throwOnError: true,
+      );
+    } catch (error) {
+      _logger.printError('adb shell rm -rf failed: $error');
+      return false;
+    }
+  }
+
   Future<bool> _installLatestApp(AndroidApk package, String userIdentifier) async {
     final bool wasInstalled = await isAppInstalled(package, userIdentifier: userIdentifier);
     if (wasInstalled) {

@@ -48,6 +48,8 @@ class BuildApkCommand extends BuildSubCommand {
         help: 'Whether to split the APKs per ABIs. '
               'To learn more, see: https://developer.android.com/studio/build/configure-apk-splits#configure-abi-split',
       )
+      // BD ADD
+      ..addOption('host-package')
       ..addMultiOption('target-platform',
         splitCommas: true,
         defaultsTo: <String>['android-arm', 'android-arm64', 'android-x64'],
@@ -134,6 +136,8 @@ class BuildApkCommand extends BuildSubCommand {
       splitPerAbi: boolArg('split-per-abi'),
       targetArchs: stringsArg('target-platform').map<AndroidArch>(getAndroidArchForName),
       shrink: boolArg('shrink'),
+      // BD ADD
+      packageForDebug: stringArg('host-package'),
     );
     validateBuild(androidBuildInfo);
 

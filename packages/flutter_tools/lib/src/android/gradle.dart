@@ -5,6 +5,12 @@
 import 'dart:async';
 
 import 'package:crypto/crypto.dart';
+// BD ADD: START
+import 'package:flutter_tools/src/android/android_device.dart';
+import 'package:flutter_tools/src/base/os.dart';
+import 'package:flutter_tools/src/commands/drive.dart';
+import 'package:flutter_tools/src/device.dart';
+// END
 import 'package:meta/meta.dart';
 import 'package:xml/xml.dart';
 
@@ -561,7 +567,48 @@ Future<void> buildGradleApp({
     await _performCodeSizeAnalysis('apk', apkFile, androidBuildInfo);
   }
   // BD ADD:
+  await _copyFileForDebug(androidBuildInfo, apkDirectory, apkFile);
   await FlutterBuildInfo.instance.reportInfo();
+}
+
+/// BD ADD
+Future<void> _copyFileForDebug(AndroidBuildInfo androidBuildInfo,
+    Directory apkDirectory, File apkFile) async {
+  if (androidBuildInfo.packageForDebug?.isEmpty ?? true) {
+    return;
+  }
+  final Device device = await findTargetDevice();
+  if (device != null && device is AndroidDevice) {
+    /// Clear destination dir
+    final String pushDestDir =
+        '/sdcard/Android/data/${androidBuildInfo.packageForDebug}/files/flutter_debug/';
+    await device.deleteDirOnDevice(pushDestDir);
+    await device.createDirOnDevice(pushDestDir);
+    globals.printStatus('create new dir:$pushDestDir');
+
+    /// Unzip apk file
+    final Directory unzipDir = apkDirectory.childDirectory('apk-unzip');
+    globals.os.unzip(apkFile, unzipDir);
+
+    /// Push libflutter.so
+    final Directory libDir = unzipDir.childDirectory('lib').childDirectory(
+        getNameForAndroidArch(androidBuildInfo.targetArchs.first));
+    await device.pushFile(libDir.childFile('libflutter.so').path, pushDestDir);
+
+    if (androidBuildInfo.buildInfo.mode == BuildMode.debug ||
+        androidBuildInfo.buildInfo.mode == BuildMode.jitRelease) {
+      final Directory child =
+          unzipDir.childDirectory('assets').childDirectory('flutter_assets');
+      await device.pushFile(
+          child.childFile('isolate_snapshot_data').path, pushDestDir);
+      await device.pushFile(
+          child.childFile('vm_snapshot_data').path, pushDestDir);
+      await device.pushFile(
+          child.childFile('kernel_blob.bin').path, pushDestDir);
+    } else {
+      await device.pushFile(libDir.childFile('libapp.so').path, pushDestDir);
+    }
+  }
 }
 
 Future<void> _performCodeSizeAnalysis(

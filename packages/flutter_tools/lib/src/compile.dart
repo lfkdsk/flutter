@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/calculate_build_info.dart';
 import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import 'package:usage/uuid/uuid.dart';
@@ -365,6 +366,9 @@ class KernelCompiler {
       if (platformDill != null) ...<String>[
         '--platform',
         platformDill,
+      ],
+      if (FlutterBuildInfo.instance.conditions.isNotEmpty) ...<String> [
+        FlutterBuildInfo.instance.conditions,
       ],
       ...await TransformerHooks.getTransformerParams(),
       ...?extraFrontEndOptions,

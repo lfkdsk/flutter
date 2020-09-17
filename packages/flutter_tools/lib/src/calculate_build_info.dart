@@ -57,6 +57,7 @@ class FlutterBuildInfo {
   String projectVersion = '';
   String projectBranch = '';
   String flutterwVersion = '';
+  String conditions = '';
   int eventTime = 0;
 
   void parseCommand(List<String> args) {

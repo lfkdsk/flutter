@@ -77,6 +77,7 @@ Future<void> main(List<String> args) async {
   final bool lite = args.contains('--lite');
   final bool liteGlobal = args.contains('--lite-global');
   final bool liteShareSkia = args.contains('--lite-share-skia');
+  final bool hasConditions = args.contains('--conditions');
 
   int engineMode = ENGINE_NORMAL;
   if (lite) {
@@ -136,6 +137,18 @@ Future<void> main(List<String> args) async {
     args = List<String>.from(args); // dart didn't support this command
     args.removeWhere((String option) => option == '--bundler');
     Bundler.commandUsedBundler(); // we just need to know if exists
+  }
+
+  if (hasConditions) {
+    args = List<String>.from(args); // dart didn't support this command
+    final int index = args.indexWhere((String ele) => ele == '--conditions');
+    if (index > 0 && index + 2 < args.length) {
+      final String conFlag = args[index];
+      final String conParams = args[index + 1];
+      FlutterBuildInfo.instance.conditions = '$conFlag $conParams';
+      // remove unsupported flag in flutter commands.
+      args.removeRange(index, index + 2);
+    }
   }
   // END
 

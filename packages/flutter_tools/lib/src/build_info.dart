@@ -113,6 +113,8 @@ class AndroidBuildInfo {
     ],
     this.splitPerAbi = false,
     this.shrink = false,
+    // BD ADD
+    this.packageForDebug = '',
   });
 
   // The build info containing the mode and flavor.
@@ -130,6 +132,9 @@ class AndroidBuildInfo {
 
   /// The target platforms for the build.
   final Iterable<AndroidArch> targetArchs;
+
+  // BD ADD
+  final String packageForDebug;
 
 }
 

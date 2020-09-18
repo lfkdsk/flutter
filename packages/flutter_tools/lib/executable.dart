@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:flutter_tools/src/globals.dart';
+import 'package:flutter_tools/src/project.dart';
 
 import 'runner.dart' as runner;
 import 'src/base/context.dart';
@@ -129,10 +130,12 @@ Future<void> main(List<String> args) async {
   if (hasConditions) {
     args = List<String>.from(args); // dart didn't support this command
     final int index = args.indexWhere((String ele) => ele == '--conditions');
-    if (index > 0 && index + 2 < args.length) {
+    if (index > 0 && index + 1 < args.length) {
       final String conFlag = args[index];
       final String conParams = args[index + 1];
-      FlutterBuildInfo.instance.conditions = '$conFlag $conParams';
+      final conditions = FlutterProject.current().directory.childFile('build/conditions');
+      conditions.createSync(recursive: true);
+      conditions.writeAsStringSync(conParams);
       // remove unsupported flag in flutter commands.
       args.removeRange(index, index + 2);
     }

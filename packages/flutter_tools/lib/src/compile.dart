@@ -317,6 +317,13 @@ class KernelCompiler {
     if (outputFilePath != null && !fs.isFileSync(outputFilePath)) {
       fs.file(outputFilePath).createSync(recursive: true);
     }
+
+    final conditionsFile = FlutterProject.current().directory.childFile('build/conditions');
+    String conditions;
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+    }
+
     final List<String> command = <String>[
       engineDartPath,
       frontendServer,
@@ -337,6 +344,10 @@ class KernelCompiler {
       if (aot) ...<String>[
         '--aot',
         '--tfa',
+      ],
+      if (conditions != null) ...<String> [
+        '--conditions',
+        conditions,
       ],
       if (packagesPath != null) ...<String>[
         '--packages',
@@ -366,9 +377,6 @@ class KernelCompiler {
       if (platformDill != null) ...<String>[
         '--platform',
         platformDill,
-      ],
-      if (FlutterBuildInfo.instance.conditions.isNotEmpty) ...<String> [
-        FlutterBuildInfo.instance.conditions,
       ],
       ...await TransformerHooks.getTransformerParams(),
       ...?extraFrontEndOptions,
@@ -661,6 +669,11 @@ class DefaultResidentCompiler implements ResidentCompiler {
     final String frontendServer = artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
     );
+    final conditionsFile = FlutterProject.current().directory.childFile('build/conditions');
+    String conditions;
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+    }
     final List<String> command = <String>[
       artifacts.getArtifactPath(Artifact.engineDartBinary),
       frontendServer,
@@ -681,6 +694,10 @@ class DefaultResidentCompiler implements ResidentCompiler {
       ] else if (packagesPath != null) ...<String>[
         '--packages',
         packagesPath,
+      ],
+      if (conditions != null) ...<String> [
+        '--conditions',
+        conditions,
       ],
       ..._buildModeOptions(buildMode),
       if (trackWidgetCreation) '--track-widget-creation',

@@ -192,6 +192,10 @@ class RunCommand extends RunCommandBase {
       ..addMultiOption(FlutterOptions.kEnableExperiment,
         splitCommas: true,
         hide: true,
+      )
+      ..addMultiOption('conditions',
+        splitCommas: true,
+        hide: true,
       );
   }
 

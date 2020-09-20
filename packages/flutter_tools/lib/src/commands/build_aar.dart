@@ -195,7 +195,9 @@ class BuildAarCommand extends BuildSubCommand {
         if (f(buildMode)) {
           androidBuildInfo.add(
               AndroidBuildInfo(
-                BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor')),
+                // adapt 1.20
+                // BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor')),
+                getBuildInfo(forcedBuildMode: BuildMode.fromName(buildMode)),
                 targetArchs: targetArchitectures,
               )
           );
@@ -207,7 +209,7 @@ class BuildAarCommand extends BuildSubCommand {
     } else {
       androidBuildInfo.add(
           AndroidBuildInfo(
-            BuildInfo(mode, stringArg('flavor')),
+            getBuildInfo(forcedBuildMode: mode),
             targetArchs: targetArchitectures,
           )
       );

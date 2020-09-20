@@ -181,18 +181,19 @@ class FlutterPlugin implements Plugin<Project> {
 
             // BD ADD: START
             // flutter run/build aot命令都是执行的gradle命令的--dynamicart参数映射到gradle命令上
-            dynamicartProfile {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            dynamicartRelease {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
+            // FIXME: Temporary delete for BD #56
+            // dynamicartProfile {
+            //     initWith debug
+            //     if (it.hasProperty('matchingFallbacks')) {
+            //         matchingFallbacks = ['debug', 'release']
+            //     }
+            // }
+            // dynamicartRelease {
+            //     initWith debug
+            //     if (it.hasProperty('matchingFallbacks')) {
+            //         matchingFallbacks = ['debug', 'release']
+            //     }
+            // }
             // END
         }
 
@@ -384,12 +385,13 @@ class FlutterPlugin implements Plugin<Project> {
                 }
                 // BD ADD: START
                 // 上面的buildTypes是给主工程加的，Android插件模块打包的话需要在这里重新加一次
-                dynamicartRelease {
-                    initWith debug
-                }
-                dynamicartProfile {
-                    initWith debug
-                }
+                // FIXME: Temporary delete for BD #56
+                // dynamicartRelease {
+                //     initWith debug
+                // }
+                // dynamicartProfile {
+                //     initWith debug
+                // }
                 // END
             }
             pluginProject.android.buildTypes.each addEmbeddingCompileOnlyDependency

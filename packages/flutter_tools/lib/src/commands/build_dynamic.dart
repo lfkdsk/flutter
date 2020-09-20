@@ -141,17 +141,18 @@ class BuildDynamicCommand extends BuildSubCommand {
     final String versionCode = flutterManifest.appVersion;
 
     final Map<String, Map<String, String>> versionMap = <String, Map<String, String>>{};
-    // 生成dynamicart的最大和最小版本号
-    final String dynamicartVersion = Cache.instance.dynamicartRevision;
-    final List<String> list = dynamicartVersion.split('.');
-    final Map<String, String> dynamicartVersionJson = <String, String>{};
-    final int majorVersion = int.parse(list[0]);
-    final int minorVersion = int.parse(list[1]);
-    dynamicartVersionJson['minVersion'] = '$majorVersion.$minorVersion.0';
-    dynamicartVersionJson['maxVersion'] = '${majorVersion+1}.0.0';
-    versionMap['dynamicart'] = dynamicartVersionJson;
 
     if (verify) {
+      // 生成dynamicart的最大和最小版本号
+      final String dynamicartVersion = Cache.instance.dynamicartRevision;
+      final List<String> list = dynamicartVersion.split('.');
+      final Map<String, String> dynamicartVersionJson = <String, String>{};
+      final int majorVersion = int.parse(list[0]);
+      final int minorVersion = int.parse(list[1]);
+      dynamicartVersionJson['minVersion'] = '$majorVersion.$minorVersion.0';
+      dynamicartVersionJson['maxVersion'] = '${majorVersion+1}.0.0';
+      versionMap['dynamicart'] = dynamicartVersionJson;
+
       // 生成依赖的plugin的最大和最小版本号
       final Map<String, String> map = getPluginVersion(packagesPath);
       for (String key in map.keys) {

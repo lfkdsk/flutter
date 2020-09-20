@@ -352,9 +352,14 @@ class FlutterPlugin implements Plugin<Project> {
             return
         }
         // Add plugin dependency to the app project.
-        project.dependencies {
-            implementation pluginProject
+        // BD MOD: START
+        // project.dependencies {
+        //     implementation pluginProject
+        // }
+        project.android.buildTypes.each { buildType ->
+            addApiDependencies(project, buildType.name, pluginProject)
         }
+        // END
         Closure addEmbeddingCompileOnlyDependency = { buildType ->
             String flutterBuildMode = buildModeFor(buildType)
             // In AGP 3.5, the embedding must be added as an API implementation,

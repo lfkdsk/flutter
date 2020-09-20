@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-3](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-2...bd1.20.1-3) (2020-09-20)
+
+
+### Bug Fixes
+
+* fix build aar failed issue (BD [#56](https://jira.bytedance.com/browse/56)) ([a57ce05](https://code.byted.org/tech_client/flutter/commit/a57ce05))
+
+
+### Features
+
+* **android:** support projects dependency third-party library directly (BD [#69](https://jira.bytedance.com/browse/69)) ([4146931](https://code.byted.org/tech_client/flutter/commit/4146931))
+* add new native image interface (BD [#68](https://jira.bytedance.com/browse/68)) ([1e572aa](https://code.byted.org/tech_client/flutter/commit/1e572aa))
+* update codes from flutter 1.20.1 to 1.20.4
+
 ### [1.12.13-4](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-3...bd1.12.13-4) (2020-04-21)
 
 

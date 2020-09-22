@@ -551,6 +551,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.plugin.common.PluginRegistry;
 {{#needsShim}}
 import io.flutter.embedding.engine.plugins.shim.ShimPluginRegistry;
 {{/needsShim}}
@@ -566,6 +567,18 @@ public final class GeneratedPluginRegistrant {
 {{#needsShim}}
     ShimPluginRegistry shimPluginRegistry = new ShimPluginRegistry(flutterEngine);
 {{/needsShim}}
+{{#plugins}}
+  {{#supportsEmbeddingV2}}
+    flutterEngine.getPlugins().add(new {{package}}.{{class}}());
+  {{/supportsEmbeddingV2}}
+  {{^supportsEmbeddingV2}}
+    {{#supportsEmbeddingV1}}
+      {{package}}.{{class}}.registerWith(shimPluginRegistry.registrarFor("{{package}}.{{class}}"));
+    {{/supportsEmbeddingV1}}
+  {{/supportsEmbeddingV2}}
+{{/plugins}}
+  }
+   public static void registerWith(@NonNull FlutterEngine flutterEngine,PluginRegistry shimPluginRegistry) {
 {{#plugins}}
   {{#supportsEmbeddingV2}}
     flutterEngine.getPlugins().add(new {{package}}.{{class}}());

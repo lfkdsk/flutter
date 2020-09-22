@@ -165,6 +165,7 @@ projectsEvaluated {
             // Configure the `assembleAar<variantName>` task for each plugin's projects and make
             // the module's equivalent task depend on the plugin's task.
             String variantName = variant.name.capitalize()
+            print("assembleAar${variantName}=== ${pluginProject.name}\n")
             moduleProject.tasks.findByPath("assembleAar$variantName")
                 .dependsOn(pluginProject.tasks.findByPath("assembleAar$variantName"))
         }

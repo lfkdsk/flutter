@@ -3,11 +3,13 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io' as io;
 
 import 'package:flutter_tools/src/cache.dart';
 import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import 'package:usage/uuid/uuid.dart';
+import 'package:yaml/yaml.dart';
 
 import 'artifacts.dart';
 import 'base/common.dart';
@@ -380,6 +382,26 @@ class KernelCompiler {
       mainUri?.toString() ?? mainPath,
     ];
     // BD ADD: START
+
+    if (dynamicPlugins == null || dynamicPlugins.isEmpty) {
+      final String flutterwCfgPath = fs.path.absolute('flutterw_config');
+      print("flutterwCfgPath:${flutterwCfgPath}\n");
+      io.File flutterwYaml = io.File("${flutterwCfgPath}/flutterw.yaml");
+      if(flutterwYaml.existsSync()){
+        String str = flutterwYaml.readAsStringSync();
+        dynamic doc = loadYaml(str);
+        if(doc['engine']!=null && doc['engine']['dynamic_host']!=null && doc['engine']['dynamic_host']['dynamic_aot_plugins']!=null){
+          String dynamicPluginsStr = doc['engine']['dynamic_host']['dynamic_aot_plugins'] as String;
+          dynamicPlugins = dynamicPluginsStr.split(" ");
+        }
+
+        if(doc['engine']!=null && doc['engine']['dynamic_package']!=null && doc['engine']['dynamic_package']['dynamic_aot_plugins']!=null){
+          String dynamicPluginsStr = doc['engine']['dynamic_package']['dynamic_aot_plugins'] as String;
+          dynamicPlugins = dynamicPluginsStr.split(" ");
+        }
+      }
+    }
+
     if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
       final StringBuffer buffer = StringBuffer();
       for (int i = 0; i < dynamicPlugins.length; i++) {

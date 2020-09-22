@@ -312,7 +312,19 @@ Future<void> buildGradleApp({
       'Local Maven repo: ${localEngineRepo.path}'
     );
     command.add('-Plocal-engine-repo=${localEngineRepo.path}');
-    command.add('-Plocal-engine-build-mode=${buildInfo.modeName}');
+    // BD MOD: START
+    if (buildInfo.dynamicart) {
+      var localEngineBuildMode = buildInfo.modeName;
+      if(localEngineBuildMode=="release"){
+        localEngineBuildMode = "dynamicart_release";
+      }else if(localEngineBuildMode=="profile"){
+        localEngineBuildMode = "dynamicart_profile";
+      }
+      command.add('-Plocal-engine-build-mode=${localEngineBuildMode}');
+    }else{
+      command.add('-Plocal-engine-build-mode=${buildInfo.modeName}');
+    }
+    // END
     command.add('-Plocal-engine-out=${localEngineArtifacts.engineOutPath}');
     command.add('-Ptarget-platform=${getTargetPlatformByLocalEnginePath(
         localEngineArtifacts.engineOutPath)}');
@@ -588,7 +600,19 @@ Future<void> buildGradleAar({
       'Local Maven repo: ${localEngineRepo.path}'
     );
     command.add('-Plocal-engine-repo=${localEngineRepo.path}');
-    command.add('-Plocal-engine-build-mode=${androidBuildInfo.buildInfo.modeName}');
+    // BD MOD: START
+    if (androidBuildInfo.buildInfo.dynamicart) {
+      var localEngineBuildMode = androidBuildInfo.buildInfo.modeName;
+      if(localEngineBuildMode=="release"){
+        localEngineBuildMode = "dynamicart_release";
+      }else if(localEngineBuildMode=="profile"){
+        localEngineBuildMode = "dynamicart_profile";
+      }
+      command.add('-Plocal-engine-build-mode=${localEngineBuildMode}');
+    }else{
+      command.add('-Plocal-engine-build-mode=${androidBuildInfo.buildInfo.modeName}');
+    }
+    // END
     command.add('-Plocal-engine-out=${localEngineArtifacts.engineOutPath}');
   }
 

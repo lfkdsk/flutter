@@ -532,8 +532,7 @@ abstract class FlutterCommand extends Command<void> {
           ? stringArg('build-name')
           : null,
       // BD ADD: START
-      dynamicPlugins: argParser.options.containsKey('dynamic-aot-plugins')
-          ? stringArg('dynamic-aot-plugins') : null,
+      dynamicPlugins: getDynamicPlugins()?.join(","),
       dynamicart: argParser.options.containsKey('dynamicart')
           ? boolArg('dynamicart')
           : false,

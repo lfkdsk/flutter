@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-4](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-3...bd1.20.1-4) (2020-09-23)
+
+
+### Features
+
+* support custom shimPluginRegistry in GeneratedPluginRegistrant ([c0ac369](https://code.byted.org/tech_client/flutter/commit/c0ac369))
+
 ### [1.20.1-3](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-2...bd1.20.1-3) (2020-09-20)
 
 

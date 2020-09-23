@@ -385,18 +385,18 @@ class KernelCompiler {
 
     if (dynamicPlugins == null || dynamicPlugins.isEmpty) {
       final String flutterwCfgPath = fs.path.absolute('flutterw_config');
-      print("flutterwCfgPath:${flutterwCfgPath}\n");
+      print("flutterwCfgPath===:${flutterwCfgPath}\n");
       io.File flutterwYaml = io.File("${flutterwCfgPath}/flutterw.yaml");
       if(flutterwYaml.existsSync()){
         String str = flutterwYaml.readAsStringSync();
         dynamic doc = loadYaml(str);
-        if(doc['engine']!=null && doc['engine']['dynamic_host']!=null && doc['engine']['dynamic_host']['dynamic_aot_plugins']!=null){
-          String dynamicPluginsStr = doc['engine']['dynamic_host']['dynamic_aot_plugins'] as String;
+        if(doc['dynamic_host']!=null && doc['dynamic_host']['dynamic_aot_plugins']!=null){
+          String dynamicPluginsStr = doc['dynamic_host']['dynamic_aot_plugins'] as String;
           dynamicPlugins = dynamicPluginsStr.split(" ");
         }
 
-        if(doc['engine']!=null && doc['engine']['dynamic_package']!=null && doc['engine']['dynamic_package']['dynamic_aot_plugins']!=null){
-          String dynamicPluginsStr = doc['engine']['dynamic_package']['dynamic_aot_plugins'] as String;
+        if(doc['dynamic_package']!=null && doc['dynamic_package']['dynamic_aot_plugins']!=null){
+          String dynamicPluginsStr = doc['dynamic_package']['dynamic_aot_plugins'] as String;
           dynamicPlugins = dynamicPluginsStr.split(" ");
         }
       }

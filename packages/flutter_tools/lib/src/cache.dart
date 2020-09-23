@@ -1201,8 +1201,8 @@ class IOSEngineLiteArtifacts extends EngineCachedArtifact {
   List<String> getLicenseDirs() {
     if (cache.includeAllPlatforms || globals.platform.isMacOS) {
       return const <String>[
-//        'ios-release-lite',
-//        'ios-release-liteg',
+        'ios-release-lite',
+        'ios-release-liteg',
 //        'ios-release-lites',
 //        'ios-dynamicart-release-lites'
 ];
@@ -1554,10 +1554,10 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
 
 // BD ADD: START
 const List<List<String>> _osxLiteBinaryDirs = <List<String>>[
-//  <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
-//  <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
-//  <String>['android-arm-release-liteg/darwin-x64', 'android-arm-release-liteg/darwin-x64.zip'],
-//  <String>['android-arm64-release-liteg/darwin-x64', 'android-arm64-release-liteg/darwin-x64.zip'],
+  <String>['android-arm-release-lite/darwin-x64', 'android-arm-release-lite/darwin-x64.zip'],
+  <String>['android-arm64-release-lite/darwin-x64', 'android-arm64-release-lite/darwin-x64.zip'],
+  <String>['android-arm-release-liteg/darwin-x64', 'android-arm-release-liteg/darwin-x64.zip'],
+  <String>['android-arm64-release-liteg/darwin-x64', 'android-arm64-release-liteg/darwin-x64.zip'],
 ];
 // END
 
@@ -1587,10 +1587,10 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
 
 // BD ADD: START
 const List<List<String>> _iosBinaryLiteDirs = <List<String>>[
-//  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
-//  <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
-//  <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
-//  <String>['ios-dynamicart-release-lites', 'ios-dynamicart-release-lites/artifacts.zip'],
+  <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
+  <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
+// <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
+// <String>['ios-dynamicart-release-lites', 'ios-dynamicart-release-lites/artifacts.zip'],
 ];
 // END
 
@@ -1611,10 +1611,10 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
 
 // BD ADD: START
 const List<List<String>> _androidLiteBinaryDirs = <List<String>>[
-//  <String>['android-arm-release-lite', 'android-arm-release-lite/artifacts.zip'],
-//  <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
-//  <String>['android-arm-release-liteg', 'android-arm-release-liteg/artifacts.zip'],
-//  <String>['android-arm64-release-liteg', 'android-arm64-release-liteg/artifacts.zip'],
+  <String>['android-arm-release-lite', 'android-arm-release-lite/artifacts.zip'],
+  <String>['android-arm64-release-lite', 'android-arm64-release-lite/artifacts.zip'],
+  <String>['android-arm-release-liteg', 'android-arm-release-liteg/artifacts.zip'],
+  <String>['android-arm64-release-liteg', 'android-arm64-release-liteg/artifacts.zip'],
 ];
 // END
 

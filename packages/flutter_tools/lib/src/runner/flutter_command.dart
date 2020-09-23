@@ -359,6 +359,9 @@ abstract class FlutterCommand extends Command<void> {
 
   // BD ADD: START
   List<String> getDynamicPlugins() {
+    if(!argParser.options.containsKey('dynamic-aot-plugins')){
+      return null;
+    }
     final String dynamicPluginContent = stringArg('dynamic-aot-plugins');
     List<String> dynamicPlugins;
     if (dynamicPluginContent.isNotEmpty) {

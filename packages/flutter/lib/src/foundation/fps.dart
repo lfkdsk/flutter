@@ -26,6 +26,17 @@ class FpsUtils {
   List<FpsData> _recordedData;
   Map<String, Timer> _timers;
 
+  /// For the key of auto record fps,
+  /// The business logic in Plugin will lead to widgetCreateLocation of
+  /// loacal project error
+  /// So,we need a list of businessPlugin to help judge.
+  List<String> businessPlugins;
+
+  /// For the key of auto record fps,
+  /// We will simplify key based on '/',
+  /// This variable can control the number of ‘/’
+  int hierarchyCountOfKey = 1;
+
   static FpsUtils _getInstance() {
     _instance ??= FpsUtils._internal();
     return _instance;

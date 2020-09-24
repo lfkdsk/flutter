@@ -1484,12 +1484,21 @@ mixin WidgetInspectorService {
   // BD ADD: START
   /// 业务层创建的Widget，返回CreateLocation
   /// 非业务层创建的Widget或者无法获取Location，返回null
-  String getLocationCreatedByLocalProject(Object value) {
+  String getLocationCreatedByLocalProject(Object value,
+      {List<String> effectivePlugins}) {
     final _Location creationLocation = _getCreationLocation(value);
     if (creationLocation == null || creationLocation.file == null) {
       return null;
     }
     final String file = Uri.parse(creationLocation.file).path;
+
+    if (effectivePlugins?.isNotEmpty ?? false) {
+      for (String plugin in effectivePlugins) {
+        if (file.contains(plugin)) {
+          return creationLocation.toString();
+        }
+      }
+    }
 
     // By default check whether the creation location was within package:flutter.
     // if use flutterw, can't judge by _pubRootDirectories
@@ -2951,16 +2960,20 @@ String _describeCreationLocation(Object object) {
 }
 // BD ADD: START
 ///Element向上遍历，寻找第一个由业务创建的Widget，返回创建地址
-String getCreationLocationForError(Element element) {
+String getCreationLocationForError(Element element,
+    {List<String> effectivePlugins}) {
   if (element == null) {
     return 'none';
   }
-  String location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(element);
+  String location = WidgetInspectorService.instance
+      .getLocationCreatedByLocalProject(
+      element, effectivePlugins: effectivePlugins);
   if (location != null) {
     return location;
   }
-  element?.visitAncestorElements((ancestor) {
-    location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(ancestor);
+  element?.visitAncestorElements((Element ancestor) {
+    location = WidgetInspectorService.instance.getLocationCreatedByLocalProject(
+        ancestor, effectivePlugins: effectivePlugins);
     return location == null;
   });
   return location ?? 'none';
@@ -2969,14 +2982,21 @@ String getCreationLocationForError(Element element) {
 
 /// BD ADD:
 /// simplify location string
-String simplifyFileLocationKey(String key) {
-  if (key?.startsWith('file:') ?? false) {
-    final int index = key.lastIndexOf('/');
-    if (index > 0) {
-      key = key.substring(index);
-    }
+String simplifyFileLocationKey(String key, [int countOfHierarchy = 1]) {
+  if (!(key?.startsWith('file:') ?? false)) {
+    return key;
   }
-  return key;
+  final List<String> lists = key.split('/');
+  if (lists?.isEmpty ?? true) {
+    return key;
+  }
+  String record = '';
+  while (countOfHierarchy > 0 && lists.isNotEmpty) {
+    record = '/' + lists.last + record;
+    lists.removeLast();
+    countOfHierarchy--;
+  }
+  return record;
 }
 
 /// Returns the creation location of an object if one is available.

@@ -142,7 +142,9 @@ class ScrollStartNotification extends ScrollNotification {
     if (FpsUtils.instance.enableAutoRecord) {
       _hasScrollUpdate = false;
       final String key = 'Scroll(${simplifyFileLocationKey(
-          getCreationLocationForError(target))})';
+          getCreationLocationForError(
+              target, effectivePlugins: FpsUtils.instance.businessPlugins),
+          FpsUtils.instance.hierarchyCountOfKey)})';
       FpsUtils.instance.startRecord(key, isFromFramework: true);
     }
   }
@@ -288,7 +290,9 @@ class ScrollEndNotification extends ScrollNotification {
     super.dispatch(target);
     if (FpsUtils.instance.enableAutoRecord) {
       final String key = 'Scroll(${simplifyFileLocationKey(
-          getCreationLocationForError(target))})';
+          getCreationLocationForError(
+              target, effectivePlugins:FpsUtils.instance.businessPlugins),
+          FpsUtils.instance.hierarchyCountOfKey)})';
       FpsUtils.instance.getFps(
           key, true, recordInFramework: _hasScrollUpdate,
           isFromFramework: true);

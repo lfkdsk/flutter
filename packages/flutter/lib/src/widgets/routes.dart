@@ -162,7 +162,9 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
         // BD ADD: START
         if (_isPushing) {
           FpsUtils.instance.getFps(
-              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              'Route(${simplifyFileLocationKey(
+                  settings.name, FpsUtils.instance.hierarchyCountOfKey)})',
+              true,
               recordInFramework: true, isFromFramework: true);
           _isPushing = false;
         }
@@ -185,7 +187,9 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
         // BD ADD: START
         if (_isPushing) {
           FpsUtils.instance.getFps(
-              'Route(${simplifyFileLocationKey(settings.name)})', true,
+              'Route(${simplifyFileLocationKey(
+                  settings.name, FpsUtils.instance.hierarchyCountOfKey)})',
+              true,
               isFromFramework: true);
           _isPushing = false;
         }
@@ -217,7 +221,8 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     _didPushOrReplace();
     super.didPush();
     // BD ADD: START
-    final String key = 'Route(${simplifyFileLocationKey(settings.name)})';
+    final String key = 'Route(${simplifyFileLocationKey(
+        settings.name, FpsUtils.instance.hierarchyCountOfKey)})';
     void startRecord() {
       if (!_isPushing && FpsUtils.instance.enableAutoRecord) {
         FpsUtils.instance.startRecord(

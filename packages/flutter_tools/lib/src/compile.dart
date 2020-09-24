@@ -320,9 +320,18 @@ class KernelCompiler {
 
     final conditionsFile = FlutterProject.current().directory.childFile('build/conditions');
     String conditions;
+    final List<String> allConditions = [
+      'condition.release=${buildMode == BuildMode.release}',
+      'condition.debug=${buildMode == BuildMode.debug}',
+      'condition.notAot=${!aot}',
+      'condition.bd_1.12.13=${true}'
+    ];
+
     if (conditionsFile.existsSync()) {
       conditions = conditionsFile.readAsStringSync();
+      allConditions.add(conditions);
     }
+    conditions = allConditions.join(',');
 
     final List<String> command = <String>[
       engineDartPath,
@@ -671,6 +680,18 @@ class DefaultResidentCompiler implements ResidentCompiler {
     );
     final conditionsFile = FlutterProject.current().directory.childFile('build/conditions');
     String conditions;
+    final List<String> allConditions = [
+      'condition.release=${buildMode == BuildMode.release}',
+      'condition.debug=${buildMode == BuildMode.debug}',
+      'condition.notAot=${true}',
+      'condition.bd_1.12.13=${true}'
+    ];
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+      allConditions.add(conditions);
+    }
+    conditions = allConditions.join(',');
+
     if (conditionsFile.existsSync()) {
       conditions = conditionsFile.readAsStringSync();
     }

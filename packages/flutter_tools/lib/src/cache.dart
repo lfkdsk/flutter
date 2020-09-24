@@ -701,8 +701,22 @@ class FlutterWebSdk extends CachedArtifact {
     } else if (globals.platform.isWindows) {
       platformName += 'windows-x64';
     }
-    final Uri url = Uri.parse('${cache.storageBaseUrl}/flutter_infra/flutter/$version/$platformName.zip');
-    await artifactUpdater.downloadZipArchive('Downloading Web SDK...', url, location);
+    /// BD MOD: START
+    /// final Uri url = Uri.parse('${cache.storageBaseUrl}/flutter_infra/flutter/$version/$platformName.zip');
+    /// await artifactUpdater.downloadZipArchive('Downloading Web SDK...', url, location);
+    if (location.existsSync()) {
+      location.deleteSync(recursive: true);
+    }
+    if (customEngineArtifacts.contains(platformName)) {
+      final String customEngineUrl = '$customEngineDownloadUrl/$customEngineVersion/';
+      globals.printStatus('Downloading from TT ' + customEngineUrl + platformName + '.zip');
+      await artifactUpdater.downloadZipArchive('Downloading package $platformName...',
+          Uri.parse(customEngineUrl + platformName + '.zip'), location);
+    } else {
+      final Uri url = Uri.parse('${cache.storageBaseUrl}/flutter_infra/flutter/$version/$platformName.zip');
+      await artifactUpdater.downloadZipArchive('Downloading Web SDK...', url, location);
+    }
+    /// END
     // This is a temporary work-around for not being able to safely download into a shared directory.
     for (final FileSystemEntity entity in location.listSync(recursive: true)) {
       if (entity is File) {

@@ -6,12 +6,14 @@ import 'package:archive/archive.dart';
 // ignore: implementation_imports
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_tools/src/android/android_device.dart';
 import 'package:flutter_tools/src/base/common.dart';
 import 'package:flutter_tools/src/base/file_system.dart' hide FileSystemEntity;
 import 'package:flutter_tools/src/base/fingerprint.dart';
 import 'package:flutter_tools/src/base/process_manager.dart';
 import 'package:flutter_tools/src/build_system/targets/dart.dart';
 import 'package:flutter_tools/src/dart/package_map.dart';
+import 'package:flutter_tools/src/device.dart';
 import 'package:meta/meta.dart';
 import '../artifacts.dart';
 import '../asset.dart';
@@ -26,6 +28,7 @@ import '../project.dart';
 import '../resident_runner.dart';
 import '../runner/flutter_command.dart' show FlutterCommandResult;
 import 'build.dart';
+import 'drive.dart';
 
 const String defaultManifestPath = 'pubspec.yaml';
 
@@ -46,6 +49,7 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..addFlag('encrypt', defaultsTo: true)
       ..addOption('manifest', defaultsTo: defaultManifestPath)
       ..addOption('package-name', defaultsTo: null)
+      ..addOption('host-package', defaultsTo: null)
       ..addFlag("start-paused", defaultsTo: false)
       ..addMultiOption(
       'define',
@@ -71,6 +75,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     final bool startPaused = boolArg("start-paused")??false;
     final Map<String, String> defines = _parseDefines(stringsArg('define'));
     final String packageName = stringArg('package-name');
+    final String hostPackage = stringArg('host-package');
     defaultBuildMode = BuildMode.release;
     BuildMode buildMode = getBuildMode();
     if(buildMode==BuildMode.debug){
@@ -198,8 +203,9 @@ class BuildDynamicCommand extends BuildSubCommand {
       ..writeAsBytesSync(ZipEncoder().encode(update), flush: true);
     print('build dynamic success');
 
-    if(buildMode==BuildMode.debug){
-
+    if (hostPackage?.isNotEmpty ?? false) {
+      await _pushFile(hostPackage, patchFile, packageName);
+    } else if (buildMode == BuildMode.debug) {
       final File appJsFile = fs.file('${Cache.flutterRoot}/bin/internal/app.js');
       appJsFile.copySync(fs.path.join(getPatchBuildDirectory(), 'app.js'));
 
@@ -233,6 +239,19 @@ class BuildDynamicCommand extends BuildSubCommand {
       stderr.addStream(process.stderr);
       sleep(Duration(seconds: 3));
     }
+  }
+}
+
+Future<void> _pushFile(
+    String hostPackage, File patchFile, String packageName) async {
+  final Device device = await findTargetDevice();
+  if (device != null && device is AndroidDevice) {
+    /// Clear destination dir
+    final String pushDestDir =
+        '/sdcard/Android/data/$hostPackage/files/flutter_dynamic/';
+    await device.createDirOnDevice(pushDestDir);
+    printStatus('create new dir:$pushDestDir');
+    await device.pushFile(patchFile.path, pushDestDir + '$packageName.zip');
   }
 }
 

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-20](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-19...bd1.12.13-20) (2020-09-28)
+
+
+### Features
+
+* update default condition. ([7d6c70a](https://code.byted.org/tech_client/flutter/commit/7d6c70a))
+* upload files after build apk for mix_project debug ([24b337d](https://code.byted.org/tech_client/flutter/commit/24b337d))
+* **flutter_tools:** add compile params in local file ([08848a8](https://code.byted.org/tech_client/flutter/commit/08848a8))
+* **flutter_tools:** add flutter_tools conditions params ([6136a34](https://code.byted.org/tech_client/flutter/commit/6136a34))
+* **flutter_tools:** roll engine to 835ebee47514f6d2e2121cb7d2ba7c734267c239 ([b35bfee](https://code.byted.org/tech_client/flutter/commit/b35bfee))
+* add custom linux artifacts ([0d90dff](https://code.byted.org/tech_client/flutter/commit/0d90dff))
+
 ### [1.12.13-19](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-18...bd1.12.13-19) (2020-09-06)
 
 

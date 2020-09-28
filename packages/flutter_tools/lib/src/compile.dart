@@ -272,6 +272,10 @@ List<String> _buildModeOptions(BuildMode mode) {
   throw Exception('Unknown BuildMode: $mode');
 }
 
+// BD ADD: START
+List<String> kDynamicAotPlugins;
+// END
+
 class KernelCompiler {
   const KernelCompiler();
 
@@ -382,27 +386,38 @@ class KernelCompiler {
       mainUri?.toString() ?? mainPath,
     ];
     // BD ADD: START
+    //查看 flutterw 的配置有没有相关的配置，有的话读出来
+    final String flutterwCfgPath = fs.path.absolute('flutterw_config');
+    io.File flutterwYaml = io.File("${flutterwCfgPath}/flutterw.yaml");
+    print("flutterwCfgPath===:${flutterwYaml.path}\n");
+    if(flutterwYaml.existsSync()){
+      if (dynamicPlugins == null) {
+        dynamicPlugins = [];
+      }
+      String str = flutterwYaml.readAsStringSync();
+      dynamic doc = loadYaml(str);
+      List<String> cfgList = null;
+      if(doc!=null && doc['dynamic_host']!=null && doc['dynamic_host']['dynamic_aot_plugins']!=null){
+        String dynamicPluginsStr = doc['dynamic_host']['dynamic_aot_plugins'] as String;
+        cfgList = dynamicPluginsStr.split(" ");
+      }
 
-    if (dynamicPlugins == null || dynamicPlugins.isEmpty) {
-      final String flutterwCfgPath = fs.path.absolute('flutterw_config');
-      print("flutterwCfgPath===:${flutterwCfgPath}\n");
-      io.File flutterwYaml = io.File("${flutterwCfgPath}/flutterw.yaml");
-      if(flutterwYaml.existsSync()){
-        String str = flutterwYaml.readAsStringSync();
-        dynamic doc = loadYaml(str);
-        if(doc['dynamic_host']!=null && doc['dynamic_host']['dynamic_aot_plugins']!=null){
-          String dynamicPluginsStr = doc['dynamic_host']['dynamic_aot_plugins'] as String;
-          dynamicPlugins = dynamicPluginsStr.split(" ");
-        }
+      if(doc['dynamic_package']!=null && doc['dynamic_package']['dynamic_aot_plugins']!=null){
+        String dynamicPluginsStr = doc['dynamic_package']['dynamic_aot_plugins'] as String;
+        cfgList = dynamicPluginsStr.split(" ");
+      }
 
-        if(doc['dynamic_package']!=null && doc['dynamic_package']['dynamic_aot_plugins']!=null){
-          String dynamicPluginsStr = doc['dynamic_package']['dynamic_aot_plugins'] as String;
-          dynamicPlugins = dynamicPluginsStr.split(" ");
-        }
+      if(cfgList !=null && cfgList.isNotEmpty){
+        cfgList.forEach((s){
+          if(!dynamicPlugins.contains(s)){
+            dynamicPlugins.add(s);
+          }
+        });
       }
     }
 
     if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
+      kDynamicAotPlugins = dynamicPlugins;
       final StringBuffer buffer = StringBuffer();
       for (int i = 0; i < dynamicPlugins.length; i++) {
         buffer.write(dynamicPlugins[i]);

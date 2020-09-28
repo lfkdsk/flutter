@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter_tools/src/compile.dart';
 import 'package:flutter_tools/src/version.dart';
 import 'dart:async';
 
@@ -314,6 +315,25 @@ Map<String,String> getPluginVersion(String packagesPath){
       continue;
     }
     versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+  }
+  // 处理被 aot 的 lib
+  if(kDynamicAotPlugins!=null){
+    RegExp exp = new RegExp(r"package\:(\w+)/.*");
+    kDynamicAotPlugins.forEach((str){
+      var matchRes = exp.firstMatch(str);
+      if(matchRes==null){
+        return;
+      }
+      String key = matchRes.group(1);
+      if(!map.containsKey(key)){
+        return;
+      }
+      final Directory directory = fs.directory(map[key]).parent;
+      final dynamic pubspec = loadYaml(fs
+          .file(fs.path.absolute(directory.path, 'pubspec.yaml'))
+          .readAsStringSync());
+      versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+    });
   }
   return versionMap;
 }

@@ -335,9 +335,9 @@ class KernelCompiler {
       ..._buildModeOptions(buildMode),
       if (trackWidgetCreation) '--track-widget-creation',
       // BD ADD: START
-      if (lite) '--lite',
-      if (liteGlobal) '--lite-global',
-      if (liteShareSkia) '--lite-share-skia',
+      if (!isDynamicart && lite) '--lite',
+      if (!isDynamicart && liteGlobal) '--lite-global',
+      if (!isDynamicart && liteShareSkia) '--lite-share-skia',
     // END
       if (!linkPlatformKernelIn) '--no-link-platform',
       if (aot) ...<String>[

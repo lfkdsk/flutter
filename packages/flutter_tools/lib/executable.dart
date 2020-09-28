@@ -78,20 +78,30 @@ Future<void> main(List<String> args) async {
   final bool liteGlobal = args.contains('--lite-global');
   final bool liteShareSkia = args.contains('--lite-share-skia');
 
-  EngineMode engineMode = EngineMode.normal;
+  int engineMode = ENGINE_NORMAL;
   if (lite) {
-    engineMode = EngineMode.lite;
+    engineMode |= ENGINE_LITE;
     print('Currently in lite mode...');
-  } else if (liteGlobal) {
-    engineMode = EngineMode.lite_global;
+  }
+  if (liteGlobal) {
+    if(engineMode & ENGINE_LITE!=0){
+      throw ArgumentError(" --lite-global can be used with --lite");
+    }
+    engineMode |= ENGINE_LITE_GLOBAL;
     print('Currently in lite global mode...');
-  } else if (liteShareSkia) {
-    engineMode = EngineMode.lite_share_skia;
+  }
+  if (liteShareSkia) {
+    if(engineMode & ENGINE_LITE!=0 || engineMode & ENGINE_LITE_GLOBAL!=0){
+      throw ArgumentError("--lite-share-skia can be used with --lite or --lite-global");
+    }
+    engineMode |= ENGINE_LITE_SHARE_SKIA;
     print('Currently in lite & share skia mode...');
-  } else if(dynamicart){
-    engineMode = EngineMode.dynamicart;
+  }
+  if(dynamicart){
+    engineMode |= ENGINE_DYNAMICART;
     print('Currently in dynamicart mode...');
   }
+
   setEngineMode(engineMode);
 
   // BD ADD: START

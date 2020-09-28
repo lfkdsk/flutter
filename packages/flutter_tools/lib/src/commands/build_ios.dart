@@ -152,7 +152,7 @@ class BuildIOSCommand extends BuildSubCommand {
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
       // BD ADD START:
-      isDynamicart: kEngineMode == EngineMode.dynamicart,
+      isDynamicart: (kEngineMode & ENGINE_DYNAMICART !=0),
       isMinimumSize: isMinimumSize,
       dynamicPlugins: dynamicPlugins,
       compressSize: compressSize

@@ -1012,7 +1012,7 @@ Directory _getLocalEngineRepo({
   );
 
   String buildMode = androidBuildInfo.buildInfo.modeName;
-  if(kEngineMode == EngineMode.dynamicart && (androidBuildInfo.buildInfo.mode == BuildMode.release || androidBuildInfo.buildInfo.mode == BuildMode.profile)){
+  if((kEngineMode & ENGINE_DYNAMICART !=0) && (androidBuildInfo.buildInfo.mode == BuildMode.release || androidBuildInfo.buildInfo.mode == BuildMode.profile)){
     buildMode = "dynamicart_"+buildMode;
   }
   final String artifactVersion = _getLocalArtifactVersion(

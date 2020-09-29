@@ -367,6 +367,11 @@ BuildApp() {
     ${minimum_size_command}                                                 \
     ${lite_flag}
 
+  if [[ $? -ne 0 ]]; then
+    EchoError "Failed to package ${project_path}."
+    exit -1
+  fi
+
   # BD ADD:START
   if [[ "$minimum_size_flag" == "YES" ]] || [[ "$dynamicart_flag" == "YES" ]]; then
     local host_manifest="${derived_dir}/App.framework/flutter_assets/host_manifest.json"
@@ -431,10 +436,6 @@ BuildApp() {
   fi
   # END
 
-  if [[ $? -ne 0 ]]; then
-    EchoError "Failed to package ${project_path}."
-    exit -1
-  fi
   StreamOutput "done"
   StreamOutput " └─Compiling, linking and signing..."
 

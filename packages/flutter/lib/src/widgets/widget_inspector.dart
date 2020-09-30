@@ -965,8 +965,15 @@ mixin WidgetInspectorService {
 
     SchedulerBinding.instance.addPersistentFrameCallback(_onFrameStart);
 
-    final FlutterExceptionHandler structuredExceptionHandler = _reportError;
+    // BD MOD: START
+    // final FlutterExceptionHandler structuredExceptionHandler = _reportError;
     final FlutterExceptionHandler defaultExceptionHandler = FlutterError.onError;
+    final FlutterExceptionHandler structuredExceptionHandler =
+        (FlutterErrorDetails details) {
+      _reportError(details);
+      defaultExceptionHandler(details);
+    };
+    // END
 
     _registerBoolServiceExtension(
       name: 'structuredErrors',

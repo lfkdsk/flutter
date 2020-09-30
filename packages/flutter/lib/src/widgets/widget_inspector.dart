@@ -977,7 +977,14 @@ mixin WidgetInspectorService {
   ///  * [BindingBase.initServiceExtensions], which explains when service
   ///    extensions can be used.
   void initServiceExtensions(_RegisterServiceExtensionCallback registerServiceExtensionCallback) {
-    _structuredExceptionHandler = _reportError;
+    // BD MOD: START
+    // _structuredExceptionHandler = _reportError;
+    final FlutterExceptionHandler defaultExceptionHandler = FlutterError.presentError;
+    _structuredExceptionHandler = (FlutterErrorDetails details) {
+      _reportError(details);
+      defaultExceptionHandler(details);
+    };
+    // END
     if (isStructuredErrorsEnabled()) {
       FlutterError.onError = _structuredExceptionHandler;
     }
@@ -990,8 +997,8 @@ mixin WidgetInspectorService {
 
     SchedulerBinding.instance.addPersistentFrameCallback(_onFrameStart);
 
-    final FlutterExceptionHandler defaultExceptionHandler = FlutterError.presentError;
-
+    // BD DEL:
+    // final FlutterExceptionHandler defaultExceptionHandler = FlutterError.presentError;
     _registerBoolServiceExtension(
       name: 'structuredErrors',
       getter: () async => FlutterError.presentError == _structuredExceptionHandler,

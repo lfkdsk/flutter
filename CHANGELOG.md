@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-5](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-4...bd1.20.1-5) (2020-10-09)
+
+
+### Bug Fixes
+
+* exit when build bundle failed ([9c8343e](https://code.byted.org/tech_client/flutter/commit/9c8343e))
+
 ### [1.20.1-4](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-3...bd1.20.1-4) (2020-09-23)
 
 

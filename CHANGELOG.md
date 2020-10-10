@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-6](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-5...bd1.20.1-6) (2020-10-10)
+
+
+### Bug Fixes
+
+* [flutter] elide semantic information from certain widget spans (#65857)
+
 ### [1.20.1-5](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-4...bd1.20.1-5) (2020-10-09)
 
 

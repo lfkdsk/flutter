@@ -914,7 +914,7 @@ class RenderParagraph extends RenderBox
       if (info.isPlaceholder) {
         // BD MOD: START
         // if (children.isNotEmpty) {
-        if (children.isNotEmpty && placeholderIndex < children.length - 1) {
+        if (children.isNotEmpty && placeholderIndex < children.length) {
         // END
           final SemanticsNode childNode = children.elementAt(placeholderIndex++);
           final TextParentData parentData = child.parentData as TextParentData;

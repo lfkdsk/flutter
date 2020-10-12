@@ -7,8 +7,10 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback;
-// BD ADD:
+// BD ADD: START
 import 'dart:ui' as ui show window, performance;
+import 'dart:io';
+// END
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -1112,10 +1114,26 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
 ///    element for the element hierarchy.
 ///  * [WidgetsBinding.handleBeginFrame], which pumps the widget pipeline to
 ///    ensure the widget, element, and render trees are all built.
-void runApp(Widget app) {
+void runApp(Widget app, {bool optimizeAttach = false}) {
   WidgetsFlutterBinding.ensureInitialized()
     ..scheduleAttachRootWidget(app)
     ..scheduleWarmUpFrame();
+  // BD ADD: START
+  if (optimizeAttach) {
+    _notifyObservatoryPort();
+  }
+  // END
+}
+
+/// BD ADD
+Future<void> _notifyObservatoryPort() async {
+  if (kReleaseMode || !Platform.isAndroid) {
+    return;
+  }
+  final developer.ServiceProtocolInfo info = await developer.Service.getInfo();
+  Timer.periodic(const Duration(seconds: 10), (_) {
+    print('Observatory listening on ${info.serverUri}');
+  });
 }
 
 /// A function that should validate that the provided object is assignable to a

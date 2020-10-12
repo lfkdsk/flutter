@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'dart:io';
 // BD MOD:
 // import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback;
 import 'dart:ui' show AppLifecycleState, Locale, AccessibilityFeatures, FrameTiming, TimingsCallback, window;
@@ -886,10 +887,26 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
 ///    element for the element hierarchy.
 ///  * [WidgetsBinding.handleBeginFrame], which pumps the widget pipeline to
 ///    ensure the widget, element, and render trees are all built.
-void runApp(Widget app) {
+void runApp(Widget app, {bool optimizeAttach = false}) {
   WidgetsFlutterBinding.ensureInitialized()
     ..scheduleAttachRootWidget(app)
     ..scheduleWarmUpFrame();
+  // BD ADD: START
+  if (optimizeAttach) {
+    _notifyObservatoryPort();
+  }
+  // END
+}
+
+/// BD ADD
+Future<void> _notifyObservatoryPort() async {
+  if (kReleaseMode || !Platform.isAndroid) {
+    return;
+  }
+  final developer.ServiceProtocolInfo info = await developer.Service.getInfo();
+  Timer.periodic(const Duration(seconds: 10), (_) {
+    print('Observatory listening on ${info.serverUri}');
+  });
 }
 
 /// Print a string representation of the currently running app.

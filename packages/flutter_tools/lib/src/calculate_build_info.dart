@@ -185,11 +185,12 @@ class FlutterBuildInfo {
     userEmail = runSafeCmd(<String>['git', 'config', 'user.email']);
 
     frameworkCid = _runGit('git log -n 1 --pretty=format:%H');
-    if (frameworkCid != null) {
-      frameworkVersion =
-          BDGitTagVersion.determine(processUtils).frameworkVersionFor(frameworkCid);
-      if (frameworkVersion != null && frameworkVersion == '0.0.0-unknown') {
-        frameworkVersion = GitTagVersion.determine(processUtils).frameworkVersionFor(frameworkCid);
+    frameworkVersion = _runGit('git describe --match *.*.* --first-parent --all');
+    if (null != frameworkVersion) {
+      final int slashIndex = frameworkVersion.indexOf('/');
+      if (slashIndex > -1 && slashIndex + 1 < frameworkVersion.length) {
+        frameworkVersion =
+            frameworkVersion.substring(slashIndex + 1);
       }
     }
     engineCid = runSafeCmd(

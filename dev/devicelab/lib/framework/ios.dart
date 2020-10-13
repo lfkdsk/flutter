@@ -9,6 +9,8 @@ import 'package:path/path.dart' as path;
 
 import 'utils.dart';
 
+typedef SimulatorFunction = Future<void> Function(String deviceId);
+
 void _checkExitCode(int code) {
   if (code != 0) {
     throw Exception(

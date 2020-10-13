@@ -12,4 +12,4 @@ bytest-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/pipeline_script.py -o pipeline_script.py
     - python3 -u pipeline_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA"
   tags:
-    - flutter
+    - shared

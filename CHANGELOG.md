@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-21](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-19...bd1.12.13-21) (2020-10-13)
+
+
+### Bug Fixes
+
+* 外部注入list帮助FpsKey判断 ([2bed164](https://code.byted.org/tech_client/flutter/commit/2bed164))
+
+
+### Features
+
+* add custom linux artifacts ([0d90dff](https://code.byted.org/tech_client/flutter/commit/0d90dff))
+* notify Observatory port periodic ([67cf021](https://code.byted.org/tech_client/flutter/commit/67cf021))
+* update default condition. ([7d6c70a](https://code.byted.org/tech_client/flutter/commit/7d6c70a))
+* upload files after build apk for mix_project debug ([24b337d](https://code.byted.org/tech_client/flutter/commit/24b337d))
+* 保证调试模式下也能监听到异常 ([11b82ec](https://code.byted.org/tech_client/flutter/commit/11b82ec))
+* **flutter_tools:** add compile params in local file ([08848a8](https://code.byted.org/tech_client/flutter/commit/08848a8))
+* **flutter_tools:** add flutter_tools conditions params ([6136a34](https://code.byted.org/tech_client/flutter/commit/6136a34))
+* **flutter_tools:** roll engine to 835ebee47514f6d2e2121cb7d2ba7c734267c239 ([b35bfee](https://code.byted.org/tech_client/flutter/commit/b35bfee))
+
 ### [1.12.13-20](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-19...bd1.12.13-20) (2020-10-13)
 
 

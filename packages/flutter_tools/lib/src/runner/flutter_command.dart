@@ -763,7 +763,7 @@ abstract class FlutterCommand extends Command<void> {
       buildName: argParser.options.containsKey('build-name')
           ? stringArg('build-name')
           : null,
-      treeShakeIcons: treeShakeIcons,
+      treeShakeIcons: argParser.options.containsKey('dynamicart') ? false : treeShakeIcons,
       splitDebugInfoPath: splitDebugInfoPath,
       dartObfuscation: dartObfuscation,
       dartDefines: argParser.options.containsKey(FlutterOptions.kDartDefinesOption)

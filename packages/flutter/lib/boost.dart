@@ -74,6 +74,9 @@ class Boost {
   /// image alarm threshold (MB)
   static double imageAlarmThresholdMB = -1;
 
+  /// skip frame when size of platform view is zero
+  static bool skipFrameWhenSizeIsZero = false;
+  
   /// enable or disable semantics, reuseWidget and so on.
   static void enable(
       {bool disableSemantics = true,

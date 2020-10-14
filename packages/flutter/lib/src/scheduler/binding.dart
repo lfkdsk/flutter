@@ -975,6 +975,14 @@ mixin SchedulerBinding on BindingBase {
       _ignoreNextEngineDrawFrame = false;
       return;
     }
+    // BD ADD: START
+    if (Boost.skipFrameWhenSizeIsZero) {
+      if (window.physicalSize.isEmpty) {
+        return;
+      }
+      Boost.skipFrameWhenSizeIsZero = false;
+    }
+    // END
     handleDrawFrame();
   }
 

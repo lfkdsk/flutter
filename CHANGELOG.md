@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-22](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-21...bd1.12.13-22) (2020-10-14)
+
+
+### Features
+
+* compatible with the old version for bdimage. ([056ea23](https://code.byted.org/tech_client/flutter/commit/056ea23))
+
 ### [1.12.13-21](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-19...bd1.12.13-21) (2020-10-13)
 
 

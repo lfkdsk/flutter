@@ -75,6 +75,8 @@ class Boost {
   /// return disable mipmaps status
   static bool get disableMipmaps => _disableMipmaps;
 
+  /// skip frame when size of platform view is zero
+  static bool skipFrameWhenSizeIsZero = false;
 
   /// enable or disable semantics, reuseWidget and so on.
   static void enable(

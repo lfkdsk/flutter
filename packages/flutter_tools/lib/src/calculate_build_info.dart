@@ -8,6 +8,7 @@ import 'package:flutter_tools/src/base/process.dart';
 import 'package:flutter_tools/src/plugins.dart';
 import 'package:intl/intl.dart';
 import 'package:yaml/yaml.dart' as yaml;
+import 'package:flutter_tools/src/base/platform.dart' as platform_env;
 import 'cache.dart';
 import 'version.dart';
 
@@ -181,7 +182,16 @@ class FlutterBuildInfo {
 
     // get user name and email
     userName = runSafeCmd(<String>['git', 'config', 'user.name']);
-    userEmail = runSafeCmd(<String>['git', 'config', 'user.email']);
+    userEmail = platform_env.platform.environment['operateUser'];
+    if (userEmail != null && userEmail.trim() != '') {
+      userEmail = userEmail.trim();
+      const String bytePostfix = '@bytedance.com';
+      if (!userEmail.endsWith(bytePostfix)) {
+        userEmail += bytePostfix;
+      }
+    } else {
+      userEmail = runSafeCmd(<String>['git', 'config', 'user.email']);
+    }
 
     frameworkCid = _runGit('git log -n 1 --pretty=format:%H');
     frameworkVersion = _runGit('git describe --match *.*.* --first-parent --all');

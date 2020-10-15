@@ -416,11 +416,12 @@ class KernelCompiler {
     if(isDynamicart){
       hostDillPath = '${Cache.flutterRoot}/bin/internal/app.dill';
     }
-    print("kernelcompiler=== ${command.join(' ')}\n");
 
     if(hostDillPath != null && hostDillPath.isNotEmpty){
       command.addAll(<String>['--host-dill', hostDillPath]);
     }
+
+    print("kernelcompiler=== ${command.join(' ')}\n");
     // END
 
     _logger.printTrace(command.join(' '));

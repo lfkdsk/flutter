@@ -953,6 +953,15 @@ mixin SchedulerBinding on BindingBase, ServicesBinding {
       _ignoreNextEngineDrawFrame = true;
       return;
     }
+    // BD ADD: START
+    if (Boost.skipFrameWhenSizeIsZero) {
+      if (window.physicalSize.isEmpty) {
+        _ignoreNextEngineDrawFrame = true;
+        return;
+      }
+      Boost.skipFrameWhenSizeIsZero = false;
+    }
+    // END
     handleBeginFrame(rawTimeStamp);
   }
 
@@ -961,14 +970,6 @@ mixin SchedulerBinding on BindingBase, ServicesBinding {
       _ignoreNextEngineDrawFrame = false;
       return;
     }
-    // BD ADD: START
-    if (Boost.skipFrameWhenSizeIsZero) {
-      if (window.physicalSize.isEmpty) {
-        return;
-      }
-      Boost.skipFrameWhenSizeIsZero = false;
-    }
-    // END
     handleDrawFrame();
   }
 

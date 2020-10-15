@@ -19,6 +19,11 @@
 /// [ServicesBinding], [GestureBinding], [SchedulerBinding], [PaintingBinding],
 /// and [RendererBinding]. The rendering library does not automatically create a
 /// binding, but relies on one being initialized with those features.
+/**
+ * BD ADD:
+ */
+// @dart = 2.8
+
 library rendering;
 
 export 'package:flutter/foundation.dart' show

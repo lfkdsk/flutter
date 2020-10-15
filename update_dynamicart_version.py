@@ -13,19 +13,19 @@ GITLAB_URL = 'https://code.byted.org/'
 GITLAB_PROJECT_ID = 20716
 
 def canSkip(branch,commit_id):
-    f = open('/home/kongshanshan/.gitlab.config', 'r')
+    f = open('/home/linxuebin.01/.gitlab.config', 'r')
     gitlab_token = None
     for line in f.readlines():
         gitlab_token = line.strip()
     gl = gitlab.Gitlab(GITLAB_URL, private_token=gitlab_token)
     project = gl.projects.get(GITLAB_PROJECT_ID)
     commit = project.commits.get(commit_id)
-    if commit.author_name == 'zhangshuai.02' and commit.title == 'CI Auto build app.dill':
+    if commit.author_name == 'gongrui' and commit.title == 'CI Auto build app.dill':
         return True
     return False
 
 def call_gen_dynamicart_app_dill_jenkins(branch,commit_id):
-    f = open('/home/kongshanshan/.jenkins.config', 'r')
+    f = open('/home/linxuebin.01/.jenkins.config', 'r')
     jenkins_username = None
     jenkins_password = None
     for line in f.readlines():

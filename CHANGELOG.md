@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-6](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-5...bd1.20.1-6) (2020-10-19)
+
+
+### Bug Fixes
+
+* restore value of DEFAULT_MAVEN_HOST for build ([76b99e6](https://code.byted.org/tech_client/flutter/commit/76b99e6))
+* **iOS:** missing SimulatorFunction typedef when cherry pick ([acdeb86](https://code.byted.org/tech_client/flutter/commit/acdeb86))
+* [flutter] elide semantic information from certain widget spans ([#65857](https://jira.bytedance.com/browse/65857)) ([ff3c740](https://code.byted.org/tech_client/flutter/commit/ff3c740))
+
+
+### Features
+
+* add bytedance flutter web sdk download url ([3368cf7](https://code.byted.org/tech_client/flutter/commit/3368cf7))
+* update gitlab-ci ([2969dc7](https://code.byted.org/tech_client/flutter/commit/2969dc7))
+* update gitlab-ci.yml change gitlab runner ([d7b7fed](https://code.byted.org/tech_client/flutter/commit/d7b7fed))
+* **engine:** roll engine version to e692c330e7f12f69bd3ab5357d2b795e69a6995a ([3f40c92](https://code.byted.org/tech_client/flutter/commit/3f40c92))
+
 ### [1.20.1-6](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-5...bd1.20.1-6) (2020-10-10)
 
 

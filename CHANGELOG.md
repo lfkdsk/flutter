@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-23](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-22...bd1.12.13-23) (2020-10-20)
+
+
+### Bug Fixes
+
+* **flutter_tools:** fix a bug when there is an empty project imported by android/setting.gradle ([69988d0](https://code.byted.org/tech_client/flutter/commit/69988d0))
+* **flutter_tools:** fix the flutter version format been uploaded ([f1625a2](https://code.byted.org/tech_client/flutter/commit/f1625a2))
+* Guard against a null navigator on popping a route. ([a24b2db](https://code.byted.org/tech_client/flutter/commit/a24b2db))
+
+
+### Features
+
+* **flutter_tools:** use 'operateUser' from env first,when upload flutter usage statistics ([5ea1bd1](https://code.byted.org/tech_client/flutter/commit/5ea1bd1))
+
 ### [1.12.13-22](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-21...bd1.12.13-22) (2020-10-14)
 
 

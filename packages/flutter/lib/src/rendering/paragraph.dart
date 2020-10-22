@@ -413,8 +413,9 @@ class RenderParagraph extends RenderBox
   @override
   bool hitTestChildren(BoxHitTestResult result, { Offset position }) {
     RenderBox child = firstChild;
-    while (child != null) {
-      final TextParentData textParentData = child.parentData;
+    int childIndex = 0;
+    while (child != null && childIndex < _textPainter.inlinePlaceholderBoxes.length) {
+      final TextParentData textParentData = child.parentData as TextParentData;
       final Matrix4 transform = Matrix4.translationValues(
         textParentData.offset.dx,
         textParentData.offset.dy,
@@ -440,6 +441,7 @@ class RenderParagraph extends RenderBox
         return true;
       }
       child = childAfter(child);
+      childIndex += 1;
     }
     return false;
   }

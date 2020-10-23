@@ -9,7 +9,7 @@ import 'package:flutter_tools/src/globals.dart' as globals;
 import 'package:flutter_tools/src/plugins.dart';
 import 'package:intl/intl.dart';
 import 'package:yaml/yaml.dart' as yaml;
-import 'package:flutter_tools/src/base/platform.dart' as platform_env;
+import 'globals.dart' as globals;
 import 'cache.dart';
 import 'version.dart';
 
@@ -183,7 +183,7 @@ class FlutterBuildInfo {
 
     // get user name and email
     userName = runSafeCmd(<String>['git', 'config', 'user.name']);
-    userEmail = platform_env.platform.environment['operateUser'];
+    userEmail = globals.platform.environment['operateUser'];
     if (userEmail != null && userEmail.trim() != '') {
       userEmail = userEmail.trim();
       const String bytePostfix = '@bytedance.com';

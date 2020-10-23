@@ -294,7 +294,7 @@ class KernelCompiler {
       'condition.release=${buildMode == BuildMode.release}',
       'condition.debug=${buildMode == BuildMode.debug}',
       'condition.notAot=${!aot}',
-      'condition.bd_1.12.13=${true}'
+      'condition.bd_1.20=${true}'
     ];
 
     if (conditionsFile.existsSync()) {
@@ -750,7 +750,7 @@ class DefaultResidentCompiler implements ResidentCompiler {
       'condition.release=${buildMode == BuildMode.release}',
       'condition.debug=${buildMode == BuildMode.debug}',
       'condition.notAot=${true}',
-      'condition.bd_1.12.13=${true}'
+      'condition.bd_1.20=${true}'
     ];
     if (conditionsFile.existsSync()) {
       conditions = conditionsFile.readAsStringSync();

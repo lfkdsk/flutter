@@ -1298,6 +1298,13 @@ class _TabBarViewState extends State<TabBarView> {
       _warpUnderwayCount += 1;
       await _pageController.animateToPage(_currentIndex, duration: kTabScrollDuration, curve: Curves.ease);
       _warpUnderwayCount -= 1;
+      // BD ADD: START
+      if (widget.children != _children && _warpUnderwayCount == 0) {
+        setState(() {
+          _updateChildren();
+        });
+      }
+      // END
       return Future<void>.value();
     }
 

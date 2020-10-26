@@ -32,13 +32,12 @@
             android:windowSoftInputMode="adjustResize|stateHidden"
             tools:replace="android:exported"
             android:exported="true">
-            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-				<activity
+        <activity
             android:name=".TestScanActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:hardwareAccelerated="true"

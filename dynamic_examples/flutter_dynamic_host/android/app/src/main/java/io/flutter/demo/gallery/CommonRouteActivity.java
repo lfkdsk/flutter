@@ -3,17 +3,17 @@ package io.flutter.demo.gallery;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 
 
-import com.bytedance.flutter.vessel.route.FlutterRouteActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.bytedance.flutter.vessel.route.v2.DynamicFlutterActivity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.app.FlutterActivity;
+import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
@@ -26,7 +26,7 @@ import io.flutter.plugins.GeneratedPluginRegistrant;
 public class CommonRouteActivity extends DynamicFlutterActivity {
 
     @Override
-    protected void onRegisterPlugins(PluginRegistry pluginRegistry) {
+    protected void onRegisterPlugins(FlutterEngine flutterEngine, PluginRegistry pluginRegistry) {
         GeneratedPluginRegistrant.registerWith(pluginRegistry);
         AdsLandingPagePlugin2.registerWith(pluginRegistry);
     }

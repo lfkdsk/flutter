@@ -3,13 +3,13 @@ package io.flutter.demo.gallery;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
+import android.os.Build;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.bytedance.flutter.dynamicart.Dynamicart;
 import com.bytedance.flutter.vessel.route.DynamicRouteHelper;
-import com.bytedance.flutter.vessel.route.RouteConstants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class RouteUtils {
         sDynamicRouteHelper = new DynamicRouteHelper(CommonRouteActivity.class, new DynamicRouteHelper.IntentInterceptor() {
             @Override
             public void interceptIntent(@NonNull Intent intent, @NonNull Context context,
-                    @Nullable String pluginName, @Nullable String path, @Nullable Map<String, Object> params) {
+                                        @Nullable String pluginName, @Nullable String path, @Nullable Map<String, Object> params) {
             }
         }, new DynamicRouteHelper.KernelAppPathGetter() {
             @Override
@@ -49,11 +49,13 @@ public class RouteUtils {
         if (extraArgs != null) {
             params = new HashMap<>(extraArgs);
         }
-        for (String parameterName: uri.getQueryParameterNames()) {
-            if (params == null) {
-                params = new HashMap<>();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            for (String parameterName: uri.getQueryParameterNames()) {
+                if (params == null) {
+                    params = new HashMap<>();
+                }
+                params.put(parameterName, uri.getQueryParameter(parameterName));
             }
-            params.put(parameterName, uri.getQueryParameter(parameterName));
         }
         return params;
     }

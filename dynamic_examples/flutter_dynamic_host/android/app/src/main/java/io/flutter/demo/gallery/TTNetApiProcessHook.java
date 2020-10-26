@@ -1,5 +1,6 @@
 package io.flutter.demo.gallery;
 
+import android.os.Build;
 import android.util.Pair;
 
 import com.bytedance.common.utility.NetworkUtils;
@@ -41,7 +42,9 @@ public class TTNetApiProcessHook implements NetworkParams.ApiProcessHook<HttpReq
         overrideCommonParams(url, params);
         List<Pair<String, String>> list = new ArrayList<>();
         for (Map.Entry<String, String> entry: params.entrySet()) {
-            list.add(new Pair<>(entry.getKey(), entry.getValue()));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+                list.add(new Pair<>(entry.getKey(), entry.getValue()));
+            }
         }
         stringBuilder.append(NetworkUtils.format(list, "UTF-8"));
         return stringBuilder.toString();

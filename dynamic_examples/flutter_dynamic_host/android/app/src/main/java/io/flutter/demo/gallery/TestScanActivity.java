@@ -2,7 +2,6 @@ package io.flutter.demo.gallery;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 
@@ -77,4 +76,3 @@ public class TestScanActivity extends Activity implements QRCodeView.Delegate {
 
 
 }
-

@@ -312,6 +312,14 @@ class ManifestAssetBundle implements AssetBundle {
     final DevFSStringContent licenses = DevFSStringContent(licenseResult.combinedLicenses);
     additionalDependencies = licenseResult.dependencies;
 
+    // BD ADD: START
+    final DevFSStringContent hostMani = await _parseManifest(
+        packagesPath,
+        manifestPath,
+        globals.fs.path.join(globals.fs.file(manifestPath).parent.path, 'pubspec.lock'),
+        isMinimumSize);
+    // END
+
     if (wildcardDirectories.isNotEmpty) {
       // Force the depfile to contain missing files so that Gradle does not skip
       // the task. Wildcard directories are not compatible with full incremental
@@ -328,6 +336,7 @@ class ManifestAssetBundle implements AssetBundle {
     _setIfChanged(_kAssetManifestJson, assetManifest);
     _setIfChanged(kFontManifestJson, fontManifest);
     _setIfChanged(_kNoticeFile, licenses);
+    _setIfChanged(hostManifest, hostMani);
     // BD ADD:
     entries[_KFlutterVersion] = DevFSFileContent(globals.fs.file(globals.fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
     return 0;
@@ -347,10 +356,12 @@ class ManifestAssetBundle implements AssetBundle {
     }
   }
 
-  Future<DevFSByteContent> _parseManifest(String packagesPath, String manifest,
+  Future<DevFSStringContent> _parseManifest(String packagesPath, String manifest,
       String pubspecLock, bool isMinimumSize) async {
     final FlutterManifest flutterManifest =
-        await FlutterManifest.createFromPath(manifest);
+        await FlutterManifest.createFromPath(manifest,
+          logger: globals.logger,
+          fileSystem: globals.fs,);
     final String packageName = flutterManifest.appName;
     final String versionCode = flutterManifest.appVersion;
     final Map<String, Map<String, String>> versionMap = <String, Map<String, String>>{};

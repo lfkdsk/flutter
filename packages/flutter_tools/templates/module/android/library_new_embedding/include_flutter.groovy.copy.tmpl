@@ -16,6 +16,23 @@ plugins.each { name, path ->
     def pluginDirectory = flutterProjectRoot.toPath().resolve(path).resolve('android').toFile()
     gradle.include ":$name"
     gradle.project(":$name").projectDir = pluginDirectory
+
+    Properties gradleProperties = new Properties()
+    File gradlePropertiesFile = flutterProjectRoot.toPath().resolve(path).resolve('android').resolve("gradle.properties").toFile()
+    if (gradlePropertiesFile.exists()) {
+        gradlePropertiesFile.withReader('UTF-8') { reader -> gradleProperties.load(reader) }
+    } else {
+        println("$name has no gradle.properties")
+    }
+    def extraModules = gradleProperties.getProperty("extra_module_include")
+    if (extraModules != null) {
+        def moduleIncludes = extraModules.split(",")
+        moduleIncludes.each {
+            println "gradle include $it"
+            gradle.include ":$it"
+            gradle.project(":$it").projectDir = flutterProjectRoot.toPath().resolve(path).resolve('android').resolve("$it").toFile()
+        }
+    }
 }
 
 gradle.getGradle().projectsLoaded { g ->

@@ -350,6 +350,16 @@ class FlutterPlugin implements Plugin<Project> {
             project.logger.error("Plugin project :$pluginName not found. Please update settings.gradle.")
             return
         }
+        // BD ADD: START
+        def extraModules = pluginProject.properties.get("extra_module_include")
+        if (extraModules != null) {
+            def moduleIncludes = extraModules.split(",")
+            moduleIncludes.each {
+                println "configurePluginProject for extra module $it"
+                configurePluginProject(it, ":$it")
+            }
+        }
+        // END
         // Add plugin dependency to the app project.
         // BD MOD: START
         // project.dependencies {

@@ -15,5 +15,22 @@ To manually update `settings.gradle`, follow these steps:
                 def pluginDirectory = flutterProjectRoot.resolve(path).resolve('android').toFile()
                 include ":$name"
                 project(":$name").projectDir = pluginDirectory
+            
+                Properties gradleProperties = new Properties()
+                File gradlePropertiesFile = flutterProjectRoot.resolve(path).resolve('android').resolve("gradle.properties").toFile()
+                if (gradlePropertiesFile.exists()) {
+                    gradlePropertiesFile.withReader('UTF-8') { reader -> gradleProperties.load(reader) }
+                } else {
+                    println("$name has no gradle.properties")
+                }
+                def extraModules = gradleProperties.getProperty("extra_module_include")
+                if (extraModules != null) {
+                    def moduleIncludes = extraModules.split(",")
+                    moduleIncludes.each {
+                        println "gradle include $it"
+                        include ":$it"
+                        project(":$it").projectDir = flutterProjectRoot.resolve(path).resolve('android').resolve("$it").toFile()
+                    }
+                }
             }
 

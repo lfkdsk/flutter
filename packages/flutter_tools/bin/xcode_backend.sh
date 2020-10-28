@@ -255,6 +255,8 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     track_widget_creation_flag="--track-widget-creation"
   fi
 
+  local build_dir="${FLUTTER_BUILD_DIR:-build}"
+
   local dynamic_aot_plugins_command=""
   if [[ "$dynamic_aot_plugins" != "" ]]; then
      dynamic_aot_plugins_command="--dynamic-aot-plugins=${dynamic_aot_plugins}"

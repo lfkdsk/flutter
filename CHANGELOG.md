@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-8](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-7...bd1.20.1-8) (2020-10-28)
+
+
+### Bug Fixes
+
+* **flutter_tools:** fix the flutter version format been uploaded ([3f27c71](https://code.byted.org/tech_client/flutter/commit/3f27c71))
+* **statistics:** use global instead of using platform directly ([bce6397](https://code.byted.org/tech_client/flutter/commit/bce6397))
+* fix negative fullCacheExtent in viewport.dart ([7ea1a13](https://code.byted.org/tech_client/flutter/commit/7ea1a13))
+
+
+### Features
+
+* **flutter_tools:** use 'operateUser' from env first,when upload flutter usage statistics ([5a3eb1a](https://code.byted.org/tech_client/flutter/commit/5a3eb1a))
+
 ### [1.20.1-7](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-5...bd1.20.1-7) (2020-10-19)
 
 

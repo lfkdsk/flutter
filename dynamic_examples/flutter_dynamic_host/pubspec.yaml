@@ -21,7 +21,7 @@ dependencies:
   bd_video_player: 1.0.4-alpha.5
   #  soundpool: ^0.5.0 # 俄罗斯方块tetris 使用，但是影响iOS编译，先注释掉。
   audioplayers: ^0.8.0
-  share: ^0.6.3+5
+  # share: ^0.6.3+5
   shared_preferences: ^0.5.6+1
 #  bd_route_app: 0.3.0
 #  bd_route_app:

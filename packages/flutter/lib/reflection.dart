@@ -27,15 +27,26 @@ class _UnpackInvocation {
 
   final List<String> names;
 
-  _UnpackInvocation(
-      this.functionName, this.invokeType, this.arguments, this.names);
+  final List<Type> types;
 
-  static _UnpackInvocation unpack(Invocation invocation,
-      {bool isClass: false}) {
-    var positionalArguments = invocation.positionalArguments;
-    var namedArguments = invocation.namedArguments;
+  _UnpackInvocation(
+    this.functionName,
+    this.invokeType,
+    this.arguments,
+    this.names,
+    this.types,
+  );
+
+  static _UnpackInvocation unpack(
+    Invocation invocation, {
+    bool isClass: false,
+  }) {
+    final positionalArguments = invocation.positionalArguments;
+    final namedArguments = invocation.namedArguments;
+    final typeArguments = invocation.typeArguments;
     final int numPositionalArguments = positionalArguments.length;
-    final int numNamedArguments = namedArguments != null ? namedArguments.length : 0;
+    final int numNamedArguments =
+        namedArguments != null ? namedArguments.length : 0;
     final int numArguments = numPositionalArguments + numNamedArguments;
     final List<dynamic> arguments = List<dynamic>(numArguments);
     arguments.setRange(0, numPositionalArguments, positionalArguments);
@@ -66,7 +77,13 @@ class _UnpackInvocation {
       functionName = functionName.substring(0, functionName.length - 1);
     }
 
-    return _UnpackInvocation(functionName, invokeType, arguments, names);
+    return _UnpackInvocation(
+      functionName,
+      invokeType,
+      arguments,
+      names,
+      typeArguments,
+    );
   }
 }
 
@@ -104,9 +121,14 @@ class _LibraryMirror extends _ObjectMirror {
   @override
   @pragma('vm:entry-point')
   dynamic noSuchMethod(Invocation invocation) {
-    var res = _UnpackInvocation.unpack(invocation);
+    final res = _UnpackInvocation.unpack(invocation);
     return engine.libraryInvoke(
-        reflectee, res.invokeType, res.functionName, res.arguments, res.names);
+      reflectee,
+      res.invokeType,
+      res.functionName,
+      res.arguments,
+      res.names,
+    );
   }
 }
 
@@ -119,8 +141,14 @@ class _ClassMirror extends _ObjectMirror {
   @override
   @pragma('vm:entry-point')
   dynamic noSuchMethod(Invocation invocation) {
-    var res = _UnpackInvocation.unpack(invocation, isClass: true);
+    final res = _UnpackInvocation.unpack(invocation, isClass: true);
     return engine.classInvoke(
-        reflectee, res.invokeType, res.functionName, res.arguments, res.names);
+      reflectee,
+      res.invokeType,
+      res.functionName,
+      res.arguments,
+      res.names,
+      res.types,
+    );
   }
 }

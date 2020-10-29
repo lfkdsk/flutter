@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/trans_support.dart';
 import 'package:meta/meta.dart';
 import 'package:package_config/package_config.dart';
 import 'package:process/process.dart';
@@ -260,6 +261,24 @@ class KernelCompiler {
     if (outputFilePath != null && !_fileSystem.isFileSync(outputFilePath)) {
       _fileSystem.file(outputFilePath).createSync(recursive: true);
     }
+
+    // BD ADD
+    final conditionsFile = FlutterProject.current().directory.childFile('.dart_tool/conditions');
+    String conditions;
+    final List<String> allConditions = [
+      'condition.release=${buildMode == BuildMode.release}',
+      'condition.debug=${buildMode == BuildMode.debug}',
+      'condition.notAot=${!aot}',
+      'condition.bd_1.22=${true}'
+    ];
+
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+      allConditions.add(conditions);
+    }
+    conditions = allConditions.join(',');
+    // BD END
+
     final List<String> command = <String>[
       engineDartPath,
       '--disable-dart-dev',
@@ -282,6 +301,12 @@ class KernelCompiler {
         '--aot',
         '--tfa',
       ],
+      // BD ADD: START
+      if (conditions != null) ...<String> [
+        '--conditions',
+        conditions,
+      ],
+      // END
       if (packagesPath != null) ...<String>[
         '--packages',
         packagesPath,
@@ -312,6 +337,7 @@ class KernelCompiler {
         platformDill,
       ],
       ...?extraFrontEndOptions,
+      ...await TransformerHooks.getTransformerParams(),
       mainUri?.toString() ?? mainPath,
     ];
 
@@ -671,6 +697,25 @@ class DefaultResidentCompiler implements ResidentCompiler {
     final String frontendServer = _artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
     );
+    // BD ADD
+    final conditionsFile = FlutterProject.current().directory.childFile('.dart_tool/conditions');
+    String conditions;
+    final List<String> allConditions = [
+      'condition.release=${buildMode == BuildMode.release}',
+      'condition.debug=${buildMode == BuildMode.debug}',
+      'condition.notAot=${true}',
+      'condition.bd_1.22=${true}'
+    ];
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+      allConditions.add(conditions);
+    }
+    conditions = allConditions.join(',');
+
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+    }
+    // BD END
     final List<String> command = <String>[
       _artifacts.getArtifactPath(Artifact.engineDartBinary),
       '--disable-dart-dev',
@@ -702,6 +747,10 @@ class DefaultResidentCompiler implements ResidentCompiler {
         '--packages',
         packagesPath,
       ],
+      if (conditions != null) ...<String> [
+        '--conditions',
+        conditions,
+      ],
       ...buildModeOptions(buildMode),
       if (trackWidgetCreation) '--track-widget-creation',
       if (fileSystemRoots != null)
@@ -721,6 +770,7 @@ class DefaultResidentCompiler implements ResidentCompiler {
         '--platform',
         platformDill,
       ],
+      ...await TransformerHooks.getTransformerParams(),
       if (unsafePackageSerialization == true) '--unsafe-package-serialization',
       ...?extraFrontEndOptions,
     ];

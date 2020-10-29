@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/project.dart';
+
 import 'runner.dart' as runner;
 import 'src/base/context.dart';
 import 'src/base/logger.dart';
@@ -80,6 +82,7 @@ Future<void> main(List<String> args) async {
   final bool lite = args.contains('--lite');
   final bool liteGlobal = args.contains('--lite-global');
   final bool liteShareSkia = args.contains('--lite-share-skia');
+  final bool hasConditions = args.contains('--conditions');
 
   EngineMode engineMode = EngineMode.normal;
   if (lite) {
@@ -120,16 +123,41 @@ Future<void> main(List<String> args) async {
   print('current cmd: flutter $cmdStr');
   // END
 
-    /**
-     * BD ADD: START
-     *    add bundle exec for pod install
-     */
-    if(args.contains('--bundler')){
-      args = List<String>.from(args); // dart didn't support this command
-      args.removeWhere((String option) => option == '--bundler');
-      Bundler.commandUsedBundler(); // we just need to know if exists
+  /**
+   * BD ADD: START
+   *    add bundle exec for pod install
+   */
+  if (args.contains('--bundler')) {
+    args = List<String>.from(args); // dart didn't support this command
+    args.removeWhere((String option) => option == '--bundler');
+    Bundler.commandUsedBundler(); // we just need to know if exists
+  }
+
+  if (hasConditions) {
+    final conditions = FlutterProject.current().directory.childFile(
+      '.dart_tool/conditions',
+    );
+    final allConditions = <String>[];
+    if (conditions.existsSync()) {
+      conditions.deleteSync();
     }
-    // END
+    conditions.createSync(recursive: true);
+    args = List<String>.from(args); // dart didn't support this command
+    final int index = args.indexWhere((String ele) => ele == '--conditions');
+    if (index > 0 &&
+        index + 1 < args.length &&
+        args[index + 1].contains('condition')) {
+      final String conFlag = args[index];
+      final String conParams = args[index + 1];
+      allConditions.add(conParams);
+      // remove unsupported flag in flutter commands.
+      args.removeRange(index, index + 2);
+    }
+
+    print('current conditions ${allConditions.join(', ')}');
+    conditions.writeAsStringSync(allConditions.join(','), flush: true);
+  }
+  // END
 
   await runner.run(args, () => <FlutterCommand>[
     AnalyzeCommand(

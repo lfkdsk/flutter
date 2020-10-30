@@ -82,6 +82,7 @@ Future<void> main(List<String> args) async {
   final bool lite = args.contains('--lite');
   final bool liteGlobal = args.contains('--lite-global');
   final bool liteShareSkia = args.contains('--lite-share-skia');
+  // flutter conditions.
   final bool hasConditions = args.contains('--conditions');
 
   EngineMode engineMode = EngineMode.normal;

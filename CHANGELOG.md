@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1-9](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-8...bd1.20.1-9) (2020-10-29)
+
+
+### Features
+
+* **flutter_tools:** sync hook to 120 ([1a1c24f](https://code.byted.org/tech_client/flutter/commit/1a1c24f))
+
 ### [1.20.1-8](https://code.byted.org/tech_client/flutter/compare/bd1.20.1-7...bd1.20.1-8) (2020-10-28)
 
 

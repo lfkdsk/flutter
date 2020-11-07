@@ -1,15 +1,42 @@
 .common: &common
   only:
     - bd_1.20_pre
+  except:
+    - tags
+    - web
 
 stages:
-  - run-benchmark
+  - test-stage-first
+  - test-stage-second
 
-bytest-benchmark:
+usability-benchmark:
   <<: *common
-  stage: run-benchmark
+  stage: test-stage-first
   script:
-    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/pipeline_script.py -o pipeline_script.py
-    - python3 -u pipeline_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA"
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=usability
   tags:
     - shared
+
+pref-benchmark:
+  <<: *common
+  stage: test-stage-second
+  script:
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref
+  tags:
+    - shared
+
+bytest-baseline-benchmark:
+  only:
+    - web
+    - tags
+  stage: test-stage-first
+  script:
+    - export CONSUL_HTTP_HOST=10.227.80.56
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/baseline_script.zip -o baseline_script.zip
+    - unzip -o -d baseline_script baseline_script.zip
+    - python3 -u baseline_script/baseline_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA"
+    - unset CONSUL_HTTP_HOST
+  tags:
+    - benchmark

@@ -1655,10 +1655,10 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-x64-release/darwin-x64', 'android-x64-release/darwin-x64.zip'],
   // BD ADD START:
   // FIXME: Temporary delete for BD #56
-//   <String>['android-arm-dynamicart-release/darwin-x64', 'android-arm-dynamicart-release/darwin-x64.zip'],
-//   <String>['android-arm64-dynamicart-release/darwin-x64', 'android-arm64-dynamicart-release/darwin-x64.zip'],
-//   <String>['android-arm-dynamicart-profile/darwin-x64', 'android-arm-dynamicart-profile/darwin-x64.zip'],
-//   <String>['android-arm64-dynamicart-profile/darwin-x64', 'android-arm64-dynamicart-profile/darwin-x64.zip'],
+  <String>['android-arm-dynamicart-release/darwin-x64', 'android-arm-dynamicart-release/darwin-x64.zip'],
+  <String>['android-arm64-dynamicart-release/darwin-x64', 'android-arm64-dynamicart-release/darwin-x64.zip'],
+  <String>['android-arm-dynamicart-profile/darwin-x64', 'android-arm-dynamicart-profile/darwin-x64.zip'],
+  <String>['android-arm64-dynamicart-profile/darwin-x64', 'android-arm64-dynamicart-profile/darwin-x64.zip'],
   // END
 
 ];
@@ -1696,8 +1696,8 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios-release', 'ios-release/artifacts.zip'],
   // BD ADD: START
   // FIXME: Temporary delete for BD #56
-//   <String>['ios-dynamicart-release', 'ios-dynamicart-release/artifacts.zip'],
-//   <String>['ios-dynamicart-profile', 'ios-dynamicart-profile/artifacts.zip'],
+  <String>['ios-dynamicart-release', 'ios-dynamicart-release/artifacts.zip'],
+  <String>['ios-dynamicart-profile', 'ios-dynamicart-profile/artifacts.zip'],
   // END
 ];
 
@@ -1724,10 +1724,10 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
 //  <String>['android-x86-jit-release', android-x86-jit-release/artifacts.zip'],
   // BD ADD START:
   // FIXME: Temporary delete for BD #56
-//   <String>['android-arm-dynamicart-release', 'android-arm-dynamicart-release/artifacts.zip'],
-//   <String>['android-arm64-dynamicart-release', 'android-arm64-dynamicart-release/artifacts.zip'],
-//   <String>['android-arm-dynamicart-profile', 'android-arm-dynamicart-profile/artifacts.zip'],
-//   <String>['android-arm64-dynamicart-profile', 'android-arm64-dynamicart-profile/artifacts.zip'],
+   <String>['android-arm-dynamicart-release', 'android-arm-dynamicart-release/artifacts.zip'],
+   <String>['android-arm64-dynamicart-release', 'android-arm64-dynamicart-release/artifacts.zip'],
+   <String>['android-arm-dynamicart-profile', 'android-arm-dynamicart-profile/artifacts.zip'],
+   <String>['android-arm64-dynamicart-profile', 'android-arm64-dynamicart-profile/artifacts.zip'],
   // END
   // BD DEL:
   // <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],

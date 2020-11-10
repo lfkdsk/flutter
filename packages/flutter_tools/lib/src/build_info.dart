@@ -35,11 +35,16 @@ class BuildInfo {
     this.nullSafetyMode = NullSafetyMode.autodetect,
     this.codeSizeDirectory,
     // BD ADD: START
+    this.dynamicart = false,
+    this.dynamicPlugins,
     this.lite = false,
     this.liteGlobal = false,
     this.liteShareSkia = false
     // END
   });
+
+  // BD ADD:
+  final String dynamicPlugins;
 
   final BuildMode mode;
 
@@ -90,6 +95,7 @@ class BuildInfo {
   /// On Xcode builds it is used as CFBundleShortVersionString.
   final String buildName;
   // BD ADD:START
+  final bool dynamicart;
   final bool lite;
   final bool liteGlobal;
   final bool liteShareSkia;
@@ -664,6 +670,21 @@ String getAndroidBuildDirectory() {
 /// Returns the AOT build output directory.
 String getAotBuildDirectory() {
   return globals.fs.path.join(getBuildDirectory(), 'aot');
+}
+
+// BD ADD
+String getPatchBuildDirectory() {
+  return globals.fs.path.join(getBuildDirectory(), 'dynamic');
+}
+
+// BD ADD
+String getPatchAssetBuildDirectory() {
+  return globals.fs.path.join(getPatchBuildDirectory(), 'flutter_assets');
+}
+
+// BD ADD
+String getAssetRelativePath(){
+  return 'flutter_assets';
 }
 
 /// Returns the asset build output directory.

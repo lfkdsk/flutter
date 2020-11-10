@@ -101,6 +101,9 @@ Future<XcodeBuildResult> buildXcodeProject({
 
   // BD ADD:
   bool compressSize = false,
+  bool isDynamicart = false,
+  bool isMinimumSize = false,
+  List<String> dynamicPlugins,
 }) async {
   if (!upgradePbxProjWithFlutterAssets(app.project, globals.logger)) {
     return XcodeBuildResult(success: false);
@@ -190,6 +193,9 @@ Future<XcodeBuildResult> buildXcodeProject({
     targetOverride: targetOverride,
     buildInfo: buildInfo,
     // BD ADD:
+    isDynamicart: isDynamicart,
+    isMinimumSize:isMinimumSize,
+    dynamicPlugins:dynamicPlugins,
     compressSize: compressSize
   );
   await processPodsIfNeeded(project.ios, getIosBuildDirectory(), buildInfo.mode);
@@ -431,6 +437,13 @@ Future<XcodeBuildResult> buildXcodeProject({
       }
 
       // BD ADD: START
+      // minimum-size模式下删除ios包Flutter.framework的icudtl.dat文件
+      if(isMinimumSize) {
+        final String icu = '${expectedOutputDirectory}/Frameworks/Flutter.framework/icudtl.dat';
+        if(globals.fs.file(icu).existsSync()){
+          globals.fs.file(icu).deleteSync();
+        }
+      }
       //删除ios包内容中的icudtl.dat文件
       if(compressSize) {
         final String icu = '$expectedOutputDirectory/Frameworks/Flutter.framework/icudtl.dat';

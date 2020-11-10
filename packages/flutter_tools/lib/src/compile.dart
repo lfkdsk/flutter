@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io' as io;
 
 import 'package:meta/meta.dart';
 import 'package:package_config/package_config.dart';
@@ -19,6 +20,8 @@ import 'build_info.dart';
 import 'convert.dart';
 import 'globals.dart' as globals;
 import 'project.dart';
+import 'package:flutter_tools/src/cache.dart';
+import 'package:yaml/yaml.dart';
 
 KernelCompilerFactory get kernelCompilerFactory => context.get<KernelCompilerFactory>();
 
@@ -201,6 +204,10 @@ List<String> buildModeOptions(BuildMode mode) {
   throw Exception('Unknown BuildMode: $mode');
 }
 
+// BD ADD: START
+List<String> kDynamicAotPlugins;
+// END
+
 /// A compiler interface for producing single (non-incremental) kernel files.
 class KernelCompiler {
   KernelCompiler({
@@ -240,6 +247,10 @@ class KernelCompiler {
     bool lite = false,
     bool liteGlobal = false,
     bool liteShareSkia = false,
+    bool isDynamicart = false,
+    List<String>dynamicPlugins,
+    bool isDynamicDill = false,
+    String hostDillPath
     // END
   }) async {
     final String frontendServer = _artifacts.getArtifactPath(
@@ -276,6 +287,8 @@ class KernelCompiler {
       if (lite) '--lite',
       if (liteGlobal) '--lite-global',
       if (liteShareSkia) '--lite-share-skia',
+      if (isDynamicart) '--dynamicart',
+      if (isDynamicDill) '--dynamic',
     // END
       if (!linkPlatformKernelIn) '--no-link-platform',
       if (aot) ...<String>[
@@ -314,6 +327,59 @@ class KernelCompiler {
       ...?extraFrontEndOptions,
       mainUri?.toString() ?? mainPath,
     ];
+
+    // BD ADD: START
+    //查看 flutterw 的配置有没有相关的配置，有的话读出来
+    final String flutterwCfgPath = globals.fs.path.absolute('flutterw_config');
+    io.File flutterwYaml = io.File("${flutterwCfgPath}/flutterw.yaml");
+    print("flutterwCfgPath===:${flutterwYaml.path}\n");
+    if(flutterwYaml.existsSync()){
+      if (dynamicPlugins == null) {
+        dynamicPlugins = [];
+      }
+      String str = flutterwYaml.readAsStringSync();
+      dynamic doc = loadYaml(str);
+      List<String> cfgList = null;
+      if(doc!=null && doc['dynamic_host']!=null && doc['dynamic_host']['dynamic_aot_plugins']!=null){
+        String dynamicPluginsStr = doc['dynamic_host']['dynamic_aot_plugins'] as String;
+        cfgList = dynamicPluginsStr.split(" ");
+      }
+      if(doc['dynamic_package']!=null && doc['dynamic_package']['dynamic_aot_plugins']!=null){
+        String dynamicPluginsStr = doc['dynamic_package']['dynamic_aot_plugins'] as String;
+        cfgList = dynamicPluginsStr.split(" ");
+      }
+
+      if(cfgList !=null && cfgList.isNotEmpty){
+        cfgList.forEach((s){
+          if(!dynamicPlugins.contains(s)){
+            dynamicPlugins.add(s);
+          }
+        });
+      }
+    }
+
+    if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
+      kDynamicAotPlugins = dynamicPlugins;
+      final StringBuffer buffer = StringBuffer();
+      for (int i = 0; i < dynamicPlugins.length; i++) {
+        buffer.write(dynamicPlugins[i]);
+        if (i != dynamicPlugins.length - 1) {
+          buffer.write(',');
+        }
+      }
+      command.addAll(['--dynamic-aot-plugins', buffer.toString()]);
+    }
+
+    if(isDynamicart){
+      hostDillPath = '${Cache.flutterRoot}/bin/internal/app.dill';
+    }
+
+    if(hostDillPath != null && hostDillPath.isNotEmpty){
+      command.addAll(<String>['--host-dill', hostDillPath]);
+    }
+
+    print("kernelcompiler=== ${command.join(' ')}\n");
+    // END
 
     _logger.printTrace(command.join(' '));
     final Process server = await _processManager.start(command);

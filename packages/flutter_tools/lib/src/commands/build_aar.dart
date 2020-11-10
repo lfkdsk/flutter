@@ -36,6 +36,8 @@ class BuildAarCommand extends BuildSubCommand {
         defaultsTo: true,
         help: 'Build a release version of the current project.',
       );
+    // BD ADD:
+    addDynamicartModeFlags();
     addTreeShakeIconsFlag();
     usesFlavorOption();
     usesBuildNumberOption();
@@ -141,19 +143,53 @@ class BuildAarCommand extends BuildSubCommand {
       ? stringArg('build-number')
       : '1.0';
 
-    for (final String buildMode in const <String>['debug', 'profile', 'release']) {
-      if (boolArg(buildMode)) {
-        androidBuildInfo.add(
-          AndroidBuildInfo(
-            getBuildInfo(forcedBuildMode: BuildMode.fromName(buildMode)),
-            targetArchs: targetArchitectures,
-          )
-        );
+//    for (final String buildMode in const <String>['debug', 'profile', 'release']) {
+//      if (boolArg(buildMode)) {
+//        androidBuildInfo.add(
+//          AndroidBuildInfo(
+//            getBuildInfo(forcedBuildMode: BuildMode.fromName(buildMode)),
+//            targetArchs: targetArchitectures,
+//          )
+//        );
+//      }
+//    }
+//    if (androidBuildInfo.isEmpty) {
+//      throwToolExit('Please specify a build mode and try again.');
+//    }
+
+    void buildAndroidBuildInfo(bool f(String buildMode)){
+      for (String buildMode in const <String>['debug', 'profile', 'release']) {
+        if (f(buildMode)) {
+          androidBuildInfo.add(
+              AndroidBuildInfo(
+                BuildInfo(BuildMode.fromName(buildMode), stringArg('flavor'),
+                    // BD ADD: START
+                    dynamicPlugins: getDynamicPlugins()?.join(","),
+                    dynamicart: argParser.options.containsKey('dynamicart')
+                        ? boolArg('dynamicart')
+                        : false,
+                    lite: argParser.options.containsKey('lite')
+                        ? boolArg('lite')
+                        : false,
+                    liteGlobal: argParser.options.containsKey('lite-global')
+                        ? boolArg('lite-global')
+                        : false,
+                    liteShareSkia: argParser.options.containsKey('lite-share-skia')
+                        ? boolArg('lite-share-skia')
+                        : false),
+                targetArchs: targetArchitectures,
+              )
+          );
+        }
       }
     }
+
+    buildAndroidBuildInfo((String buildMode) => boolArg(buildMode));
+
     if (androidBuildInfo.isEmpty) {
-      throwToolExit('Please specify a build mode and try again.');
+      buildAndroidBuildInfo((String buildMode) => true);
     }
+    // END
 
     await androidBuilder.buildAar(
       project: _getProject(),

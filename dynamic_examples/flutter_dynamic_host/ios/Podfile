@@ -1,0 +1,219 @@
+# Uncomment this line to define a global platform for your project
+# platform :ios, '9.0'
+gem 'bd_pod_extentions'
+require 'bd_pod_extentions'
+bd_use_app("thirdParty", "public", "toutiao", "zhibozhongtai")
+platform :ios, '9.0'
+bytedanceAnalyzeSpeed(true)
+
+#二进制显示源码
+showCode!
+
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def parse_KV_file(file,separator='=')
+  file_abs_path = File.expand_path(file)
+  if !File.exists? file_abs_path
+    return [];
+  end
+  pods_ary =
+  skip_line_start_symbols = ["#", "/"]
+  File.foreach(file_abs_path) { |line|
+      next if skip_line_start_symbols.any? { |symbol| line =~ /^\s*#{symbol}/ }
+      plugin = line.split(pattern=separator)
+      if plugin.length == 2
+        podname = plugin[0].strip()
+        path = plugin[1].strip()
+        podpath = File.expand_path("#{path}", file_abs_path)
+        pods_ary.push({:name => podname,:path=>podpath});
+      else
+        puts "Invalid plugin specification: #{line}"
+      end
+  }
+  return pods_ary
+end
+
+target 'Runner' do
+  # Prepare symlinks folder. We use symlinks to avoid having Podfile.lock
+  # referring to absolute paths on developers' machines.
+  system('rm -rf .symlinks')
+  system('mkdir -p .symlinks/plugins')
+
+  # Flutter Pods
+  # pod 'Flutter', :path => ENV['FLUTTER_FRAMEWORK_DIR']
+  generated_xcode_build_settings = parse_KV_file('./Flutter/Generated.xcconfig')
+  if generated_xcode_build_settings.empty?
+    puts "Generated.xcconfig must exist. If you're running pod install manually, make sure flutter packages get is executed first."
+  end
+  generated_xcode_build_settings.map { |p|
+    if p.instance_of? Hash and p[:name] == 'FLUTTER_FRAMEWORK_DIR'
+      symlink = File.join('.symlinks', 'flutter')
+      File.symlink(File.dirname(p[:path]), symlink)
+      pod 'Flutter', :path => File.join(symlink, File.basename(p[:path]))
+    end
+  }
+
+  # Plugin Pods
+  plugin_pods = parse_KV_file('../.flutter-plugins')
+  plugin_pods.map { |p|
+    if p.instance_of? Hash 
+      symlink = File.join('.symlinks', 'plugins', p[:name])
+      File.symlink(p[:path], symlink)
+      pod p[:name], :path => File.join(symlink, 'ios')
+    end
+  }
+  
+  # Bytedance Pods
+  pod_binary 'BDFlutterPluginManager', '0.1.6'
+  pod 'BDPackageManagerService', :path => '/Users/bytedance/Documents/project/projects/BDPackageManagerService'
+  pod 'BDFlutterPackageManager', :path => '/Users/bytedance/Documents/project/projects/BDFlutterPackageManager'
+
+#  pod_source 'BDPackageManagerService', '1.1.0-rc.13'
+#  pod_source 'BDFlutterPackageManager', '0.0.2-rc.3'
+  pod_binary 'TransBridge-iOS', '0.1.4'
+  pod_binary 'Toast', '4.0.0'
+  pod_binary 'BDADFlutterLanding', '0.1.4-rc.0'
+  pod_binary 'ByteDanceKit','3.0.2',:subspecs => [
+     'Foundation',
+     'UIKit',
+     'UITextView'
+  ]
+  pod_binary 'AFgzipRequestSerializer','0.0.3'
+  pod_binary 'AFNetworking','2.5.4'
+  pod_binary 'AWEVideoPlayer', '0.5.4'
+  pod_binary 'BDALog','0.1.20'
+  pod_source 'BDAlogProtocol','0.1.7'
+  pod_binary 'BDAssert','2.0.1',:subspecs => [
+     'Core',
+     'UserException'
+  ]
+  pod_binary 'BDTrackerProtocol','2.0.0'
+  pod_binary 'BDWebImage','1.0.10-rc.1',:subspecs => [
+       'Core',
+       'Decoder',
+       'Download',
+       'Download/Chromium',
+       'Download/DownloadBase',
+       'Download/URLSession',
+    ]
+  pod_source 'boringssl','0.0.7'
+  pod_binary 'CocoaLumberjack','3.4.1',:subspecs => [
+    'Default',
+    'Extensions'
+    ]
+  pod_binary 'FlutterChannelTool', '2.0.0'
+  pod_binary 'FMDB','2.7.5',:subspecs => [
+       'standard'
+    ]
+  pod_binary 'Gaia','3.0.2'
+  pod_binary 'Godzippa','1.1.0'
+  pod_binary 'IESVideoPlayer','0.2.28'
+  pod 'boringssl', '0.0.7'
+  pod_binary 'libwebp','1.0.0',:subspecs => [
+       'core',
+       'demux',
+       'mux',
+       'webp'
+    ]
+  pod_binary 'RSSwizzle','1.0.0'
+  pod_binary 'SSZipArchive','2.1.5'
+  pod_binary 'TTBridgeUnify','2.2.0-alpha.0',:subspecs => [
+       'TTBridge',
+    ]
+  pod_binary 'ABRInterface', '0.3.2'
+  pod_binary 'BDDataDecorator','2.0.3',:subspecs => [
+    'Data',
+    'AES',
+  ]
+  pod_binary 'TTTopSignature' ,'0.0.4'
+  pod_binary 'TTTracker','1.1.16-rc.0'
+  pod_binary 'TTVideoEngine','1.9.52.6'
+  pod_binary 'TTVideoSetting','0.0.5'
+  pod_binary 'YYCache','1.0.4.3'
+  pod_binary 'TTInstallService','1.3.3'
+  pod_source'TTMacroManager','1.0.1'
+  pod_binary 'TTNetworkManager','2.2.9.7'
+  pod_binary 'TTPlayerSDK','2.8.14.5'
+  pod_binary 'TTPreloaderSDK', '1.4.30'
+  pod_binary 'AWECloudCommand','1.0.8'
+  pod_binary 'TTReachability','1.7.1'
+  pod_binary 'BDTracker','0.5.3',:subspecs => [
+       'InstallBase',
+       'InstallCore',
+       'InstallHome',
+       'Network/TTNetwork',
+       'Network/Base',
+       'TrackerBase',
+       'TrackerCore',
+       'TrackerDatabase',
+       'TrackerHome'
+    ]
+  pod_binary 'Heimdallr', '0.7.19-rc.4.1-bugfix', :subspecs => [
+     'Core',
+     'Monitors',
+     'TTMonitor',
+     'HMDURLProtocolTracker',
+     'TTNet',
+     'HMDStart',
+     'Mach',
+     'Utility',
+     'DeviceInfo',
+     'HMDANR',
+     'HMDOOM',
+     'CrashCapture',
+     'CrashDetector',
+     'Log',
+     'UITracker',
+     'Upload',
+     'HMDSession',
+     'HMDConfig',
+     'HMDStore',
+     'ALog',
+     'CloudCommand',
+     'Network',
+     'HTTPRequestTracker',
+     'Dart',
+     'HMDOOMCrash',
+     'HMDWatchDog',
+     'UserException',
+     'Protect',
+     'Runloop',
+     'HMDLaunchTracing',
+     'OpenTracing',
+     'HMDDomestic',
+     'HMDAlogProtocol',
+     'HMDSDKMonitor'
+  ]
+  pod_binary 'TTUIWidget', '1.3.3', :subspecs => [
+       'TTIndicatorView',
+    ]
+  pod_binary 'TTThemed','0.1.37'
+  pod_binary 'TTBaseLib','2.0.10',:subspecs => [
+       'TTBaseTool',
+       'TTCategory',
+       'TTDeviceHelper',
+       'TTLabelTextHelper',
+       'TTSandBoxHelper',
+       'TTUIResponderHelper',
+    ]
+  pod_binary 'TTKitchen','3.0.1',:subspecs => [
+    'Core',
+    ]
+  pod_binary 'Gaia','3.0.2'
+  pod_binary 'OpenUDID', '1.0.0'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+end

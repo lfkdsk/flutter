@@ -98,6 +98,40 @@ class BasicMessageChannel<T> {
   }
 }
 
+// BD ADD:
+typedef ChannelListener = void Function(MethodTiming);
+
+class MethodTiming {
+
+  MethodTiming(this.channelName, this.methodName, this.encodeDuration,
+      this.asyncDuration, this.decodeDuration, this.paramsSize, this.resultSize);
+
+  MethodTiming.exception(this.channelName, this.methodName, Exception exception) {
+    exceptionType = exception.runtimeType.toString();
+    message = exception.toString();
+  }
+  
+  /// key
+  final String channelName;
+  final String methodName;
+
+  /// timings, in ms
+  int encodeDuration;
+  int asyncDuration;
+  int decodeDuration;
+
+  /// size, in Bytes
+  int paramsSize;
+  int resultSize;
+
+  /// exception
+  String exceptionType;
+  String message;
+  
+  bool get hasError => (exceptionType != null || message != null);
+}
+// END
+
 /// A named channel for communicating with platform plugins using asynchronous
 /// method calls.
 ///
@@ -311,6 +345,39 @@ class MethodChannel {
   @optionalTypeArgs
   Future<T> invokeMethod<T>(String method, [ dynamic arguments ]) async {
     assert(method != null);
+
+    // BD ADD:
+    if (onInvokeMethod != null) {
+      final int encodeStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData callData = codec.encodeMethodCall(MethodCall(method, arguments));
+
+      final int awaitStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData result = await binaryMessenger.send(name, callData);
+      if (result == null) {
+        final e = MissingPluginException('No implementation found for method $method on channel $name');
+        onInvokeMethod(MethodTiming.exception(name, method, e));
+        throw e;
+      }
+      final int decodeStart = DateTime.now().millisecondsSinceEpoch;
+      T typedResult;
+      try {
+        typedResult = codec.decodeEnvelope(result);
+      } on Exception catch (e) {
+        onInvokeMethod(MethodTiming.exception(name, method, e));
+        rethrow;
+      }
+      final int decodeEnd = DateTime.now().millisecondsSinceEpoch;
+
+      final int encodeDuration = awaitStart - encodeStart;
+      final int asyncDuration = decodeStart - awaitStart;
+      final int decodeDuration = decodeEnd - decodeStart;
+
+      onInvokeMethod(MethodTiming(name, method, encodeDuration, asyncDuration, 
+        decodeDuration, callData.lengthInBytes, result.lengthInBytes));
+      return typedResult;
+    }
+    // END
+
     final ByteData result = await binaryMessenger.send(
       name,
       codec.encodeMethodCall(MethodCall(method, arguments)),
@@ -321,6 +388,9 @@ class MethodChannel {
     final T typedResult = codec.decodeEnvelope(result);
     return typedResult;
   }
+
+  // BD ADD:
+  static ChannelListener onInvokeMethod;
 
   /// An implementation of [invokeMethod] that can return typed lists.
   ///

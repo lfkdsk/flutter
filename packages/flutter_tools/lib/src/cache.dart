@@ -336,6 +336,17 @@ class Cache {
   }
 
   /// BD ADD: START
+  /// /// 获取动态化的版本号，用于动态包的校验，
+  //  /// 这里版本号是三位版本号，比如1.2.0,其中1代表主版本号，flutter sdk进行大版本升级时需要将此版本+1,2代表兼容性的版本号在
+  //  /// 修改flutter sdk的接口或者是引擎不兼容时需要升级此版本号，
+  //  /// 注意在修改flutter sdk的接口或者是dart引擎不兼容时要升级这个版本号
+  String get dynamicartRevision {
+    _dynamicartRevision ??= getVersionFor('dynamicart');
+    return _dynamicartRevision;
+  }
+
+  String _dynamicartRevision;
+
   String get customEngineRevision {
     _customEngineRevision ??= getVersionFor('ttengine');
     return _customEngineRevision;
@@ -1550,6 +1561,12 @@ const List<List<String>> _osxBinaryDirs = <List<String>>[
   <String>['android-arm64-release/darwin-x64', 'android-arm64-release/darwin-x64.zip'],
   <String>['android-x64-profile/darwin-x64', 'android-x64-profile/darwin-x64.zip'],
   <String>['android-x64-release/darwin-x64', 'android-x64-release/darwin-x64.zip'],
+  // BD ADD START:
+//  <String>['android-arm-dynamicart-release/darwin-x64', 'android-arm-dynamicart-release/darwin-x64.zip'],
+//  <String>['android-arm64-dynamicart-release/darwin-x64', 'android-arm64-dynamicart-release/darwin-x64.zip'],
+//  <String>['android-arm-dynamicart-profile/darwin-x64', 'android-arm-dynamicart-profile/darwin-x64.zip'],
+//  <String>['android-arm64-dynamicart-profile/darwin-x64', 'android-arm64-dynamicart-profile/darwin-x64.zip'],
+  // END
 ];
 
 // BD ADD: START
@@ -1583,6 +1600,10 @@ const List<List<String>> _iosBinaryDirs = <List<String>>[
   <String>['ios', 'ios/artifacts.zip'],
   <String>['ios-profile', 'ios-profile/artifacts.zip'],
   <String>['ios-release', 'ios-release/artifacts.zip'],
+  // BD ADD: START
+//  <String>['ios-dynamicart-release', 'ios-dynamicart-release/artifacts.zip'],
+//  <String>['ios-dynamicart-profile', 'ios-dynamicart-profile/artifacts.zip'],
+  // END
 ];
 
 // BD ADD: START
@@ -1590,7 +1611,7 @@ const List<List<String>> _iosBinaryLiteDirs = <List<String>>[
   <String>['ios-release-lite', 'ios-release-lite/artifacts.zip'],
   <String>['ios-release-liteg', 'ios-release-liteg/artifacts.zip'],
   <String>['ios-release-lites', 'ios-release-lites/artifacts.zip'],
-// <String>['ios-dynamicart-release-lites', 'ios-dynamicart-release-lites/artifacts.zip'],
+//  <String>['ios-dynamicart-release-lites', 'ios-dynamicart-release-lites/artifacts.zip'],
 ];
 // END
 
@@ -1605,6 +1626,12 @@ const List<List<String>> _androidBinaryDirs = <List<String>>[
   <String>['android-arm64-release', 'android-arm64-release/artifacts.zip'],
   <String>['android-x64-profile', 'android-x64-profile/artifacts.zip'],
   <String>['android-x64-release', 'android-x64-release/artifacts.zip'],
+  // BD ADD START:
+//  <String>['android-arm-dynamicart-release', 'android-arm-dynamicart-release/artifacts.zip'],
+//  <String>['android-arm64-dynamicart-release', 'android-arm64-dynamicart-release/artifacts.zip'],
+//  <String>['android-arm-dynamicart-profile', 'android-arm-dynamicart-profile/artifacts.zip'],
+//  <String>['android-arm64-dynamicart-profile', 'android-arm64-dynamicart-profile/artifacts.zip'],
+  // END
   // BD DEL:
   // <String>['android-x86-jit-release', 'android-x86-jit-release/artifacts.zip'],
 ];

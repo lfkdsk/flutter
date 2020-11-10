@@ -20,11 +20,23 @@ import 'flutter_manifest.dart';
 import 'globals.dart' as globals;
 import 'project.dart';
 
+// BD ADD
+import 'package:flutter_tools/src/compile.dart';
+import 'package:flutter_tools/src/version.dart';
+
 const AssetBundleFactory _kManifestFactory = _ManifestAssetBundleFactory();
 
 const String defaultManifestPath = 'pubspec.yaml';
 
 const String kFontManifestJson = 'FontManifest.json';
+
+// BD ADD: START
+const String assetManifestJson = 'AssetManifest.json';
+const String fontManifestJson = 'FontManifest.json';
+const String _fontSetMaterial = 'material';
+const String license = 'LICENSE';
+const String hostManifest = 'host_manifest.json';
+// END
 
 /// Injected factory class for spawning [AssetBundle] instances.
 abstract class AssetBundleFactory {
@@ -55,6 +67,10 @@ abstract class AssetBundle {
     @required String packagesPath,
     bool includeDefaultFonts = true,
     bool reportLicensedPackages = false,
+    // BD ADD: START
+    bool includeManifest = false,
+    bool isMinimumSize = false,
+    // END
   });
 }
 
@@ -128,6 +144,10 @@ class ManifestAssetBundle implements AssetBundle {
     @required String packagesPath,
     bool includeDefaultFonts = true,
     bool reportLicensedPackages = false,
+    // BD ADD: START
+    bool includeManifest = false,
+    bool isMinimumSize = false,
+    // END
   }) async {
     assetDirPath ??= getAssetBuildDirectory();
     FlutterProject flutterProject;
@@ -290,6 +310,20 @@ class ManifestAssetBundle implements AssetBundle {
     final DevFSStringContent licenses = DevFSStringContent(licenseResult.combinedLicenses);
     additionalDependencies = licenseResult.dependencies;
 
+    // BD ADD: START
+    if (includeManifest) {
+      final DevFSStringContent hostMani = await _parseManifest(
+          packagesPath,
+          manifestPath,
+          globals.fs.path.join(globals.fs
+              .file(manifestPath)
+              .parent
+              .path, 'pubspec.lock'),
+          isMinimumSize);
+      _setIfChanged(hostManifest, hostMani);
+    }
+    // END
+
     if (wildcardDirectories.isNotEmpty) {
       // Force the depfile to contain missing files so that Gradle does not skip
       // the task. Wildcard directories are not compatible with full incremental
@@ -324,6 +358,103 @@ class ManifestAssetBundle implements AssetBundle {
       entries[key] = content;
     }
   }
+
+  Future<DevFSStringContent> _parseManifest(String packagesPath, String manifest,
+      String pubspecLock, bool isMinimumSize) async {
+    final FlutterManifest flutterManifest =
+    await FlutterManifest.createFromPath(manifest,
+      logger: globals.logger,
+      fileSystem: globals.fs,);
+    final String packageName = flutterManifest.appName;
+    final String versionCode = flutterManifest.appVersion;
+    final Map<String, Map<String, String>> versionMap = <String, Map<String, String>>{};
+    versionMap['dynamicart'] = {'version': globals.cache.dynamicartRevision};
+    final Map<String, String>pluginVersion = getPluginVersion(packagesPath);
+    for (String key in pluginVersion.keys) {
+      versionMap[key] = {'version': pluginVersion[key]};
+    }
+
+    final Map<String, dynamic> jsonObject = <String, dynamic>{};
+    jsonObject['packageName'] = packageName == null ? '' : packageName;
+    if (isMinimumSize) {
+      jsonObject['mode'] = 'minimum-size';
+    } else {
+      jsonObject['mode'] = 'full';
+    }
+
+    jsonObject['version'] = versionCode == null ? '' : versionCode;
+    jsonObject['dependencies'] = versionMap;
+    return DevFSStringContent(json.encode(jsonObject));
+  }
+}
+
+///获得工程依赖的plugin的版本号,[packagesPath]:.package文件路径，返回值的key为plugin的名称，value为版本号
+Map<String,String> getPluginVersion(String packagesPath){
+  final Map<String, String> map = _parsePackage(packagesPath);
+  final Map<String,String>versionMap =  Map();
+  for (String key in map.keys) {
+    final Directory directory = globals.fs.directory(map[key]).parent;
+    final dynamic pubspec = loadYaml(globals.fs
+        .file(globals.fs.path.absolute(directory.path, 'pubspec.yaml'))
+        .readAsStringSync());
+    final dynamic flutterConfig = pubspec['flutter'];
+    if (flutterConfig == null || !(flutterConfig.containsKey('plugin') as bool)) {
+      continue;
+    }
+    versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+  }
+  // 处理被 aot 的 lib
+  if(kDynamicAotPlugins!=null){
+    RegExp exp = new RegExp(r"package\:(\w+)/.*");
+    kDynamicAotPlugins.forEach((str){
+      var matchRes = exp.firstMatch(str);
+      if(matchRes==null){
+        return;
+      }
+      String key = matchRes.group(1);
+      if(!map.containsKey(key)){
+        return;
+      }
+      final Directory directory = globals.fs.directory(map[key]).parent;
+      final dynamic pubspec = loadYaml(globals.fs
+          .file(globals.fs.path.absolute(directory.path, 'pubspec.yaml'))
+          .readAsStringSync());
+      versionMap[pubspec['name'] as String] = pubspec['version'] as String;
+    });
+  }
+  return versionMap;
+}
+
+/// 解析.packages文件
+Map<String, String> _parsePackage(String packagesPath) {
+  final Map<String, String> map = Map();
+  final File dotPackages = globals.fs.file(packagesPath);
+  final Directory directory = dotPackages.parent;
+  if (dotPackages.existsSync()) {
+    final Iterable<String> lines = dotPackages
+        .readAsStringSync()
+        .split('\n')
+        .where((String line) => !line.startsWith(RegExp(r'^ *#')));
+    for (String line in lines) {
+      final int colon = line.indexOf(':');
+      if (colon > 0) {
+        final String packageName = line.substring(0, colon);
+        final String package = line.substring(colon + 1);
+        String packagePath;
+        if (package.startsWith('file:')) {
+          packagePath = globals.fs.path.fromUri(line.substring(colon + 1));
+          map[packageName] =
+              globals.fs.path.normalize(
+                  globals.fs.path.absolute(directory.path, packagePath));
+        } else {
+          map[packageName] =
+              globals.fs.path.normalize(
+                  globals.fs.path.absolute(directory.path, package));
+        }
+      }
+    }
+  }
+  return map;
 }
 
 @immutable

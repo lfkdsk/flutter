@@ -312,6 +312,12 @@ class Environment {
     Directory buildDir,
     Map<String, String> defines = const <String, String>{},
     Map<String, String> inputs = const <String, String>{},
+    // BD ADD: START
+    List<String>dynamicPlugins,
+    bool isDynamicart,
+    bool isMinimumSize,
+    bool compressSize,
+    // END
   }) {
     // Compute a unique hash of this build's particular environment.
     // Sort the keys by key so that the result is stable. We always
@@ -348,6 +354,11 @@ class Environment {
       processManager: processManager,
       engineVersion: engineVersion,
       inputs: inputs,
+      // BD ADD: START
+      dynamicPlugins: dynamicPlugins,
+      isDynamicart: isDynamicart ?? false,
+      isMinimumSize: isMinimumSize ?? false,
+      // END
     );
   }
 
@@ -399,6 +410,11 @@ class Environment {
     @required this.artifacts,
     @required this.engineVersion,
     @required this.inputs,
+    // BD ADD: START
+    @required this.isDynamicart,
+    @required this.isMinimumSize,
+    this.dynamicPlugins
+    // END
   });
 
   /// The [Source] value which is substituted with the path to [projectDir].
@@ -476,6 +492,12 @@ class Environment {
 
   /// The version of the current engine, or `null` if built with a local engine.
   final String engineVersion;
+
+  // BD ADD: START
+  final List<String>dynamicPlugins;
+  final bool isDynamicart;
+  final bool isMinimumSize;
+// END
 }
 
 /// The result information from the build system.

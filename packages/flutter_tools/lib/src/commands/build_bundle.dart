@@ -55,6 +55,15 @@ class BuildBundleCommand extends BuildSubCommand {
         splitCommas: true,
         hide: true,
       )
+      // BD ADD: START
+      ..addFlag('minimum-size',
+          defaultsTo: false,
+          help: '用于ios的dyamicart模式下减少包体积的参数',
+          hide: true)
+      ..addFlag('dynamicart',
+          negatable: false,
+          help: '开启动态化, 目前只支持release模式.')
+      // END
       ..addFlag('report-licensed-packages',
         help: 'Whether to report the names of all the packages that are included '
               "in the application's LICENSE file.",
@@ -137,6 +146,10 @@ class BuildBundleCommand extends BuildSubCommand {
       fileSystemScheme: stringArg('filesystem-scheme'),
       fileSystemRoots: stringsArg('filesystem-root'),
       treeShakeIcons: buildInfo.treeShakeIcons,
+      // BD ADD:
+      isDynamicart: boolArg('dynamicart'),
+      isMinimumSize: boolArg('minimum-size')
+      // END
     );
     return FlutterCommandResult.success();
   }

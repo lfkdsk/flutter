@@ -332,6 +332,10 @@ Map<String,String> getPluginVersion(String packagesPath){
       final dynamic pubspec = loadYaml(fs
           .file(fs.path.absolute(directory.path, 'pubspec.yaml'))
           .readAsStringSync());
+      final dynamic flutterConfig = pubspec['flutter'];
+      if (flutterConfig == null || !(flutterConfig.containsKey('plugin') as bool)) {
+        return;
+      }
       versionMap[pubspec['name'] as String] = pubspec['version'] as String;
     });
   }

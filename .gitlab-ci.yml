@@ -8,6 +8,9 @@
 stages:
   - test-stage-first
   - test-stage-second
+  - test-stage-third
+  - test-stage-four
+  - test-stage-five
 
 usability-benchmark:
   <<: *common
@@ -23,7 +26,43 @@ pref-benchmark:
   stage: test-stage-second
   script:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
-    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=1
+  tags:
+    - shared
+
+startup-benchmark:
+  <<: *common
+  stage: test-stage-third
+  script:
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=2
+  tags:
+    - shared
+
+compile-benchmark:
+  <<: *common
+  stage: test-stage-four
+  script:
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=3
+  tags:
+    - shared
+
+memory-benchmark:
+  <<: *common
+  stage: test-stage-four
+  script:
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=4
+  tags:
+    - shared
+
+macro-benchmark:
+  <<: *common
+  stage: test-stage-four
+  script:
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
+    - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=5
   tags:
     - shared
 

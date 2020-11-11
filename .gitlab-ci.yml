@@ -11,6 +11,7 @@ stages:
   - test-stage-third
   - test-stage-four
   - test-stage-five
+  - test-stage-six
 
 usability-benchmark:
   <<: *common
@@ -50,7 +51,7 @@ compile-benchmark:
 
 memory-benchmark:
   <<: *common
-  stage: test-stage-four
+  stage: test-stage-five
   script:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=4
@@ -59,7 +60,7 @@ memory-benchmark:
 
 macro-benchmark:
   <<: *common
-  stage: test-stage-four
+  stage: test-stage-six
   script:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=5

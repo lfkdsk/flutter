@@ -313,11 +313,17 @@ class ManifestAssetBundle implements AssetBundle {
     additionalDependencies = licenseResult.dependencies;
 
     // BD ADD: START
-    final DevFSStringContent hostMani = await _parseManifest(
-        packagesPath,
-        manifestPath,
-        globals.fs.path.join(globals.fs.file(manifestPath).parent.path, 'pubspec.lock'),
-        isMinimumSize);
+    if (includeManifest) {
+      final DevFSStringContent hostMani = await _parseManifest(
+          packagesPath,
+          manifestPath,
+          globals.fs.path.join(globals.fs
+              .file(manifestPath)
+              .parent
+              .path, 'pubspec.lock'),
+          isMinimumSize);
+      _setIfChanged(hostManifest, hostMani);
+    }
     // END
 
     if (wildcardDirectories.isNotEmpty) {
@@ -336,7 +342,7 @@ class ManifestAssetBundle implements AssetBundle {
     _setIfChanged(_kAssetManifestJson, assetManifest);
     _setIfChanged(kFontManifestJson, fontManifest);
     _setIfChanged(_kNoticeFile, licenses);
-    _setIfChanged(hostManifest, hostMani);
+
     // BD ADD:
     entries[_KFlutterVersion] = DevFSFileContent(globals.fs.file(globals.fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
     return 0;

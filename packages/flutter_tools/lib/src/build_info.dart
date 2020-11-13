@@ -404,6 +404,7 @@ bool isEmulatorBuildMode(BuildMode mode) {
 
 enum HostPlatform {
   darwin_x64,
+  darwin_arm,
   linux_x64,
   windows_x64,
 }
@@ -412,6 +413,8 @@ String getNameForHostPlatform(HostPlatform platform) {
   switch (platform) {
     case HostPlatform.darwin_x64:
       return 'darwin-x64';
+    case HostPlatform.darwin_arm:
+      return 'darwin-arm';
     case HostPlatform.linux_x64:
       return 'linux-x64';
     case HostPlatform.windows_x64:
@@ -424,6 +427,7 @@ String getNameForHostPlatform(HostPlatform platform) {
 enum TargetPlatform {
   android,
   ios,
+  // darwin_arm64 not yet supported, macOS desktop targets run in Rosetta as x86.
   darwin_x64,
   linux_x64,
   windows_x64,

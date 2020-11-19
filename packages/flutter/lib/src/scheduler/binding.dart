@@ -954,8 +954,14 @@ mixin SchedulerBinding on BindingBase, ServicesBinding {
       return;
     }
     // BD ADD: START
-    if (Boost.skipFrameWhenSizeIsZero) {
+    if (Boost.skipFrameWhenSizeIsZero || Boost.alwaysSkipFrameWhenSizeIsZero)
+    {
       if (window.physicalSize.isEmpty) {
+        assert(() {
+          if (Boost.alwaysSkipFrameWhenSizeIsZero)
+            debugPrint('alwaysSkipFrameWhenSizeIsZero! window.physicalSize.isEmpty');
+          return true;
+        }());
         _ignoreNextEngineDrawFrame = true;
         return;
       }

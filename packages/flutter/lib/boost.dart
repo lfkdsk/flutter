@@ -76,7 +76,12 @@ class Boost {
   static bool get disableMipmaps => _disableMipmaps;
 
   /// skip frame when size of platform view is zero
+  /// Effective only once. auto close when the window gets the correct size.
   static bool skipFrameWhenSizeIsZero = false;
+
+  ///always skip frame when size of platform view is zero
+  ///To solve the problem of redundant builds for hybrid routes
+  static bool alwaysSkipFrameWhenSizeIsZero = false;
 
   /// enable or disable semantics, reuseWidget and so on.
   static void enable(

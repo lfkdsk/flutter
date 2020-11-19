@@ -953,6 +953,23 @@ mixin SchedulerBinding on BindingBase, ServicesBinding {
       _ignoreNextEngineDrawFrame = true;
       return;
     }
+
+    // BD ADD: START
+    if (Boost.skipFrameWhenSizeIsZero || Boost.alwaysSkipFrameWhenSizeIsZero)
+    {
+      if (window.physicalSize.isEmpty) {
+        assert(() {
+          if (Boost.alwaysSkipFrameWhenSizeIsZero)
+            debugPrint('alwaysSkipFrameWhenSizeIsZero! window.physicalSize.isEmpty');
+          return true;
+        }());
+        _ignoreNextEngineDrawFrame = true;
+        return;
+      }
+      Boost.skipFrameWhenSizeIsZero = false;
+    }
+    // END
+    
     handleBeginFrame(rawTimeStamp);
   }
 

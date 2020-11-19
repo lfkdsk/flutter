@@ -1531,7 +1531,9 @@ class RenderViewport extends RenderViewportBase<SliverPhysicalContainerParentDat
         break;
     }
 
-    final double fullCacheExtent = mainAxisExtent + 2 * _calculatedCacheExtent!;
+    // BD MOD:
+    // final double fullCacheExtent = mainAxisExtent + 2 * _calculatedCacheExtent!;
+    final double fullCacheExtent = math.max(0.0, mainAxisExtent + 2 * _calculatedCacheExtent!);
     final double centerCacheOffset = centerOffset + _calculatedCacheExtent!;
     final double reverseDirectionRemainingCacheExtent = centerCacheOffset.clamp(0.0, fullCacheExtent);
     final double forwardDirectionRemainingCacheExtent = (fullCacheExtent - centerCacheOffset).clamp(0.0, fullCacheExtent);

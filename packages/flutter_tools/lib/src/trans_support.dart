@@ -4,6 +4,7 @@
 
 import 'dart:io';
 
+import 'package:flutter_tools/src/dart/pub.dart';
 import 'package:package_config/packages_file.dart' as packages_file;
 import 'package:yaml/yaml.dart';
 
@@ -30,25 +31,27 @@ const List<String> dartVmFlags = <String>[];
 /// Return the platform specific name for the given Dart SDK binary. So, `pub`
 /// ==> `pub.bat`. The default SDK location can be overridden with a specified
 /// [sdkLocation].
-String sdkBinaryName(String name, { String sdkLocation }) {
-  return fs.path.absolute(fs.path.join(sdkLocation ?? dartSdkPath, 'bin', platform.isWindows ? '$name.bat' : name));
+String sdkBinaryName(String name, {String sdkLocation}) {
+  return fs.path.absolute(fs.path.join(sdkLocation ?? dartSdkPath, 'bin',
+      platform.isWindows ? '$name.bat' : name));
 }
-
 
 const String kPackagesFileName = '.packages';
 
 Map<String, Uri> _parse(String packagesPath) {
   final List<int> source = fs.file(packagesPath).readAsBytesSync();
-  return packages_file.parse(source,
-      Uri.file(packagesPath, windows: platform.isWindows));
+  return packages_file.parse(
+      source, Uri.file(packagesPath, windows: platform.isWindows));
 }
 
 class PackageMap {
   PackageMap(this.packagesPath);
 
-  static String get globalPackagesPath => _globalPackagesPath ?? kPackagesFileName;
+  static String get globalPackagesPath =>
+      _globalPackagesPath ?? kPackagesFileName;
 
-  static String get globalGeneratedPackagesPath => fs.path.setExtension(globalPackagesPath, '.generated');
+  static String get globalGeneratedPackagesPath =>
+      fs.path.setExtension(globalPackagesPath, '.generated');
 
   static set globalPackagesPath(String value) {
     _globalPackagesPath = value;
@@ -69,6 +72,7 @@ class PackageMap {
     load();
     return _map;
   }
+
   Map<String, Uri> _map;
 
   /// Returns the path to [packageUri].
@@ -92,11 +96,13 @@ class PackageMap {
       return null;
     }
     String message = '$packagesPath does not exist.';
-    final String pubspecPath = fs.path.absolute(fs.path.dirname(packagesPath), 'pubspec.yaml');
+    final String pubspecPath =
+        fs.path.absolute(fs.path.dirname(packagesPath), 'pubspec.yaml');
     if (fs.isFileSync(pubspecPath)) {
       message += '\nDid you run "flutter pub get" in this directory?';
     } else {
-      message += '\nDid you run this command from the same directory as your pubspec.yaml file?';
+      message +=
+          '\nDid you run this command from the same directory as your pubspec.yaml file?';
     }
     return message;
   }
@@ -116,7 +122,7 @@ class TransformerHooks {
       return false;
     }
     final String transLibPath =
-    packageMap.map['transformer_template']?.toFilePath();
+        packageMap.map['transformer_template']?.toFilePath();
     if (transLibPath == null) {
       return false;
     }
@@ -125,7 +131,7 @@ class TransformerHooks {
         'snapshot',
         'transformer_template.dart.snapshot');
     final File expectedTransformerSnapshot =
-    fs.file(expectedTransformerSnapshotPath);
+        fs.file(expectedTransformerSnapshotPath);
     if (!expectedTransformerSnapshot.existsSync()) {
       await generateTransformerSnapshot(expectedTransformerSnapshotPath);
     }
@@ -180,12 +186,24 @@ class TransformerHooks {
     if (pubspecLockFile.existsSync()) {
       pubspecLockFile.deleteSync();
     }
-    await processManager.run(
-      <String>[sdkBinaryName('pub'), 'get', '--verbosity=warning'],
+    final lock = fs.file(
+      '${pub.getCacheRoot()}/global_packages/transformer_template/pubspec.lock',
+    );
+    if (lock.existsSync()) {
+      lock.deleteSync();
+    }
+    lock.createSync(recursive: true);
+    ProcessResult result = await processManager.run(
+      <String>[sdkBinaryName('pub'), 'get'],
       workingDirectory: snapshotDir.parent.path,
       environment: <String, String>{'FLUTTER_ROOT': Cache.flutterRoot},
     );
-    await processManager.run(
+    if (result.exitCode != 0) {
+      printStatus(result.stderr.toString());
+    } else {
+      printStatus(result.stdout.toString());
+    }
+    result = await processManager.run(
       <String>[
         sdkBinaryName('dart'),
         '--snapshot=snapshot/transformer_template.dart.snapshot',
@@ -193,12 +211,18 @@ class TransformerHooks {
       ],
       workingDirectory: snapshotDir.parent.path,
     );
+
+    if (result.exitCode != 0) {
+      printStatus(result.stderr.toString());
+    } else {
+      printStatus(result.stdout.toString());
+    }
   }
 
   Future<void> justTransformDill(
-      BuildMode buildMode,
-      String outputFilename,
-      ) async {
+    BuildMode buildMode,
+    String outputFilename,
+  ) async {
     final bool isEnable = await checkTransformerSnapshot(hasAop: false);
     if (!isEnable) {
       return;
@@ -237,8 +261,8 @@ class TransformerHooks {
 
   static bool hasTransformer() {
     final YamlMap yaml =
-    loadYaml(FlutterProject.current().pubspecFile.readAsStringSync())
-    as YamlMap;
+        loadYaml(FlutterProject.current().pubspecFile.readAsStringSync())
+            as YamlMap;
     return yaml['transformers'] != null;
   }
 
@@ -270,10 +294,10 @@ class TransformerHooks {
   }
 
   static Future<ProcessResult> transformDill(
-      BuildMode buildMode,
-      String inputDill,
-      String outputDill,
-      ) async {
+    BuildMode buildMode,
+    String inputDill,
+    String outputDill,
+  ) async {
     final List<String> command = <String>[
       artifacts.getArtifactPath(Artifact.engineDartBinary),
       transformerSnapshot,
@@ -282,9 +306,9 @@ class TransformerHooks {
       if (buildMode != BuildMode.release) ...<String>[
         '--sdk-root',
         fs
-            .file(artifacts.getArtifactPath(Artifact.platformKernelDill))
-            .parent
-            .path +
+                .file(artifacts.getArtifactPath(Artifact.platformKernelDill))
+                .parent
+                .path +
             fs.path.separator
       ],
       '--output',

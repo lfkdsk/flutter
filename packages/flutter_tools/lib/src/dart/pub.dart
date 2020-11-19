@@ -133,6 +133,9 @@ abstract class Pub {
     String directory,
     @required io.Stdio stdio,
   });
+
+  // BD ADD
+  String getCacheRoot();
 }
 
 class _DefaultPub implements Pub {
@@ -429,7 +432,7 @@ class _DefaultPub implements Pub {
     return values.join(':');
   }
 
-  String _getRootPubCacheIfAvailable() {
+  String getRootPubCacheIfAvailable() {
     if (_platform.environment.containsKey(_kPubCacheEnvironmentKey)) {
       return _platform.environment[_kPubCacheEnvironmentKey];
     }
@@ -453,7 +456,7 @@ class _DefaultPub implements Pub {
       'FLUTTER_ROOT': flutterRootOverride ?? Cache.flutterRoot,
       _kPubEnvironmentKey: await _getPubEnvironmentValue(context),
     };
-    final String pubCache = _getRootPubCacheIfAvailable();
+    final String pubCache = getRootPubCacheIfAvailable();
     if (pubCache != null) {
       environment[_kPubCacheEnvironmentKey] = pubCache;
     }
@@ -482,4 +485,7 @@ class _DefaultPub implements Pub {
       await savePackageConfig(newPackageConfig, packageConfigFile.parent.parent);
     }
   }
+
+  @override
+  String getCacheRoot() => getRootPubCacheIfAvailable();
 }

@@ -5,6 +5,7 @@
 import 'dart:io';
 
 import 'package:flutter_tools/src/dart/pub.dart';
+import 'package:io/io.dart';
 import 'package:package_config/packages_file.dart' as packages_file;
 import 'package:yaml/yaml.dart';
 
@@ -126,13 +127,25 @@ class TransformerHooks {
     if (transLibPath == null) {
       return false;
     }
+    final transformerLocal = FlutterProject.current()
+        .dartTool
+        .childDirectory('transformer_template');
     final String expectedTransformerSnapshotPath = fs.path.join(
-        fs.directory(transLibPath).parent.path,
+        transformerLocal.path,
         'snapshot',
         'transformer_template.dart.snapshot');
-    final File expectedTransformerSnapshot =
-        fs.file(expectedTransformerSnapshotPath);
+    final File expectedTransformerSnapshot = fs.file(
+      expectedTransformerSnapshotPath,
+    );
     if (!expectedTransformerSnapshot.existsSync()) {
+      if (transformerLocal.existsSync()) {
+        transformerLocal.deleteSync();
+      }
+      transformerLocal.createSync(recursive: true);
+      copyPathSync(
+        fs.file(transLibPath).parent.path,
+        transformerLocal.path,
+      );
       await generateTransformerSnapshot(expectedTransformerSnapshotPath);
     }
     if (expectedTransformerSnapshot.existsSync()) {
@@ -186,13 +199,6 @@ class TransformerHooks {
     if (pubspecLockFile.existsSync()) {
       pubspecLockFile.deleteSync();
     }
-    final lock = fs.file(
-      '${pub.getCacheRoot()}/global_packages/transformer_template/pubspec.lock',
-    );
-    if (lock.existsSync()) {
-      lock.deleteSync();
-    }
-    lock.createSync(recursive: true);
     ProcessResult result = await processManager.run(
       <String>[sdkBinaryName('pub'), 'get'],
       workingDirectory: snapshotDir.parent.path,

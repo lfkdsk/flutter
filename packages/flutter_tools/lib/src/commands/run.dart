@@ -197,6 +197,11 @@ class RunCommand extends RunCommandBase {
         hide: !verboseHelp,
         help: 'Specify a pre-built application binary to use when running.',
       )
+      // BD ADD
+      ..addFlag('in-replace-mode',
+          negatable: false,
+          hide: true,
+          help: 'Mode for opt the mix project develop')
       ..addOption('project-root',
         hide: !verboseHelp,
         help: 'Specify the project root directory.',
@@ -413,6 +418,8 @@ class RunCommand extends RunCommandBase {
         webEnableExposeUrl: featureFlags.isWebEnabled && boolArg('web-allow-expose-url'),
         webRunHeadless: featureFlags.isWebEnabled && boolArg('web-run-headless'),
         webBrowserDebugPort: browserDebugPort,
+        // BD ADD
+        inReplaceMode: boolArg('in-replace-mode'),
       );
     } else {
       return DebuggingOptions.enabled(
@@ -450,6 +457,8 @@ class RunCommand extends RunCommandBase {
           && !runningWithPrebuiltApplication
           && devices.every((Device device) => device.supportsFastStart),
         nullAssertions: boolArg('null-assertions'),
+        // BD ADD
+        inReplaceMode: boolArg('in-replace-mode'),
       );
     }
   }

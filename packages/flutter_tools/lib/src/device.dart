@@ -801,6 +801,8 @@ class DebuggingOptions {
     this.vmserviceOutFile,
     this.fastStart = false,
     this.nullAssertions = false,
+    // BD ADD
+    this.inReplaceMode = false,
    }) : debuggingEnabled = true;
 
   DebuggingOptions.disabled(this.buildInfo, {
@@ -814,6 +816,8 @@ class DebuggingOptions {
       this.webBrowserDebugPort,
       this.cacheSkSL = false,
       this.traceAllowlist,
+      // BD ADD
+      this.inReplaceMode = false,
     }) : debuggingEnabled = false,
       useTestFonts = false,
       startPaused = false,
@@ -881,6 +885,9 @@ class DebuggingOptions {
   final bool fastStart;
 
   final bool nullAssertions;
+
+  /// BD ADD
+  final bool inReplaceMode;
 
   bool get hasObservatoryPort => hostVmServicePort != null;
 }

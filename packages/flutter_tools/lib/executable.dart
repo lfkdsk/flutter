@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:meta/meta.dart';
 import 'package:flutter_tools/src/project.dart';
+import 'package:flutter_tools/src/commands/dev.dart';
 
 import 'runner.dart' as runner;
 import 'src/base/context.dart';
@@ -196,8 +197,10 @@ Future<void> main(List<String> args) async {
     ConfigCommand(verboseHelp: verboseHelp),
     CreateCommand(),
     DaemonCommand(hidden: !verboseHelp),
-    // BD ADD:
+    // BD ADD: START
     DevelopCommand(),
+    DevCommand(),
+    // END
     DevicesCommand(),
     DoctorCommand(verbose: verbose),
     DowngradeCommand(),

@@ -249,6 +249,7 @@ Future<void> _pushFile(
     /// Clear destination dir
     final String pushDestDir =
         '/sdcard/Android/data/$hostPackage/files/flutter_dynamic/';
+    await device.deleteDirOnDevice(pushDestDir);
     await device.createDirOnDevice(pushDestDir);
     printStatus('create new dir:$pushDestDir');
     await device.pushFile(patchFile.path, pushDestDir + '$packageName.zip');

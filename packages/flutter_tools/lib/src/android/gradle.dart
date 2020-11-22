@@ -558,10 +558,11 @@ Future<void> _copyFileForDebug(AndroidBuildInfo androidBuildInfo,
         getNameForAndroidArch(androidBuildInfo.targetArchs.first));
     await device.pushFile(libDir.childFile('libflutter.so').path, pushDestDir);
 
+    /// Push Dart code
+    final Directory child =
+        unzipDir.childDirectory('assets').childDirectory('flutter_assets');
     if (androidBuildInfo.buildInfo.mode == BuildMode.debug ||
         androidBuildInfo.buildInfo.mode == BuildMode.jitRelease) {
-      final Directory child =
-          unzipDir.childDirectory('assets').childDirectory('flutter_assets');
       await device.pushFile(
           child.childFile('isolate_snapshot_data').path, pushDestDir);
       await device.pushFile(
@@ -571,6 +572,9 @@ Future<void> _copyFileForDebug(AndroidBuildInfo androidBuildInfo,
     } else {
       await device.pushFile(libDir.childFile('libapp.so').path, pushDestDir);
     }
+
+    /// Push Images
+    await device.pushFile(child.childDirectory('packages').path, pushDestDir);
   }
 }
 

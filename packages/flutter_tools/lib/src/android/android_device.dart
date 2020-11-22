@@ -476,7 +476,7 @@ class AndroidDevice extends Device {
     }
     try {
       await processUtils.run(
-        adbCommandForDevice(<String>['shell', 'mkdir', dirPath]),
+        adbCommandForDevice(<String>['shell', 'mkdir', '-p', dirPath]),
         throwOnError: true,
       );
     } catch (error) {
@@ -608,7 +608,9 @@ class AndroidDevice extends Device {
     printTrace("Stopping app '${package.name}' on $name.");
     await stopApp(package);
 
-    if (!await _installLatestApp(package)) {
+    // BD MOD: START
+    // if (!await _installLatestApp(package)) {
+    if (!debuggingOptions.inReplaceMode && !await _installLatestApp(package)) {
       return LaunchResult.failed();
     }
 

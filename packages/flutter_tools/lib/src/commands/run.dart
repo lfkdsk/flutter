@@ -144,6 +144,11 @@ class RunCommand extends RunCommandBase {
         hide: !verboseHelp,
         help: 'Specify a pre-built application binary to use when running.',
       )
+      // BD ADD
+      ..addFlag('in-replace-mode',
+          negatable: false,
+          hide: true,
+          help: 'Mode for opt the mix project develop')
       ..addOption('project-root',
         hide: !verboseHelp,
         help: 'Specify the project root directory.',
@@ -303,6 +308,8 @@ class RunCommand extends RunCommandBase {
         initializePlatform: boolArg('web-initialize-platform'),
         hostname: featureFlags.isWebEnabled ? stringArg('web-hostname') : '',
         port: featureFlags.isWebEnabled ? stringArg('web-port') : '',
+        // BD ADD
+        inReplaceMode: boolArg('in-replace-mode'),
       );
     } else {
       return DebuggingOptions.enabled(
@@ -324,6 +331,8 @@ class RunCommand extends RunCommandBase {
         hostname: featureFlags.isWebEnabled ? stringArg('web-hostname') : '',
         port: featureFlags.isWebEnabled ? stringArg('web-port') : '',
         vmserviceOutFile: stringArg('vmservice-out-file'),
+        // BD ADD
+        inReplaceMode: boolArg('in-replace-mode'),
       );
     }
   }

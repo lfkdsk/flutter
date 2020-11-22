@@ -507,9 +507,11 @@ class DebuggingOptions {
     this.hostname,
     this.port,
     this.vmserviceOutFile,
+    // BD ADD
+    this.inReplaceMode = false,
    }) : debuggingEnabled = true;
 
-  DebuggingOptions.disabled(this.buildInfo, { this.initializePlatform = true, this.port, this.hostname, this.cacheSkSL = false, })
+  DebuggingOptions.disabled(this.buildInfo, { this.initializePlatform = true, this.port, this.hostname, this.cacheSkSL = false, this.inReplaceMode = false,})
     : debuggingEnabled = false,
       useTestFonts = false,
       startPaused = false,
@@ -547,6 +549,8 @@ class DebuggingOptions {
   final String hostname;
   /// A file where the vmservice URL should be written after the application is started.
   final String vmserviceOutFile;
+  /// BD ADD
+  final bool inReplaceMode;
 
   bool get hasObservatoryPort => hostVmServicePort != null;
 }

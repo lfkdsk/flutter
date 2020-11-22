@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:flutter_tools/src/commands/dev.dart';
 import 'package:flutter_tools/src/globals.dart';
 
 import 'runner.dart' as runner;
@@ -188,8 +189,10 @@ Future<void> main(List<String> args) async {
         ConfigCommand(verboseHelp: verboseHelp),
         CreateCommand(),
         DaemonCommand(hidden: !verboseHelp),
-        // BD ADD:
+        // BD ADD: START
         DevelopCommand(),
+        DevCommand(),
+        // END
         DevicesCommand(),
         DoctorCommand(verbose: verbose),
         DriveCommand(),

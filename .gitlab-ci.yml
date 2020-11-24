@@ -20,7 +20,7 @@ flutter-precache:
     - export PUB_HOSTED_URL=https://dart-pub.byted.org
     - bin/flutter precache
   tags:
-    - shared
+    - benchmark
 
 usability-benchmark:
   <<: *common
@@ -29,7 +29,7 @@ usability-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=usability
   tags:
-    - shared
+    - benchmark
 
 pref-benchmark:
   <<: *common
@@ -38,7 +38,7 @@ pref-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=1
   tags:
-    - shared
+    - benchmark
 
 startup-benchmark:
   <<: *common
@@ -47,7 +47,7 @@ startup-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=2
   tags:
-    - shared
+    - benchmark
 
 compile-benchmark:
   <<: *common
@@ -56,7 +56,7 @@ compile-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=3
   tags:
-    - shared
+    - benchmark
 
 memory-benchmark:
   <<: *common
@@ -65,7 +65,7 @@ memory-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=4
   tags:
-    - shared
+    - benchmark
 
 macro-benchmark:
   <<: *common
@@ -74,7 +74,7 @@ macro-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=pref --stage=5
   tags:
-    - shared
+    - benchmark
 
 bytest-baseline-benchmark:
   only:

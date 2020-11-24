@@ -13,6 +13,15 @@ stages:
   - test-stage-five
   - test-stage-six
 
+flutter-precache:
+  <<: *common
+  stage: test-stage-first
+  script:
+    - export PUB_HOSTED_URL=https://dart-pub.byted.org
+    - bin/flutter precache
+  tags:
+    - shared
+
 usability-benchmark:
   <<: *common
   stage: test-stage-first

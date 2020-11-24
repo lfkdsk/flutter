@@ -20,7 +20,7 @@ flutter-precache:
     - export PUB_HOSTED_URL=https://dart-pub.byted.org
     - bin/flutter precache
   tags:
-    - benchmark
+    - shared
 
 usability-benchmark:
   <<: *common
@@ -29,7 +29,7 @@ usability-benchmark:
     - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/benchmark_script.py -o benchmark_script.py
     - python3 -u benchmark_script.py --branch="${CI_COMMIT_REF_NAME}" --cid="$CI_COMMIT_SHA" --mode=usability
   tags:
-    - benchmark
+    - shared
 
 pref-benchmark:
   <<: *common

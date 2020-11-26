@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-2](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-1...bd1.22.3-2) (2020-11-26)
+
+
+### Bug Fixes
+
+* fix AndroidMemoryInfo parse error ([dab55ee](https://code.byted.org/tech_client/flutter/commit/dab55ee))
+* fix negative fullCacheExtent in viewport.dart ([83f0188](https://code.byted.org/tech_client/flutter/commit/83f0188))
+
+
+### Features
+
+* update .gitlab-ci.yml ([315c692](https://code.byted.org/tech_client/flutter/commit/315c692))
+* update .gitlab-ci.yml ([f9b7192](https://code.byted.org/tech_client/flutter/commit/f9b7192))
+* update .gitlab-ci.yml ([e0e0af0](https://code.byted.org/tech_client/flutter/commit/e0e0af0))
+
 ### [1.12.13-4](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-3...bd1.12.13-4) (2020-04-21)
 
 

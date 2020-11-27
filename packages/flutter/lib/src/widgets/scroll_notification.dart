@@ -137,12 +137,15 @@ class ScrollStartNotification extends ScrollNotification {
   @override
   void dispatch(BuildContext target) {
     super.dispatch(target);
+    final String key = 'Scroll(${simplifyFileLocationKey(
+        getCreationLocationForError(
+            target, effectivePlugins: FpsUtils.instance.businessPlugins),
+        FpsUtils.instance.hierarchyCountOfKey)})';
+    if (FpsUtils.instance.fpsSceneBegin != null) {
+      FpsUtils.instance.fpsSceneBegin(key, FpsSceneType.scroll);
+    }
     if (FpsUtils.instance.enableAutoRecord) {
       _hasScrollUpdate = false;
-      final String key = 'Scroll(${simplifyFileLocationKey(
-          getCreationLocationForError(
-              target, effectivePlugins: FpsUtils.instance.businessPlugins),
-          FpsUtils.instance.hierarchyCountOfKey)})';
       FpsUtils.instance.startRecord(key, isFromFramework: true);
     }
   }
@@ -285,11 +288,14 @@ class ScrollEndNotification extends ScrollNotification {
   @override
   void dispatch(BuildContext target) {
     super.dispatch(target);
+    final String key = 'Scroll(${simplifyFileLocationKey(
+        getCreationLocationForError(
+            target, effectivePlugins:FpsUtils.instance.businessPlugins),
+        FpsUtils.instance.hierarchyCountOfKey)})';
+    if (FpsUtils.instance.fpsSceneEnd != null) {
+      FpsUtils.instance.fpsSceneEnd(key, FpsSceneType.scroll);
+    }
     if (FpsUtils.instance.enableAutoRecord) {
-      final String key = 'Scroll(${simplifyFileLocationKey(
-          getCreationLocationForError(
-              target, effectivePlugins:FpsUtils.instance.businessPlugins),
-          FpsUtils.instance.hierarchyCountOfKey)})';
       FpsUtils.instance.getFps(
           key, true, recordInFramework: _hasScrollUpdate,
           isFromFramework: true);

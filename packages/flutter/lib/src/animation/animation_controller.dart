@@ -420,7 +420,7 @@ class AnimationController extends Animation<double>
 
   // BD ADD: START
   void _checkRecordFps() {
-    if (fpsKey == null || !FpsUtils.instance.enableAutoRecord) {
+    if (fpsKey == null) {
       return;
     }
     addStatusListener((AnimationStatus status) {
@@ -438,17 +438,28 @@ class AnimationController extends Animation<double>
   }
 
   void _changeRecordStatus(bool isStart) {
+    final String key = 'Animation($fpsKey)';
     if (isStart) {
       if (!_isInAnim) {
-        FpsUtils.instance.startRecord(
-            'Animation($fpsKey)', isFromFramework: true);
+        if (FpsUtils.instance.fpsSceneBegin != null) {
+          FpsUtils.instance.fpsSceneBegin(key, FpsSceneType.anim);
+        }
+        if (FpsUtils.instance.enableAutoRecord) {
+          FpsUtils.instance.startRecord(
+              key, isFromFramework: true);
+        }
         _isInAnim = true;
       }
     } else {
       if (_isInAnim) {
-        FpsUtils.instance.getFps(
-            'Animation($fpsKey)', true, recordInFramework: true,
-            isFromFramework: true);
+        if (FpsUtils.instance.fpsSceneEnd != null) {
+          FpsUtils.instance.fpsSceneEnd(key, FpsSceneType.anim);
+        }
+        if (FpsUtils.instance.enableAutoRecord) {
+          FpsUtils.instance.getFps(
+              key, true, recordInFramework: true,
+              isFromFramework: true);
+        }
         _isInAnim = false;
       }
     }

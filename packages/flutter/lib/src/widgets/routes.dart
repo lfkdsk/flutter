@@ -161,11 +161,15 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
           overlayEntries.first.opaque = opaque;
         // BD ADD: START
         if (_isPushing) {
-          FpsUtils.instance.getFps(
-              'Route(${simplifyFileLocationKey(
-                  settings.name, FpsUtils.instance.hierarchyCountOfKey)})',
-              true,
-              recordInFramework: true, isFromFramework: true);
+          final String key = 'Route(${simplifyFileLocationKey(
+                  settings.name, FpsUtils.instance.hierarchyCountOfKey)})';
+          if (FpsUtils.instance.fpsSceneEnd != null) {
+            FpsUtils.instance.fpsSceneEnd(key, FpsSceneType.route);
+          }
+          if (FpsUtils.instance.enableAutoRecord) {
+            FpsUtils.instance.getFps(
+              key, true, recordInFramework: true, isFromFramework: true);
+          }
           _isPushing = false;
         }
         // END
@@ -186,11 +190,15 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
         }
         // BD ADD: START
         if (_isPushing) {
-          FpsUtils.instance.getFps(
-              'Route(${simplifyFileLocationKey(
-                  settings.name, FpsUtils.instance.hierarchyCountOfKey)})',
-              true,
-              isFromFramework: true);
+          final String key = 'Route(${simplifyFileLocationKey(
+                  settings.name, FpsUtils.instance.hierarchyCountOfKey)})';
+          if (FpsUtils.instance.fpsSceneEnd != null) {
+            FpsUtils.instance.fpsSceneEnd(key, FpsSceneType.route);
+          }
+          if (FpsUtils.instance.enableAutoRecord) {
+            FpsUtils.instance.getFps(
+              key, true, isFromFramework: true);
+          }
           _isPushing = false;
         }
         // END
@@ -224,9 +232,14 @@ abstract class TransitionRoute<T> extends OverlayRoute<T> {
     final String key = 'Route(${simplifyFileLocationKey(
         settings.name, FpsUtils.instance.hierarchyCountOfKey)})';
     void startRecord() {
-      if (!_isPushing && FpsUtils.instance.enableAutoRecord) {
-        FpsUtils.instance.startRecord(
-            key, timeOut: const Duration(seconds: 2), isFromFramework: true);
+      if (!_isPushing) {
+        if (FpsUtils.instance.fpsSceneBegin != null) {
+          FpsUtils.instance.fpsSceneBegin(key, FpsSceneType.route);
+        }
+        if (FpsUtils.instance.enableAutoRecord) {
+          FpsUtils.instance.startRecord(
+              key, timeOut: const Duration(seconds: 2), isFromFramework: true);
+        }
         _isPushing = true;
       }
     }

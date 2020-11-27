@@ -166,7 +166,8 @@ class Performance {
     }
 
 
-    List extMenList = await GetTotalExtMemInfoKB();
+    // List extMenList = await GetTotalExtMemInfoKB();
+    List extMenList = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     int imageCache = PaintingBinding.instance?.imageCache?.currentSizeBytes >> 10;
     int imageLive = PaintingBinding.instance?.imageCache?.getImageLiveBytesSize() >> 10;

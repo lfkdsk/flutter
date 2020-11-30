@@ -26,7 +26,7 @@ dependencies:
 #  bd_route_app: 0.3.0
 #  bd_route_app:
 #    git: git@code.byted.org:bd-flutter-plugins/route_app.git
-  bd_vessel: 1.0.4-alpha.6
+  bd_vessel: 1.0.4-alpha.46
   # xr_picture_group使用
   infinite_listview: ^1.0.1+1
   xg_gesture_conflict: ^0.0.7-alpha.0
@@ -52,6 +52,7 @@ dependencies:
   package_info: ^0.4.0+5
 
   xg_system_text_style: ^0.0.13
+  lottie: ^0.6.0
 #  tt_night_mode: ^0.0.1
 
 #  firebase_analytics: ^2.0.3

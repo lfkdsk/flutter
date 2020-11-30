@@ -1,0 +1,10 @@
+l_version: 1.0.6
+engine:
+  git:
+    url: 'git@code.byted.org:tech_client/flutter.git'
+    ref: bd_1.12.13-dynamicart-28
+  compressSize: 'true'
+  dynamic: 'true'
+dynamic_host:
+  dynamic_aot_plugins:
+    package:lottie/

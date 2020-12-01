@@ -332,6 +332,23 @@ class KernelCompiler {
     if (outputFilePath != null && !fs.isFileSync(outputFilePath)) {
       fs.file(outputFilePath).createSync(recursive: true);
     }
+
+    final conditionsFile = FlutterProject.current().directory.childFile('.dart_tool/conditions');
+    String conditions;
+    final List<String> allConditions = [
+      'condition.release=${buildMode == BuildMode.release}',
+      'condition.debug=${buildMode == BuildMode.debug}',
+      'condition.notAot=${!aot}',
+      'condition.bd_1.12.13=${true}',
+      'condition.isDynamic=${true}',
+    ];
+
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+      allConditions.add(conditions);
+    }
+    conditions = allConditions.join(',');
+
     final List<String> command = <String>[
       engineDartPath,
       frontendServer,
@@ -355,6 +372,10 @@ class KernelCompiler {
       ],
       // BD ADD: START
       if (isDynamicart) '--dynamicart',
+      if (conditions != null) ...<String> [
+        '--conditions',
+        conditions,
+      ],
       // END
       if (packagesPath != null) ...<String>[
         '--packages',
@@ -687,6 +708,19 @@ class DefaultResidentCompiler implements ResidentCompiler {
     final String frontendServer = artifacts.getArtifactPath(
       Artifact.frontendServerSnapshotForEngineDartSdk
     );
+    final conditionsFile = FlutterProject.current().directory.childFile('.dart_tool/conditions');
+    String conditions;
+    final List<String> allConditions = [
+      'condition.release=${buildMode == BuildMode.release}',
+      'condition.debug=${buildMode == BuildMode.debug}',
+      'condition.notAot=${true}',
+      'condition.bd_1.12.13=${true}'
+    ];
+    if (conditionsFile.existsSync()) {
+      conditions = conditionsFile.readAsStringSync();
+      allConditions.add(conditions);
+    }
+    conditions = allConditions.join(',');
     final List<String> command = <String>[
       artifacts.getArtifactPath(Artifact.engineDartBinary),
       frontendServer,
@@ -700,6 +734,10 @@ class DefaultResidentCompiler implements ResidentCompiler {
       if (outputPath != null) ...<String>[
         '--output-dill',
         outputPath,
+      ],
+      if (conditions != null) ...<String> [
+        '--conditions',
+        conditions,
       ],
       if (packagesFilePath != null) ...<String>[
         '--packages',

@@ -8,6 +8,7 @@ import 'package:flutter_tools/src/globals.dart';
 
 import 'runner.dart' as runner;
 import 'src/base/context.dart';
+
 // The build_runner code generation is provided here to make it easier to
 // avoid introducing the dependency into google3. Not all build* packages
 // are synced internally.
@@ -17,6 +18,7 @@ import 'src/build_runner/web_compilation_delegate.dart';
 
 import 'src/codegen.dart';
 import 'src/commands/analyze.dart';
+
 // BD ADD:
 import 'src/commands/analyze_size.dart';
 import 'src/commands/assemble.dart';
@@ -27,6 +29,7 @@ import 'src/commands/clean.dart';
 import 'src/commands/config.dart';
 import 'src/commands/create.dart';
 import 'src/commands/daemon.dart';
+
 // BD ADD:
 import 'src/commands/develop.dart';
 import 'src/commands/devices.dart';
@@ -51,6 +54,7 @@ import 'src/commands/unpack.dart';
 import 'src/commands/update_packages.dart';
 import 'src/commands/upgrade.dart';
 import 'src/commands/version.dart';
+import 'src/project.dart';
 import 'src/runner/flutter_command.dart';
 import 'src/web/compile.dart';
 import 'src/web/web_runner.dart';
@@ -58,6 +62,7 @@ import 'src/web/web_runner.dart';
 // BD ADD: START
 import 'src/artifacts.dart';
 import 'src/calculate_build_info.dart';
+
 // END
 /// Main entry point for commands.
 ///
@@ -68,14 +73,17 @@ Future<void> main(List<String> args) async {
 
   final bool doctor = (args.isNotEmpty && args.first == 'doctor') ||
       (args.length == 2 && verbose && args.last == 'doctor');
-  final bool help = args.contains('-h') || args.contains('--help') ||
-      (args.isNotEmpty && args.first == 'help') || (args.length == 1 && verbose);
+  final bool help = args.contains('-h') ||
+      args.contains('--help') ||
+      (args.isNotEmpty && args.first == 'help') ||
+      (args.length == 1 && verbose);
   final bool muteCommandLogging = help || doctor;
   final bool verboseHelp = help && verbose;
   // BD ADD: START
   final bool lite = args.contains('--lite');
   final bool liteGlobal = args.contains('--lite-global');
   final bool liteShareSkia = args.contains('--lite-share-skia');
+  final bool hasConditions = args.contains('--conditions');
 
   EngineMode engineMode = EngineMode.normal;
   if (lite) {
@@ -85,8 +93,8 @@ Future<void> main(List<String> args) async {
     engineMode = EngineMode.lite_global;
     print('Currently in lite global mode...');
   } else if (liteShareSkia) {
-      engineMode = EngineMode.lite_share_skia;
-      print('Currently in lite & share skia mode...');
+    engineMode = EngineMode.lite_share_skia;
+    print('Currently in lite & share skia mode...');
   }
   setEngineMode(engineMode);
 
@@ -97,8 +105,9 @@ Future<void> main(List<String> args) async {
     FlutterBuildInfo.instance.isAot =
         (args.length >= 2 && args[1] == 'aot') || args.contains('aot');
     if (FlutterBuildInfo.instance.isAot &&
-        (args.length >= 2 && args[1] == 'ios' || args.contains('ios')
-            || args.contains('--target-platform=ios'))) {
+        (args.length >= 2 && args[1] == 'ios' ||
+            args.contains('ios') ||
+            args.contains('--target-platform=ios'))) {
       FlutterBuildInfo.instance.platform = 'ios';
     }
     if (args.contains('--compress-size')) {
@@ -118,10 +127,32 @@ Future<void> main(List<String> args) async {
    * BD ADD: START
    *    add bundle exec for pod install
    */
-  if(args.contains('--bundler')){
+  if (args.contains('--bundler')) {
     args = List<String>.from(args); // dart didn't support this command
     args.removeWhere((String option) => option == '--bundler');
     Bundler.commandUsedBundler(); // we just need to know if exists
+  }
+
+  if (hasConditions) {
+    final conditions = FlutterProject.current().directory.childFile(
+      '.dart_tool/conditions',
+    );
+    final allConditions = <String>[];
+    conditions.createSync(recursive: true);
+    args = List<String>.from(args); // dart didn't support this command
+    final int index = args.indexWhere((String ele) => ele == '--conditions');
+    if (index > 0 &&
+        index + 1 < args.length &&
+        args[index + 1].contains('condition')) {
+      final String conFlag = args[index];
+      final String conParams = args[index + 1];
+      allConditions.add(conParams);
+      // remove unsupported flag in flutter commands.
+      args.removeRange(index, index + 2);
+    }
+
+    print('current conditions ${allConditions.join(', ')}');
+    conditions.writeAsStringSync(allConditions.join(','), flush: true);
   }
   // END
 

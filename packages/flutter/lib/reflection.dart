@@ -33,23 +33,21 @@ class _UnpackInvocation{
   static _UnpackInvocation unpack(Invocation invocation, {bool isClass:false}){
     var positionalArguments = invocation.positionalArguments;
     var namedArguments = invocation.namedArguments;
-    int numPositionalArguments = positionalArguments.length;
     int numNamedArguments = namedArguments != null ? namedArguments.length : 0;
-    int numArguments = numPositionalArguments + numNamedArguments;
-    // List<dynamic> arguments = new List<dynamic>(numArguments);
-    List<dynamic> arguments = [];
-    arguments.setRange(0, numPositionalArguments, positionalArguments);
-    // List<String> names = new List<String>(numNamedArguments);
-    List<String> names = [];
-    int argumentIndex = numPositionalArguments;
-    int nameIndex = 0;
+    var allArguments = <dynamic>[];
+    var allNames = <String>[];
+    if(positionalArguments.isNotEmpty){
+      positionalArguments.forEach((dynamic element) {
+        allArguments.add(element);
+      });
+    }
     if (numNamedArguments > 0) {
       namedArguments.forEach((key, dynamic value) {
-        arguments[argumentIndex++] = value;
+        allArguments.add(value);
         String name = key.toString();
         name = name.substring(8);
         name = name.substring(0,name.length-2);
-        names[nameIndex++] = name;
+        allNames.add(name);
       });
     }
 
@@ -67,7 +65,22 @@ class _UnpackInvocation{
       functionName = functionName.substring(0,functionName.length-1);
     }
 
-    return _UnpackInvocation(functionName,invokeType,arguments,names);
+    return _UnpackInvocation(functionName,invokeType,allArguments,allNames);
+  }
+
+  String toString(){
+   var str =  "functionName:${functionName}, invokeType:${invokeType}, names:${names}\n";
+   if(arguments.isNotEmpty){
+     for(var i=0;i<arguments.length;i++ ){
+       str +="arg:${i}:${arguments[i]},${arguments[i].runtimeType}\n";
+     }
+   }
+   if(names.isNotEmpty){
+     for(var i=0;i<names.length;i++ ){
+       str +="name:${i}:${names[i]}\n";
+     }
+   }
+   return str;
   }
 
 }

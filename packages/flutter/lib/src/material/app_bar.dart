@@ -24,6 +24,8 @@ import 'scaffold.dart';
 import 'tabs.dart';
 import 'text_theme.dart';
 import 'theme.dart';
+/// BD ADD:
+import 'package:flutter/boost.dart';
 
 const double _kLeadingWidth = kToolbarHeight; // So the leading button is square.
 const double _kMaxTitleTextScaleFactor = 1.34; // TODO(perc): Add link to Material spec when available, https://github.com/flutter/flutter/issues/58769.
@@ -723,28 +725,74 @@ class _AppBarState extends State<AppBar> {
       ? SystemUiOverlayStyle.light
       : SystemUiOverlayStyle.dark;
 
-    return Semantics(
-      container: true,
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: overlayStyle,
-        child: Material(
-          color: widget.backgroundColor
-            ?? appBarTheme.color
-            ?? theme.primaryColor,
-          elevation: widget.elevation
-            ?? appBarTheme.elevation
-            ?? _defaultElevation,
-          shadowColor: widget.shadowColor
-            ?? appBarTheme.shadowColor
-            ?? _defaultShadowColor,
-          shape: widget.shape,
-          child: Semantics(
-            explicitChildNodes: true,
-            child: appBar,
+    /// BD MOD: START
+    // return Semantics(
+    //   container: true,
+    //   child: AnnotatedRegion<SystemUiOverlayStyle>(
+    //     value: overlayStyle,
+    //     child: Material(
+    //       color: widget.backgroundColor
+    //           ?? appBarTheme.color
+    //           ?? theme.primaryColor,
+    //       elevation: widget.elevation
+    //           ?? appBarTheme.elevation
+    //           ?? _defaultElevation,
+    //       shadowColor: widget.shadowColor
+    //           ?? appBarTheme.shadowColor
+    //           ?? _defaultShadowColor,
+    //       shape: widget.shape,
+    //       child: Semantics(
+    //         explicitChildNodes: true,
+    //         child: appBar,
+    //       ),
+    //     ),
+    //   ),
+    // );
+    if(Boost.useDefaultSystemUiOverlayStyle) {
+      return Semantics(
+        container: true,
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: overlayStyle,
+          child: Material(
+            color: widget.backgroundColor
+                ?? appBarTheme.color
+                ?? theme.primaryColor,
+            elevation: widget.elevation
+                ?? appBarTheme.elevation
+                ?? _defaultElevation,
+            shadowColor: widget.shadowColor
+                  ?? appBarTheme.shadowColor
+                  ?? _defaultShadowColor,
+            shape: widget.shape,
+            child: Semantics(
+              explicitChildNodes: true,
+              child: appBar,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Semantics(
+        container: true,
+          child: Material(
+            color: widget.backgroundColor
+                ?? appBarTheme.color
+                ?? theme.primaryColor,
+            elevation: widget.elevation
+                ?? appBarTheme.elevation
+                ?? _defaultElevation,
+            shadowColor: widget.shadowColor
+                ?? appBarTheme.shadowColor
+                ?? _defaultShadowColor,
+            shape: widget.shape,
+            child: Semantics(
+              explicitChildNodes: true,
+              child: appBar,
+            ),
+          ),
+      );
+    }
+    /// END
   }
 }
 

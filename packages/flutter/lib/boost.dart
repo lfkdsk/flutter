@@ -82,6 +82,10 @@ class Boost {
   ///To solve the problem of redundant builds for hybrid routes
   static bool alwaysSkipFrameWhenSizeIsZero = false;
 
+  ///will be used to control whether the AppBar uses the default SystemUiOverlayStyle or not.
+  ///default value -> true
+  static bool useDefaultSystemUiOverlayStyle = true;
+
   /// enable or disable semantics, reuseWidget and so on.
   static void enable(
       {bool disableSemantics = true,

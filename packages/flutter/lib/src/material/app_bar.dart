@@ -22,6 +22,8 @@ import 'scaffold.dart';
 import 'tabs.dart';
 import 'text_theme.dart';
 import 'theme.dart';
+/// BD ADD:
+import 'package:flutter/boost.dart';
 
 const double _kLeadingWidth = kToolbarHeight; // So the leading button is square.
 
@@ -591,26 +593,47 @@ class _AppBarState extends State<AppBar> {
     final SystemUiOverlayStyle overlayStyle = brightness == Brightness.dark
       ? SystemUiOverlayStyle.light
       : SystemUiOverlayStyle.dark;
-
-    return Semantics(
-      container: true,
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: overlayStyle,
-        child: Material(
-          color: widget.backgroundColor
-            ?? appBarTheme.color
-            ?? theme.primaryColor,
-          elevation: widget.elevation
-            ?? appBarTheme.elevation
-            ?? _defaultElevation,
-          shape: widget.shape,
-          child: Semantics(
-            explicitChildNodes: true,
-            child: appBar,
+    /// BD ADD:
+    if(Boost.useDefaultSystemUiOverlayStyle) {
+      return Semantics(
+        container: true,
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: overlayStyle,
+          child: Material(
+            color: widget.backgroundColor
+                ?? appBarTheme.color
+                ?? theme.primaryColor,
+            elevation: widget.elevation
+                ?? appBarTheme.elevation
+                ?? _defaultElevation,
+            shape: widget.shape,
+            child: Semantics(
+              explicitChildNodes: true,
+              child: appBar,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    /// BD ADD: START
+    } else {
+      return Semantics(
+        container: true,
+          child: Material(
+            color: widget.backgroundColor
+                ?? appBarTheme.color
+                ?? theme.primaryColor,
+            elevation: widget.elevation
+                ?? appBarTheme.elevation
+                ?? _defaultElevation,
+            shape: widget.shape,
+            child: Semantics(
+              explicitChildNodes: true,
+              child: appBar,
+            ),
+          ),
+      );
+    }
+    /// END
   }
 }
 

@@ -27,7 +27,7 @@ public class CommonRouteActivity extends DynamicFlutterActivity {
 
     @Override
     protected void onRegisterPlugins(FlutterEngine flutterEngine, PluginRegistry pluginRegistry) {
-        GeneratedPluginRegistrant.registerWith(pluginRegistry);
+        GeneratedPluginRegistrant.registerWith(flutterEngine, pluginRegistry);
         AdsLandingPagePlugin2.registerWith(pluginRegistry);
     }
 

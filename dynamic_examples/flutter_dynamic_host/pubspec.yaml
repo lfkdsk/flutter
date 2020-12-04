@@ -30,7 +30,7 @@ dependencies:
   device_info: ^0.4.2+4
   soundpool: ^1.1.1
   flutter_secure_storage: ^3.3.3
-  bd_vessel: 2.0.0-rc.2
+  bd_vessel: 3.0.0-alpha.3
   tt_ad_flutter_plugin: 1.0.33-alpha.2-xigua
 
 

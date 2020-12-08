@@ -463,6 +463,10 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
     }
 
     final Set<SemanticsAction> actions = <SemanticsAction>{};
+    // BD ADD: START, See: http://t.wtturl.cn/J4LYN2f/
+    if (pixels == null)
+      _pixels = 0;
+    // END
     if (pixels > minScrollExtent)
       actions.add(backward);
     if (pixels < maxScrollExtent)

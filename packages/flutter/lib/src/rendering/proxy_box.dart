@@ -255,6 +255,8 @@ class RenderConstrainedBox extends RenderProxyBox {
 
   @override
   void performLayout() {
+    // BD ADD: fix http://t.wtturl.cn/J4L4mwA/
+    constraints.normalize();
     if (child != null) {
       child.layout(_additionalConstraints.enforce(constraints), parentUsesSize: true);
       size = child.size;

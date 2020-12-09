@@ -53,9 +53,6 @@ Future<void> updateGeneratedXcodeProperties({
   bool setSymroot = true,
   String buildDirOverride,
   // BD ADD:
-  bool isDynamicart = false,
-  bool isMinimumSize = false,
-  List<String> dynamicPlugins,
   bool compressSize = false,
 }) async {
   final List<String> xcodeBuildSettings = _xcodeBuildSettingsLines(
@@ -66,9 +63,6 @@ Future<void> updateGeneratedXcodeProperties({
     setSymroot: setSymroot,
     buildDirOverride: buildDirOverride,
     // BD ADD:
-    isDynamicart: isDynamicart,
-    isMinimumSize: isMinimumSize,
-    dynamicPlugins: dynamicPlugins,
     compressSize:compressSize,
   );
 
@@ -171,9 +165,6 @@ List<String> _xcodeBuildSettingsLines({
   bool setSymroot = true,
   String buildDirOverride,
   // BD ADD:
-  bool isDynamicart = false,
-  bool isMinimumSize = false,
-  List<String> dynamicPlugins,
   bool compressSize = false,
 }) {
   final List<String> xcodeBuildSettings = <String>[];
@@ -243,25 +234,8 @@ List<String> _xcodeBuildSettingsLines({
     xcodeBuildSettings.add('${config.key}=${config.value}');
   }
   // BD ADD: START
-  if (isDynamicart) {
-    xcodeBuildSettings.add('DYNAMICART=YES');
-  }
-  if (isMinimumSize) {
-    xcodeBuildSettings.add('MINIMUM_SIZE=YES');
-  }
   if (compressSize) {
     xcodeBuildSettings.add('COMPRESS_SIZE=true');
-  }
-  // 传给IOS xcode_backend.sh的dynamic_aot_plugins参数，注意：因为格式的最后一个为/，所以这个要写在最后面
-  if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
-    final StringBuffer buffer = StringBuffer();
-    for (int i = 0; i < dynamicPlugins.length; i++) {
-      buffer.write(dynamicPlugins[i]);
-      if (i != dynamicPlugins.length - 1) {
-        buffer.write(',');
-      }
-    }
-    xcodeBuildSettings.add('DYNAMIC_AOT_PLUGINS=${buffer.toString()}');
   }
   if (buildInfo.lite) {
     xcodeBuildSettings.add('LITE=true');

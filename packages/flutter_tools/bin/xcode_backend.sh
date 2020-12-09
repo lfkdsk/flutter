@@ -72,23 +72,6 @@ BuildApp() {
     project_path="${FLUTTER_APPLICATION_PATH}"
   fi
 
-  # BD ADD: START
-  local dynamicart_flag="NO"
-  if [[ -n "$DYNAMICART" ]]; then
-    dynamicart_flag="${DYNAMICART}"
-  fi
-
-  local minimum_size_flag="NO"
-  if [[ -n "$MINIMUM_SIZE" ]]; then
-    minimum_size_flag="${MINIMUM_SIZE}"
-  fi
-
-  local dynamic_aot_plugins=""
-  if [[ -n "$DYNAMIC_AOT_PLUGINS" ]]; then
-      dynamic_aot_plugins="${DYNAMIC_AOT_PLUGINS}"
-  fi
-  # END
-
   local target_path="lib/main.dart"
   if [[ -n "$FLUTTER_TARGET" ]]; then
     target_path="${FLUTTER_TARGET}"
@@ -169,21 +152,6 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
   # END
 
   local framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
-
-  # BD MOD: START
-  # AssertExists "${framework_path}"
-  if [[ "${dynamicart_flag}" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$build_mode" == "profile" ]]);
-  then
-      framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/ios-dynamicart-${build_mode}${lite_suffix}"
-  else
-      framework_path="${FLUTTER_ROOT}/bin/cache/artifacts/engine/${artifact_variant}"
-  fi
-
-  if [[ ! -n "$LOCAL_ENGINE" ]];then
-    AssertExists "${framework_path}"
-  fi
-  # END
-
   local flutter_engine_flag=""
   local local_engine_flag=""
   local flutter_framework="${framework_path}/Flutter.framework"
@@ -222,20 +190,10 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     mkdir "${derived_dir}/engine"
     RunCommand cp -r -- "${flutter_podspec}" "${derived_dir}/engine"
     RunCommand cp -r -- "${flutter_framework}" "${derived_dir}/engine"
-    # BD ADD: START
-    if [[ "$minimum_size_flag" == "YES" ]]; then
-      RunCommand rm -f -- "${derived_dir}/engine/Flutter.framework/icudtl.dat"
-    fi
-    # END
   else
     RunCommand rm -rf -- "${derived_dir}/Flutter.framework"
     RunCommand cp -- "${flutter_podspec}" "${derived_dir}"
     RunCommand cp -r -- "${flutter_framework}" "${derived_dir}"
-    # BD ADD: START
-    if [[ "$minimum_size_flag" == "YES" ]]; then
-      RunCommand rm -f -- "${derived_dir}/Flutter.framework/icudtl.dat"
-    fi
-    # END
   fi
 
   RunCommand pushd "${project_path}" > /dev/null
@@ -250,204 +208,40 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     performance_measurement_option="--performance-measurement-file=${PERFORMANCE_MEASUREMENT_FILE}"
   fi
 
-  local track_widget_creation_flag=""
-  if [[ -n "$TRACK_WIDGET_CREATION" ]]; then
-    track_widget_creation_flag="--track-widget-creation"
-  fi
-
-  local build_dir="${FLUTTER_BUILD_DIR:-build}"
-
   local code_size_directory=""
   if [[ -n "$CODE_SIZE_DIRECTORY" ]]; then
     code_size_directory="-dCodeSizeDirectory=${CODE_SIZE_DIRECTORY}"
   fi
 
   # BD ADD: START
-  local dynamic_aot_plugins_command=""
-  if [[ "$dynamic_aot_plugins" != "" ]]; then
-     dynamic_aot_plugins_command="--dynamic-aot-plugins=${dynamic_aot_plugins}"
-  fi
-  local dynamicart_command=""
-  if [[ "$dynamicart_flag" == "YES" ]]; then
-     dynamicart_command="--dynamicart"
-  fi
-
   local app_framework_dir="${derived_dir}/App.framework"
   local asset_dir="${app_framework_dir}/${assets_path}"
   # END
 
-  if [[ "${build_mode}" != "debug" ]]; then
-    StreamOutput " ├─Building Dart code..."
-    # Transform ARCHS to comma-separated list of target architectures.
-    local archs="${ARCHS// /,}"
-    if [[ $archs =~ .*i386.* || $archs =~ .*x86_64.* ]]; then
-      EchoError "========================================================================"
-      EchoError "ERROR: Flutter does not support running in profile or release mode on"
-      EchoError "the Simulator (this build was: '$build_mode')."
-      EchoError "You can ensure Flutter runs in Debug mode with your host app in release"
-      EchoError "mode by setting FLUTTER_BUILD_MODE=debug in the .xcconfig associated"
-      EchoError "with the ${CONFIGURATION} build configuration."
-      EchoError "========================================================================"
-      exit -1
-    fi
-    StreamOutput " ├─Building Dart code..."
-    local minimum_size_command=""
-    if [[ "$minimum_size_flag" == "YES" ]] && ([[ "$build_mode" == "release" ]] || [[ "$dynamicart_flag" == "YES" ]]); then
-      minimum_size_command="--minimum-size"
-    fi
-    EchoError "========================================================================${dynamic_aot_plugins_command}"
-
-    RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics           \
-      ${verbose_flag}                                                       \
-      build aot                                                             \
-      --output-dir="${build_dir}/aot"                                       \
-      --target-platform=ios                                                 \
-      --target="${target_path}"                                             \
-      --${build_mode}                                                       \
-      --ios-arch="${archs}"                                                 \
-      ${flutter_engine_flag}                                                \
-      ${local_engine_flag}                                                  \
-      ${bitcode_flag}                                                       \
-      ${dynamicart_command}                                                 \
-      ${dynamic_aot_plugins_command}                                        \
-      ${minimum_size_command}                                               \
-      ${compress_size_flag}                                                 \
-      ${lite_flag}
-
-    if [[ $? -ne 0 ]]; then
-      EchoError "Failed to build ${project_path}."
-      exit -1
-    fi
-    StreamOutput "done"
-
-    local app_framework="${build_dir}/aot/App.framework"
-
-    RunCommand cp -r -- "${app_framework}" "${derived_dir}"
-
-    if [[ "${build_mode}" == "release" ]]; then
-      StreamOutput " ├─Generating dSYM file..."
-      # Xcode calls `symbols` during app store upload, which uses Spotlight to
-      # find dSYM files for embedded frameworks. When it finds the dSYM file for
-      # `App.framework` it throws an error, which aborts the app store upload.
-      # To avoid this, we place the dSYM files in a folder ending with ".noindex",
-      # which hides it from Spotlight, https://github.com/flutter/flutter/issues/22560.
-      RunCommand mkdir -p -- "${build_dir}/dSYMs.noindex"
-      RunCommand xcrun dsymutil -o "${build_dir}/dSYMs.noindex/App.framework.dSYM" "${app_framework}/App"
-      if [[ $? -ne 0 ]]; then
-        EchoError "Failed to generate debug symbols (dSYM) file for ${app_framework}/App."
-        exit -1
-      fi
-      StreamOutput "done"
-
-      StreamOutput " ├─Stripping debug symbols..."
-      RunCommand xcrun strip -x -S "${derived_dir}/App.framework/App"
-      if [[ $? -ne 0 ]]; then
-        EchoError "Failed to strip ${derived_dir}/App.framework/App."
-        exit -1
-      fi
-      StreamOutput "done"
-    fi
-
-  else
-    RunCommand mkdir -p -- "${derived_dir}/App.framework"
-
-    # Build stub for all requested architectures.
-    local arch_flags=""
-    read -r -a archs <<< "$ARCHS"
-    for arch in "${archs[@]}"; do
-      arch_flags="${arch_flags}-arch $arch "
-    done
-
-    RunCommand eval "$(echo "static const int Moo = 88;" | xcrun clang -x c \
-        ${arch_flags} \
-        -fembed-bitcode-marker \
-        -dynamiclib \
-        -Xlinker -rpath -Xlinker '@executable_path/Frameworks' \
-        -Xlinker -rpath -Xlinker '@loader_path/Frameworks' \
-        -install_name '@rpath/App.framework/App' \
-        -o "${derived_dir}/App.framework/App" -)"
-  fi
-
-  local plistPath="${project_path}/ios/Flutter/AppFrameworkInfo.plist"
-  if [[ -e "${project_path}/.ios" ]]; then
-    plistPath="${project_path}/.ios/Flutter/AppFrameworkInfo.plist"
-  fi
-
-  RunCommand cp -- "$plistPath" "${derived_dir}/App.framework/Info.plist"
-
-  local precompilation_flag=""
-  if [[ "$CURRENT_ARCH" != "x86_64" ]] && [[ "$build_mode" != "debug" ]]; then
-    precompilation_flag="--precompiled"
-  fi
-
-  # BD ADD: START
-  local app_framework_dir="${derived_dir}/App.framework"
-  local asset_dir="${app_framework_dir}/${assets_path}"
-  # END
-
-  StreamOutput " ├─Assembling Flutter resources..."
-  RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics             \
-    ${verbose_flag}                                                         \
-    build bundle                                                            \
-    --target-platform=ios                                                   \
-    --target="${target_path}"                                               \
-    --${build_mode}                                                         \
-    --depfile="${build_dir}/snapshot_blob.bin.d"                            \
-    --asset-dir="${asset_dir}"               \
-    ${precompilation_flag}                                                  \
-    ${flutter_engine_flag}                                                  \
-    ${local_engine_flag}                                                    \
-    ${track_widget_creation_flag}                                           \
-    ${dynamicart_command}                                                   \
-    ${minimum_size_command}                                                 \
+  RunCommand "${FLUTTER_ROOT}/bin/flutter"                                \
+    ${verbose_flag}                                                       \
+    ${flutter_engine_flag}                                                \
+    ${local_engine_flag}                                                  \
+    assemble                                                              \
+    --output="${derived_dir}/"                                            \
+    ${performance_measurement_option}                                     \
+    -dTargetPlatform=ios                                                  \
+    -dTargetFile="${target_path}"                                         \
+    -dBuildMode=${build_mode}                                             \
+    -dSplitDebugInfo="${SPLIT_DEBUG_INFO}"                                \
+    -dTreeShakeIcons="${TREE_SHAKE_ICONS}"                                \
+    -dTrackWidgetCreation="${TRACK_WIDGET_CREATION}"                      \
+    -dDartObfuscation="${DART_OBFUSCATION}"                               \
+    -dEnableBitcode="${bitcode_flag}"                                     \
+    -dIosCompressSize="${compress_size_flag}"                             \
+    -dIosArchs="${ARCHS}"                                                 \
+    ${bundle_sksl_path}                                                   \
+    ${code_size_directory}                                                \
+    --ExtraGenSnapshotOptions="${EXTRA_GEN_SNAPSHOT_OPTIONS}"             \
+    --DartDefines="${DART_DEFINES}"                                       \
+    --ExtraFrontEndOptions="${EXTRA_FRONT_END_OPTIONS}"                   \
+    "${build_mode}_ios_bundle_flutter_assets"                             \
     ${lite_flag}
-
-  if [[ $? -ne 0 ]]; then
-    EchoError "Failed to package ${project_path}."
-    exit -1
-  fi
-
-  # BD ADD:START
-  if [[ "$minimum_size_flag" == "YES" ]] || [[ "$dynamicart_flag" == "YES" ]]; then
-    local host_manifest="${derived_dir}/App.framework/flutter_assets/host_manifest.json"
-    if [[ -f "$host_manifest" ]]; then
-      RunCommand mv -f --  "${host_manifest}" "${derived_dir}/App.framework/host_manifest.json"
-    else
-      StreamOutput " ├───host_manifest.json not found at ${host_manifest}"
-    fi
-  fi
-
-  local dart_bin="${FLUTTER_ROOT}/bin/cache/dart-sdk/bin/dart"
-  local dart_path="${FLUTTER_ROOT}/packages/flutter_tools/bin/md5_sum.dart"
-  if [[ "$minimum_size_flag" == "YES" ]]; then
-    local _archs=(${archs//,/ })
-    if [[ -d "${build_dir}/patch/" ]]; then
-        RunCommand rm -rf -- "${build_dir}/patch/"
-    fi
-    for arch in ${_archs[@]}; do
-      local path="engine_armv7"
-      local engine_md5_file_name="engine_v1"
-      if [[ "$arch" == "arm64" ]]; then
-        path="engine_arm64"
-        engine_md5_file_name="engine_v2"
-      fi
-
-      RunCommand mkdir -p -- "${build_dir}/patch/"
-      RunCommand mkdir -p -- "${build_dir}/patch/${path}/"
-      RunCommand cp -Rv -- "${asset_dir}" "${build_dir}/patch/${path}/${assets_path}"
-      RunCommand cp -f --  "${build_dir}/aot/${arch}/isolate_snapshot_data" "${build_dir}/patch/${path}/isolate_snapshot_data"
-      RunCommand cp -f --  "${build_dir}/aot/${arch}/vm_snapshot_data" "${build_dir}/patch/${path}/vm_snapshot_data"
-      RunCommand cp -f --   "${flutter_framework}/icudtl.dat" "${build_dir}/patch/${path}/icudtl.dat"
-      local md5_file="${build_dir}/patch/${path}/${engine_md5_file_name}.txt"
-      ${dart_bin} ${dart_path} "${build_dir}/patch/${path}/" > "${md5_file}"
-      RunCommand cp --  "${md5_file}" "${derived_dir}/App.framework/${engine_md5_file_name}.txt"
-      local current_path=`pwd`
-      RunCommand cd ${build_dir}/patch/${path}
-      zip -q -r ./../${path}.zip ./*
-      RunCommand cd ${current_path}
-    done
-    RunCommand rm -rf -- "${asset_dir}"
-  fi
 
   # BD ADD: START
   if [[ "$compress_size_flag" != "" ]]; then

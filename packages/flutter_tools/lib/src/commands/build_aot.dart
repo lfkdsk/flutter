@@ -21,9 +21,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     usesPubOption();
     usesDartDefineOption();
     usesExtraFrontendOptions();
-    // BD ADD:
-    addDynamicartModeFlags();
-
     argParser
       ..addOption('output-dir', defaultsTo: getAotBuildDirectory())
       ..addOption('target-platform',
@@ -32,9 +29,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       )
       ..addFlag('quiet', defaultsTo: false)
       // BD ADD: START
-      ..addFlag('minimum-size',
-          defaultsTo: false,
-          help: '用于ios的dyamicart模式下减少包体积的参数')
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,)
@@ -84,16 +78,8 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     // BD ADD: START
     final bool compressSize = (buildInfo.mode == BuildMode.release) &&
         platform == TargetPlatform.ios
-        ? boolArg('compress-size') && !boolArg('minimum-size')
+        ? boolArg('compress-size')
         : false;
-    List<String> dynamicPlugins;
-
-    if (boolArg('dynamicart')) {
-      dynamicPlugins = getDynamicPlugins();
-    }
-    final bool isMinimumSize = boolArg('dynamicart') ||
-        buildInfo.mode == BuildMode.release
-        ? boolArg('minimum-size') : false;
     // END
     await aotBuilder.build(
       platform: platform,
@@ -111,9 +97,6 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
       useLite: boolArg('lite'),
       useLiteGlobal: boolArg('lite-global'),
       useLiteShareSkia: boolArg('lite-share-skia'),
-      isDynamicart: boolArg('dynamicart'),
-      dynamicPlugins: dynamicPlugins,
-      isMinimumSize: isMinimumSize
       // END
     );
     return FlutterCommandResult.success();

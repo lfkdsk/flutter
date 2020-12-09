@@ -119,7 +119,6 @@ class AOTSnapshotter {
     @required bool dartObfuscation,
     bool quiet = false,
     // BD ADD:
-    bool isMinimumSize = false,
     bool compressSize = false
   }) async {
     // TODO(cbracken): replace IOSArch with TargetPlatform.ios_{armv7,arm64}.
@@ -150,12 +149,6 @@ class AOTSnapshotter {
     }
     // END
 
-    // BD ADD:
-    if (kEngineMode & ENGINE_DYNAMICART!=0) {
-      genSnapshotArgs.add('--dynamicart');
-    }
-    // END
-
     // BD ADD: START
     String isolateSnapshotData;
     String vmSnapshotData;
@@ -168,17 +161,6 @@ class AOTSnapshotter {
         '--assembly=$assembly',
         '--strip'
       ]);
-
-      // BD ADD: START
-      if (isMinimumSize) {
-        final String isolateSnapshotData = _fileSystem.path.join(
-            outputDir.path, 'isolate_snapshot_data');
-        final String vmSnapshotData = _fileSystem.path.join(
-            outputDir.path, 'vm_snapshot_data');
-        genSnapshotArgs.add('--isolate_snapshot_data=$isolateSnapshotData');
-        genSnapshotArgs.add('--vm_snapshot_data=$vmSnapshotData');
-      }
-      // END
 
       // BD ADD: START
       if (compressSize) {

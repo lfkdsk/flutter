@@ -19,7 +19,6 @@ import '../runner/flutter_command.dart' show DevelopmentArtifact, FlutterCommand
 import 'build.dart';
 // BD ADD:
 import '../calculate_build_info.dart';
-import 'package:flutter_tools/src/artifacts.dart';
 
 /// Builds an .app for an iOS app to be used for local testing on an iOS device
 /// or simulator. Can only be run on a macOS host. For producing deployment
@@ -42,9 +41,6 @@ class BuildIOSCommand extends BuildSubCommand {
     addBundleSkSLPathOption(hide: !verboseHelp);
     addNullSafetyModeOptions(hide: !verboseHelp);
     usesAnalyzeSizeFlag();
-    // BD ADD:
-    addDynamicartModeFlags();
-
     argParser
       ..addFlag('config-only',
         help: 'Update the project configuration without performing a build. '
@@ -60,10 +56,6 @@ class BuildIOSCommand extends BuildSubCommand {
         help: 'Codesign the application bundle (only available on device builds).',
       )
       // BD ADD: START
-      ..addFlag('minimum-size',
-          defaultsTo: false,
-          help: '用于ios的dyamicart模式下减少包体积的参数'
-      )
       ..addFlag('compress-size',
         help: 'ios data 段拆包方案,只在release下生效,该参数只适用于ios,对android并不生效',
         negatable: false,
@@ -159,18 +151,7 @@ class BuildIOSCommand extends BuildSubCommand {
     // END
 
     // BD ADD: START
-    final bool isMinimumSize = (buildInfo.mode == BuildMode.release)
-        ? boolArg('minimum-size')
-        : false;
-    List<String> dynamicPlugins;
-    if (boolArg('dynamicart')) {
-      dynamicPlugins = getDynamicPlugins();
-    }
-
-    // compressSize与minimums-ize互斥，优先minimum-size
-    final bool compressSize = (!isMinimumSize && (buildInfo.mode == BuildMode.release))
-        ? boolArg('compress-size')
-        : false;
+    final bool compressSize = boolArg('compress-size');
     // END
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
@@ -179,12 +160,7 @@ class BuildIOSCommand extends BuildSubCommand {
       buildForDevice: !forSimulator,
       codesign: shouldCodesign,
       configOnly: configOnly,
-      // BD ADD START:
-      isDynamicart: (kEngineMode & ENGINE_DYNAMICART !=0),
-      isMinimumSize: isMinimumSize,
-      dynamicPlugins: dynamicPlugins,
-      compressSize: compressSize
-    // END
+      compressSize: compressSize,
     );
 
     if (!result.success) {

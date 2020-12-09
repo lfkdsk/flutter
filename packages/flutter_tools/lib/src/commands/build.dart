@@ -14,7 +14,6 @@ import 'build_aot.dart';
 import 'build_apk.dart';
 import 'build_appbundle.dart';
 import 'build_bundle.dart';
-import 'build_dynamic.dart';
 import 'build_fuchsia.dart';
 import 'build_ios.dart';
 import 'build_ios_framework.dart';
@@ -37,9 +36,6 @@ class BuildCommand extends FlutterCommand {
     addSubcommand(BuildLinuxCommand(verboseHelp: verboseHelp));
     addSubcommand(BuildWindowsCommand(verboseHelp: verboseHelp));
     addSubcommand(BuildFuchsiaCommand(verboseHelp: verboseHelp));
-
-    // BD ADD:
-    addSubcommand(BuildDynamicCommand());
   }
 
   @override

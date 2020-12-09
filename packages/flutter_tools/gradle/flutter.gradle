@@ -179,21 +179,6 @@ class FlutterPlugin implements Plugin<Project> {
                     matchingFallbacks = ["debug", "release"]
                 }
             }
-            // BD ADD: START
-            // flutter run/build aot命令都是执行的gradle命令的--dynamicart参数映射到gradle命令上
-            dynamicartProfile {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            dynamicartRelease {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            // END
         }
 
         if (shouldShrinkResources(project)) {
@@ -239,7 +224,7 @@ class FlutterPlugin implements Plugin<Project> {
         if (!supportsBuildMode(flutterBuildMode)) {
             return
         }
-        // String hostedRepository = System.env.FLUTTER_STORAGE_BASE_URL ?: DEFAULT_MAVEN_HOST
+        String hostedRepository = System.env.FLUTTER_STORAGE_BASE_URL ?: DEFAULT_MAVEN_HOST
         String repository = useLocalEngine()
             ? project.property('local-engine-repo')
             // BD MOD
@@ -387,15 +372,6 @@ class FlutterPlugin implements Plugin<Project> {
                 profile {
                     initWith debug
                 }
-                // BD ADD:
-                // 上面的buildTypes是给主工程加的，Android插件模块打包的话需要在这里重新加一次
-                dynamicartRelease {
-                    initWith debug
-                }
-                dynamicartProfile {
-                    initWith debug
-                }
-                // END
             }
             pluginProject.android.buildTypes.each addEmbeddingCompileOnlyDependency
             pluginProject.android.buildTypes.whenObjectAdded addEmbeddingCompileOnlyDependency
@@ -546,14 +522,6 @@ class FlutterPlugin implements Plugin<Project> {
     }
 
     // BD ADD: START
-    private Boolean useDynamicart() {
-        if (project.hasProperty('dynamicart')) {
-            return project.property('dynamicart').toBoolean()
-        }
-        return false
-    }
-
-    // BD ADD: START
     private Boolean useLite() {
         if (project.hasProperty('lite')) {
             return project.property('lite').toBoolean()
@@ -656,12 +624,6 @@ class FlutterPlugin implements Plugin<Project> {
     private static String buildModeFor(buildType) {
         if (buildType.name == "profile") {
             return "profile"
-        // BD ADD
-        } else if (buildType.name == "dynamicartRelease") {
-            return "dynamicart_release"
-        } else if (buildType.name == "dynamicartProfile") {
-            return "dynamicart_profile"
-        // END
         } else if (buildType.debuggable) {
             return "debug"
         }
@@ -704,18 +666,11 @@ class FlutterPlugin implements Plugin<Project> {
             trackWidgetCreationValue = project.property('track-widget-creation').toBoolean()
         }
         // BD ADD: START
-        Boolean dynamicartValue = false
-        if (project.hasProperty('dynamicart')) {
-            dynamicartValue = project.property('dynamicart').toBoolean()
-        }
-        String dynamicPluginValue = ""
-        if (project.hasProperty('dynamic-aot-plugins')) {
-            dynamicPluginValue = project.property('dynamic-aot-plugins')
-        }
         Boolean liteValue = false
         if (project.hasProperty('lite')) {
             liteValue = project.property('lite').toBoolean()
         }
+
         Boolean liteGlobalValue = false
         if (project.hasProperty('lite-global')) {
             liteGlobalValue = project.property('lite-global').toBoolean()
@@ -796,8 +751,6 @@ class FlutterPlugin implements Plugin<Project> {
                 extraFrontEndOptions extraFrontEndOptionsValue
                 extraGenSnapshotOptions extraGenSnapshotOptionsValue
                 // BD ADD: START
-                useDynamicart dynamicartValue
-                dynamicPlugins dynamicPluginValue
                 useLite liteValue
                 useLiteGlobal liteGlobalValue
                 useLiteShareSkia liteShareSkiaValue
@@ -1005,8 +958,6 @@ abstract class BaseFlutterTask extends DefaultTask {
     Boolean trackWidgetCreation
     // BD ADD: START
     @Optional @Input
-    Boolean useDynamicart
-    @Optional @Input
     Boolean useLite
     @Optional @Input
     Boolean useLiteGlobal
@@ -1033,10 +984,6 @@ abstract class BaseFlutterTask extends DefaultTask {
     @Optional @Input
     String codeSizeDirectory;
     String performanceMeasurementFile;
-    // BD ADD: START
-    @Optional @Input
-    String dynamicPlugins
-    // END
 
     @OutputFiles
     FileCollection getDependenciesFiles() {
@@ -1053,12 +1000,6 @@ abstract class BaseFlutterTask extends DefaultTask {
         }
 
         intermediateDir.mkdirs()
-
-        if(buildMode=='dynamicart_release'){
-            buildMode = "release";
-        }else if(buildMode=='dynamicart_profile'){
-            buildMode = "profile";
-        }
 
         // Compute the rule name for flutter assemble. To speed up builds that contain
         // multiple ABIs, the target name is used to communicate which ones are required
@@ -1128,19 +1069,6 @@ abstract class BaseFlutterTask extends DefaultTask {
                 args "--ExtraFrontEndOptions=${extraFrontEndOptions}"
             }
             // BD ADD: START
-            if (useDynamicart) {
-                args "--dynamicart"
-                if (dynamicPlugins != null) {
-                    args "--dynamic-aot-plugins", dynamicPlugins
-                }
-            }
-
-            if (buildMode == "dynamicart_release" || buildMode == "dynamicart_profile") {
-                args "--dynamicart"
-                if (dynamicPlugins != null) {
-                    args "--dynamic-aot-plugins", dynamicPlugins
-                }
-            }
             if (useLite) {
                 args "--lite"
             }

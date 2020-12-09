@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-3](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-2...bd1.22.3-3) (2020-12-09)
+
+
+### Features
+
+* add dynamicart and reflection to 1.22 ([cfd01b0](https://code.byted.org/tech_client/flutter/commit/cfd01b0)), closes [flutter#77](https://jira.bytedance.com/browse/77)
+
 ### [1.22.3-2](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-1...bd1.22.3-2) (2020-11-26)
 
 

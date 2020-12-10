@@ -1036,6 +1036,17 @@ String _getLocalArtifactVersion(String pomPath) {
   return null;
 }
 
+// BD ADD: START
+String getLocalEngineRepo({
+  @required String engineOutPath,
+  @required String androidBuildMode,
+}) {
+  return 'local-engine-repo=${_getLocalEngineRepo(engineOutPath: engineOutPath,
+      androidBuildInfo: AndroidBuildInfo(BuildInfo(BuildMode.fromName(androidBuildMode), '')),
+      needRemove: false).path}';
+}
+// END
+
 /// Returns the local Maven repository for a local engine build.
 /// For example, if the engine is built locally at <home>/engine/src/out/android_release_unopt
 /// This method generates symlinks in the temp directory to the engine artifacts
@@ -1043,6 +1054,8 @@ String _getLocalArtifactVersion(String pomPath) {
 Directory _getLocalEngineRepo({
   @required String engineOutPath,
   @required AndroidBuildInfo androidBuildInfo,
+  // BD ADD:
+  bool needRemove = true,
 }) {
   assert(engineOutPath != null);
   assert(androidBuildInfo != null);
@@ -1053,10 +1066,18 @@ Directory _getLocalEngineRepo({
     .createTempSync('flutter_tool_local_engine_repo.');
 
   // Remove the local engine repo before the tool exits.
-  addShutdownHook(
-    () => localEngineRepo.deleteSync(recursive: true),
-    ShutdownStage.CLEANUP,
-  );
+  // BD MOD: START
+  // addShutdownHook(
+  //   () => localEngineRepo.deleteSync(recursive: true),
+  //   ShutdownStage.CLEANUP,
+  // );
+  if (needRemove) {
+    addShutdownHook(
+          () => localEngineRepo.deleteSync(recursive: true),
+      ShutdownStage.CLEANUP,
+    );
+  }
+  // END
 
   String buildMode = androidBuildInfo.buildInfo.modeName;
   if((kEngineMode & ENGINE_DYNAMICART !=0) && (androidBuildInfo.buildInfo.mode == BuildMode.release || androidBuildInfo.buildInfo.mode == BuildMode.profile)){

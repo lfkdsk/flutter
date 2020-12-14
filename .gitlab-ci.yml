@@ -4,6 +4,7 @@
   except:
     - tags
     - web
+  retry: 1
 
 stages:
   - test-stage-first

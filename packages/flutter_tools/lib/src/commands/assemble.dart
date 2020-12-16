@@ -112,6 +112,7 @@ class AssembleCommand extends FlutterCommand {
       help: 'The maximum number of concurrent tasks the build system will run.',
     );
     // BD ADD: START
+    addDynamicartModeFlags();
     argParser.addFlag('lite',
         negatable: false,
         defaultsTo: false,
@@ -189,6 +190,10 @@ class AssembleCommand extends FlutterCommand {
           .childDirectory('.dart_tool')
           .childDirectory('flutter_build'),
       projectDir: flutterProject.directory,
+      // BD ADD: START
+      dynamicPlugins: getDynamicPlugins(),
+      isDynamicart: boolArg('dynamicart'),
+      // END
       defines: _parseDefines(stringsArg('define')),
       inputs: _parseDefines(stringsArg('input')),
       cacheDir: globals.cache.getRoot(),

@@ -37,6 +37,9 @@ class AotBuilder {
     bool useLite = false,
     bool useLiteGlobal = false,
     bool useLiteShareSkia = false,
+    bool isDynamicart = false,
+    bool isMinimumSize = false,
+    List<String> dynamicPlugins = null,
     // END
     Iterable<DarwinArch> iosBuildArchs = defaultIOSArchs,
     bool reportTimings = false,
@@ -122,6 +125,11 @@ class AotBuilder {
       fileSystem: globals.fs,
       logger: globals.logger,
       processManager: globals.processManager,
+      // BD ADD: START
+      compressSize: compressSize,
+      isDynamicart: isDynamicart,
+      isMinimumSize: isMinimumSize,
+      // END
     );
     final BuildResult result = await globals.buildSystem.build(target, environment);
     status?.stop();

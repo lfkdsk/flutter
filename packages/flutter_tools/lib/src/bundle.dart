@@ -92,6 +92,10 @@ class BundleBuilder {
     List<String> fileSystemRoots,
     String fileSystemScheme,
     @required bool treeShakeIcons,
+    // BD ADD: START
+    bool isDynamicart = false,
+    bool isMinimumSize = false
+    // END
   }) async {
     mainPath ??= defaultMainPath;
     depfilePath ??= defaultDepfilePath;
@@ -109,6 +113,10 @@ class BundleBuilder {
       trackWidgetCreation: trackWidgetCreation,
       treeShakeIcons: treeShakeIcons,
       dartDefines: buildInfo.dartDefines,
+      // BD ADD: START
+      isDynamicart : isDynamicart,
+      isMinimumSize : isMinimumSize,
+      // END
     );
     // Work around for flutter_tester placing kernel artifacts in odd places.
     if (applicationKernelFilePath != null) {
@@ -135,6 +143,10 @@ Future<void> buildWithAssemble({
   bool trackWidgetCreation,
   @required bool treeShakeIcons,
   List<String> dartDefines,
+  // BD ADD: START
+  bool isDynamicart = false,
+  bool isMinimumSize = false
+  // END
 }) async {
   // If the precompiled flag was not passed, force us into debug mode.
   buildMode = precompiled ? buildMode : BuildMode.debug;
@@ -160,6 +172,10 @@ Future<void> buildWithAssemble({
     fileSystem: globals.fs,
     logger: globals.logger,
     processManager: globals.processManager,
+    // BD ADD: START
+    isDynamicart: isDynamicart,
+    isMinimumSize: isMinimumSize,
+    // END
   );
   final Target target = buildMode == BuildMode.debug
     ? const CopyFlutterBundle()
@@ -196,6 +212,10 @@ Future<AssetBundle> buildAssets({
   @required String packagesPath,
   bool includeDefaultFonts = true,
   bool reportLicensedPackages = false,
+  // BD ADD: START
+  bool includeManifest = false,
+  bool isMinimumSize = false
+  // END
 }) async {
   assetDirPath ??= getAssetBuildDirectory();
   packagesPath ??= globals.fs.path.absolute(packagesPath);
@@ -208,6 +228,10 @@ Future<AssetBundle> buildAssets({
     packagesPath: packagesPath,
     includeDefaultFonts: includeDefaultFonts,
     reportLicensedPackages: reportLicensedPackages,
+    // BD ADD: START
+    includeManifest: includeManifest,
+    isMinimumSize: isMinimumSize
+    // END
   );
   if (result != 0) {
     return null;

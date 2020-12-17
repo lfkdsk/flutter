@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-4](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-3...bd1.22.3-4) (2020-12-17)
+
+
+### Bug Fixes
+
+* fix webview rendering error issue ([26a3be2](https://code.byted.org/tech_client/flutter/commit/26a3be2))
+
+### Features
+
+* fix bug in pub get. ([ed4a3ef](https://code.byted.org/tech_client/flutter/commit/ed4a3ef))
+* notify Observatory port periodic ([8ca72a0](https://code.byted.org/tech_client/flutter/commit/8ca72a0))
+* Skip frame when window size is 0 ([535301f](https://code.byted.org/tech_client/flutter/commit/535301f))
+* support always Skip Frame When Size IsZero ([104d6a7](https://code.byted.org/tech_client/flutter/commit/104d6a7))
+* support not use default systemuioverlaystylr  in AppBar ([6a1af2a](https://code.byted.org/tech_client/flutter/commit/6a1af2a))
+* sync hook 122 ([0ad2b1f](https://code.byted.org/tech_client/flutter/commit/0ad2b1f))
+* update .gitlab-ci.yml add job retry ([f98b63c](https://code.byted.org/tech_client/flutter/commit/f98b63c))
+* update fix bug in dart pub . ([e328ca2](https://code.byted.org/tech_client/flutter/commit/e328ca2))
+* upload files after build apk for mix_project debug ([ba14eca](https://code.byted.org/tech_client/flutter/commit/ba14eca))
+* add dynamicart and reflection to 1.22 ([82ee89b](https://code.byted.org/tech_client/flutter/commit/82ee89b))
+
 ### [1.22.3-3](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-2...bd1.22.3-3) (2020-12-09)
 
 

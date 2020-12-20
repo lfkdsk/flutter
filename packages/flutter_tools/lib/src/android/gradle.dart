@@ -642,10 +642,16 @@ Future<void> buildGradleAar({
   if (result.exitCode != 0) {
     printStatus(result.stdout, wrap: false);
     printError(result.stderr, wrap: false);
+    // BD MOD: START
+    // throwToolExit(
+    //   'Gradle task $aarTask failed with exit code $exitCode.',
+    //   exitCode: exitCode,
+    // );
     throwToolExit(
-      'Gradle task $aarTask failed with exit code $exitCode.',
-      exitCode: exitCode,
+      'Gradle task $aarTask failed with exit code ${result.exitCode}.',
+      exitCode: result.exitCode,
     );
+    // BD END
   }
   final Directory repoDirectory = getRepoDirectory(outputDirectory);
   if (!repoDirectory.existsSync()) {
@@ -653,7 +659,9 @@ Future<void> buildGradleAar({
     printError(result.stderr, wrap: false);
     throwToolExit(
       'Gradle task $aarTask failed to produce $repoDirectory.',
-      exitCode: exitCode,
+      // BD MOD:
+      // exitCode: exitCode,
+      exitCode: 1,
     );
   }
   printStatus(

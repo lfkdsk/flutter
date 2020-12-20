@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.13-25](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-24...bd1.12.13-25) (2020-12-20)
+
+
+### Bug Fixes
+
+* fix AndroidMemoryInfo parse error ([eebdbf5](https://code.byted.org/tech_client/flutter/commit/eebdbf5))
+* throwToolExit exitCode is 0 when gradle task fail(BD [#75](https://jira.bytedance.com/browse/75)) ([07ebe68](https://code.byted.org/tech_client/flutter/commit/07ebe68))
+
+
+### Features
+
+* Roll engine to 02a058ba5eb6fb6d03dfbe5ad1c2f9c625a7fdfb ([deae084](https://code.byted.org/tech_client/flutter/commit/deae084))
+
 ### [1.12.13-23](https://code.byted.org/tech_client/flutter/compare/bd1.12.13-22...bd1.12.13-23) (2020-10-20)
 
 

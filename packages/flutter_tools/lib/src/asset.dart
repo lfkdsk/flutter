@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter_tools/src/compile.dart';
+import 'package:flutter_tools/src/base/process.dart';
 import 'package:flutter_tools/src/version.dart';
 import 'dart:async';
 
@@ -29,6 +30,7 @@ const String fontManifestJson = 'FontManifest.json';
 const String _fontSetMaterial = 'material';
 const String license = 'LICENSE';
 const String hostManifest = 'host_manifest.json';
+const String hostPackageDependencies = 'host_package_dependencies.json';
 
 /// Injected factory class for spawning [AssetBundle] instances.
 abstract class AssetBundleFactory {
@@ -270,6 +272,8 @@ class _ManifestAssetBundle implements AssetBundle {
     //删除license
     //entries[_license] = _obtainLicenses(packageMap, assetBasePath, reportPackages: reportLicensedPackages);
     entries[_KFlutterVersion] = DevFSFileContent(fs.file(fs.path.join(Cache.flutterRoot,'bin/cache/flutter_tools.stamp')));
+    final String pubspecLock = fs.path.join(fs.file(manifestPath).parent.path, 'pubspec.lock');
+    entries[hostPackageDependencies] = await _parsePubspecLock(pubspecLock, manifestPath);
 
     return 0;
   }
@@ -373,6 +377,73 @@ Map<String, String> _parsePackage(String packagesPath) {
   }
   return map;
 }
+
+Future<DevFSByteContent> _parsePubspecLock(String pubspecLock, String manifest) async {
+  final FlutterManifest flutterManifest = await FlutterManifest.createFromPath(manifest);
+  final String packageName = flutterManifest.appName;
+  final String versionCode = flutterManifest.appVersion;
+  final Map<String, dynamic> jsonObject = <String, dynamic>{};
+  jsonObject['packageName'] = packageName == null ? '' : packageName;
+  jsonObject['version'] = versionCode == null ? '' : versionCode;
+  final String workingDir = fs.file(manifest).parent.path;
+  jsonObject['packageInfo'] = getPackageGitInfo(workingDir);
+  jsonObject['dependencies'] = getPackagesDependencies(pubspecLock);
+  return DevFSStringContent(json.encode(jsonObject));
+}
+
+Map<String, String> getPackageGitInfo(String workingDir) {
+  final Map<String, String> packageInfo = <String, String>{};
+  packageInfo['git_url'] = runGit(
+      'git config --get remote.origin.url', workingDir); //get git_url
+  packageInfo['commit_id'] =
+      runGit('git rev-parse HEAD', workingDir); //get commit_id
+  return packageInfo;
+}
+
+Map<String, dynamic> getPackagesDependencies(String pubspecLock) {
+  final Map<String, dynamic> packagesDependencies = <String, dynamic>{};
+  final File pubspecLockFile = fs.file(pubspecLock);
+  if (pubspecLockFile.existsSync()) {
+    final Map pluginsMap = getPluginVersion(fs.path.join(fs.file(pubspecLock).parent.path, '.packages'));
+    final dynamic lockYaml = loadYaml(fs
+        .file(pubspecLock)
+        .readAsStringSync());
+
+    final Map packagesInLock = lockYaml['packages'] as Map;
+
+    if (packagesInLock == null) {
+      return null;
+    }
+    for (var key in packagesInLock.keys) {
+      if (!pluginsMap.containsKey(key)) {
+        final Map packageDependency = Map<String, dynamic>();
+        final Map packageInLock = packagesInLock[key] as Map;
+        packageDependency['version'] = packageInLock['version'];
+        if (packageInLock['source'] != null &&'git' == packageInLock['source']){
+          final dynamic description = packageInLock['description'];
+          if (description != null && description.containsKey('url') as bool && description.containsKey('resolved-ref') as bool) {
+            packageDependency['git_url'] = description['url'];
+            packageDependency['ref'] = description['resolved-ref'];
+          }
+        }
+        packagesDependencies[key as String] = packageDependency;
+      }
+    }
+  }
+  return packagesDependencies;
+}
+
+String runGit(String command, String workingDir) {
+  try {
+    return processUtils
+        .runSync(command.split(' '), workingDirectory: workingDir)
+        .stdout
+        .trim();
+  } on Error {
+    return null;
+  }
+}
+
 
 class _Asset {
   _Asset({ this.baseDir, this.relativeUri, this.entryUri });

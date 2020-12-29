@@ -176,10 +176,7 @@ class BuildDynamicCommand extends BuildSubCommand {
     final Map<String, dynamic> jsonObject = <String, dynamic>{};
     jsonObject['packageName'] = appName == null ? '' : appName;
     jsonObject['version'] = versionCode == null ? '' : versionCode;
-    final String workingDir = fs.file(packagesPath).parent.path;
-    jsonObject['packageInfo'] = getPackageGitInfo(workingDir);
     jsonObject['dependencies'] = versionMap;
-    jsonObject['packageDependencies'] = getPackagesDependencies(fs.path.join(workingDir, 'pubspec.lock'));
     final File manifestFile =
         fs.file(fs.path.join(getPatchBuildDirectory(), 'manifest.json'));
     manifestFile.writeAsStringSync(json.encode(jsonObject));

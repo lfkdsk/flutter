@@ -404,7 +404,6 @@ Map<String, dynamic> getPackagesDependencies(String pubspecLock) {
   final Map<String, dynamic> packagesDependencies = <String, dynamic>{};
   final File pubspecLockFile = fs.file(pubspecLock);
   if (pubspecLockFile.existsSync()) {
-    final Map pluginsMap = getPluginVersion(fs.path.join(fs.file(pubspecLock).parent.path, '.packages'));
     final dynamic lockYaml = loadYaml(fs
         .file(pubspecLock)
         .readAsStringSync());
@@ -415,19 +414,17 @@ Map<String, dynamic> getPackagesDependencies(String pubspecLock) {
       return null;
     }
     for (var key in packagesInLock.keys) {
-      if (!pluginsMap.containsKey(key)) {
-        final Map packageDependency = Map<String, dynamic>();
-        final Map packageInLock = packagesInLock[key] as Map;
-        packageDependency['version'] = packageInLock['version'];
-        if (packageInLock['source'] != null &&'git' == packageInLock['source']){
-          final dynamic description = packageInLock['description'];
-          if (description != null && description.containsKey('url') as bool && description.containsKey('resolved-ref') as bool) {
-            packageDependency['git_url'] = description['url'];
-            packageDependency['ref'] = description['resolved-ref'];
-          }
+      final Map packageDependency = Map<String, dynamic>();
+      final Map packageInLock = packagesInLock[key] as Map;
+      packageDependency['version'] = packageInLock['version'];
+      if (packageInLock['source'] != null &&'git' == packageInLock['source']){
+        final dynamic description = packageInLock['description'];
+        if (description != null && description.containsKey('url') as bool && description.containsKey('resolved-ref') as bool) {
+          packageDependency['git_url'] = description['url'];
+          packageDependency['ref'] = description['resolved-ref'];
         }
-        packagesDependencies[key as String] = packageDependency;
       }
+      packagesDependencies[key as String] = packageDependency;
     }
   }
   return packagesDependencies;

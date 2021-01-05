@@ -274,4 +274,9 @@ class Boost {
   static bool IsDisableMips() {
     return _disableMipmaps;
   }
+
+  /// Warm Up before layout done
+  static void PerformWarmUpZeroSize({bool enable = true}) {
+    performance.warmUpZeroSizeOnce(enable);
+  }
 }

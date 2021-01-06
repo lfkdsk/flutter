@@ -57,6 +57,7 @@ class BdFlutterConfigExtension {
 }
 
 project.extensions.create('bdFlutterConfig', BdFlutterConfigExtension)
+project.ext.localRepo = null
 // END
 
 apply plugin: FlutterPlugin
@@ -243,7 +244,7 @@ class FlutterPlugin implements Plugin<Project> {
             return
         }
         String repository = useLocalEngine()
-            ? project.property('local-engine-repo')
+            ? project.hasProperty('local-engine-repo') ? project.property('local-engine-repo') : genLocalRepo()
             : MAVEN_REPO
 
         project.rootProject.allprojects {
@@ -524,6 +525,11 @@ class FlutterPlugin implements Plugin<Project> {
 
     private List<String> getTargetPlatforms() {
         if (!project.hasProperty('target-platform')) {
+            // BD ADD: START
+            if (!project.hasProperty('local-engine-repo') && project.hasProperty('local-engine-out')) {
+                return [getTargetPlatformByLocalEnginePath(project.property('local-engine-out'))]
+            }
+            // END
             return DEFAULT_PLATFORMS
         }
         return project.property('target-platform').split(',').collect {
@@ -542,7 +548,9 @@ class FlutterPlugin implements Plugin<Project> {
     }
 
     private Boolean useLocalEngine() {
-        return project.hasProperty('local-engine-repo')
+        // BD MOD:
+        // return project.hasProperty('local-engine-repo')
+        return project.hasProperty('local-engine-repo') || project.hasProperty('local-engine-out')
     }
 
     // BD ADD: START
@@ -665,7 +673,12 @@ class FlutterPlugin implements Plugin<Project> {
      *
      * @return "debug", "profile", or "release" (fall-back).
      */
-    private static String buildModeFor(buildType) {
+    private String buildModeFor(buildType) {
+        // BD ADD: START
+        if (project.ext.localRepo != null && project.hasProperty('local-engine-build-mode')) {
+            return project.property('local-engine-build-mode')
+        }
+        // END
         if (buildType.name == "profile") {
             return "profile"
         // BD ADD: START
@@ -679,6 +692,48 @@ class FlutterPlugin implements Plugin<Project> {
         }
         return "release"
     }
+
+    // BD ADD: START
+    private String genLocalRepo() {
+        if (project.ext.localRepo != null) {
+            return project.ext.localRepo
+        }
+        def stdout = new ByteArrayOutputStream()
+        project.exec {
+            executable flutterExecutable.absolutePath
+            args "repo"
+            args "--mode", project.property('local-engine-build-mode')
+            args "--local-engine-path", project.property('local-engine-out')
+            standardOutput = stdout
+        }
+        String repository = stdout.toString().trim().split('local-engine-repo=')[-1]
+        stdout.close()
+        project.ext.localRepo = repository
+        println("Generate temporary repo: $repository")
+        return repository
+    }
+
+    String getTargetPlatformByLocalEnginePath(String engineOutPath) {
+        String result = 'android-arm'
+        if (engineOutPath.contains('x86')) {
+            result = 'android-x86'
+        } else if (engineOutPath.contains('x64')) {
+            result = 'android-x64'
+        } else if (engineOutPath.contains('arm64')) {
+            result = 'android-arm64'
+        }
+        return result
+    }
+    void removeLocalRepo() {
+        if (project.ext.localRepo != null) {
+            File dir = new File(project.ext.localRepo)
+            if (dir.exists()) {
+                dir.deleteDir()
+                println("Remove temporary repo: ${project.ext.localRepo}")
+            }
+        }
+    }
+    // END
 
     private static String getEngineArtifactDirName(buildType, targetArch) {
         if (buildType.name == "profile") {
@@ -792,6 +847,12 @@ class FlutterPlugin implements Plugin<Project> {
             def value = project.extensions.findByName('bdFlutterConfig')
             if (value != null && value.needArmeabi != null) {
                 needArmeabi = value.needArmeabi
+            }
+            Task pkgTask = project.tasks.findByName("package${variant.name.capitalize()}")
+            if (pkgTask != null) {
+                pkgTask.doLast {
+                    removeLocalRepo()
+                }
             }
             // END
             Task packFlutterAppAotTask = project.tasks.create(name: "packLibs${FLUTTER_BUILD_PREFIX}${variant.name.capitalize()}", type: Jar) {

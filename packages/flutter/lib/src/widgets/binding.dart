@@ -787,30 +787,20 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
         super.drawFrame();
         buildOwner.finalizeTree();
       } else {
-        int buildScopeCostTime = 0;
-        int finalizeTreeCostTime = 0;
-        int preTime = DateTime.now().microsecondsSinceEpoch;
+        startBuild = DateTime.now().millisecondsSinceEpoch;
         if (renderViewElement != null) {
           buildOwner.buildScope(renderViewElement);
-          buildScopeCostTime = DateTime.now().microsecondsSinceEpoch - preTime;
         }
         super.drawFrame();
-        preTime = DateTime.now().microsecondsSinceEpoch;
         buildOwner.finalizeTree();
-        finalizeTreeCostTime = DateTime.now().microsecondsSinceEpoch - preTime;
         Boost.notifyDrawFrameCallback(
-            buildScopeCostTime,
-            lastFlushLayoutCostTime,
-            lastFlushCompositingBitsCostTime,
-            lastFlushPaintCostTime,
-            lastCompositeFrameCostTime,
-            lastFlushSemanticsCostTime,
-            finalizeTreeCostTime);
-        lastFlushLayoutCostTime = 0;
-        lastFlushCompositingBitsCostTime = 0;
-        lastFlushPaintCostTime = 0;
-        lastCompositeFrameCostTime = 0;
-        lastFlushSemanticsCostTime = 0;
+            startBuild,
+            startLayout,
+            startPaint,
+            startSubmit,
+            endSubmit,
+            null);
+        startBuild = startLayout = startPaint = startSubmit = endSubmit = 0;
       }
       // END
     } finally {

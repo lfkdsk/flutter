@@ -41,6 +41,7 @@ import 'src/commands/generate.dart';
 import 'src/commands/ide_config.dart';
 import 'src/commands/inject_plugins.dart';
 import 'src/commands/install.dart';
+import 'src/commands/local_repo.dart';
 import 'src/commands/logs.dart';
 import 'src/commands/make_host_app_editable.dart';
 import 'src/commands/packages.dart';
@@ -211,6 +212,8 @@ Future<void> main(List<String> args) async {
         UpdatePackagesCommand(hidden: !verboseHelp),
         UpgradeCommand(),
         VersionCommand(),
+        // BD ADD:
+        LocalRepoCommand(),
       ],
       verbose: verbose,
       muteCommandLogging: muteCommandLogging,

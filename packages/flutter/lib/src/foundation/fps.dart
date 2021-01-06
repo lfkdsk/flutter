@@ -5,6 +5,10 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 
+enum FpsSceneType { route, scroll, anim, other}
+
+typedef FpsSceneCallback = void Function(String sceneName, FpsSceneType type);
+
 /// Utils For record fps
 class FpsUtils {
   FpsUtils._internal() {
@@ -19,6 +23,9 @@ class FpsUtils {
   ///getInstance
   static FpsUtils get instance => _getInstance();
   static FpsUtils _instance;
+
+  FpsSceneCallback fpsSceneBegin;
+  FpsSceneCallback fpsSceneEnd;
 
   List<FpsData> _recordedData;
   Map<String, Timer> _timers;

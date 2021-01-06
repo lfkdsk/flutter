@@ -344,11 +344,11 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
   // When editing the above, also update widgets/binding.dart's copy.
 
   // BD ADD START:
-  int lastFlushLayoutCostTime = 0;
-  int lastFlushCompositingBitsCostTime = 0;
-  int lastFlushPaintCostTime = 0;
-  int lastCompositeFrameCostTime = 0;
-  int lastFlushSemanticsCostTime = 0;
+  int startBuild = 0;
+  int startLayout = 0;
+  int startPaint = 0;
+  int startSubmit = 0;
+  int endSubmit = 0;
   // END
 
   @protected
@@ -370,26 +370,15 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
       renderView.compositeFrame(); // this sends the bits to the GPU
       pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
     } else {
-      int preTime = DateTime.now().microsecondsSinceEpoch;
+      startLayout = DateTime.now().millisecondsSinceEpoch;
       pipelineOwner.flushLayout();
-      int nowTime = DateTime.now().microsecondsSinceEpoch;
-      lastFlushLayoutCostTime = nowTime - preTime;
+      startPaint = DateTime.now().millisecondsSinceEpoch;
       pipelineOwner.flushCompositingBits();
-      preTime = nowTime;
-      nowTime = DateTime.now().microsecondsSinceEpoch;
-      lastFlushCompositingBitsCostTime = nowTime - preTime;
       pipelineOwner.flushPaint();
-      preTime = nowTime;
-      nowTime = DateTime.now().microsecondsSinceEpoch;
-      lastFlushPaintCostTime = nowTime - preTime;
+      startSubmit = DateTime.now().millisecondsSinceEpoch;
       renderView.compositeFrame(); // this sends the bits to the GPU
-      preTime = nowTime;
-      nowTime = DateTime.now().microsecondsSinceEpoch;
-      lastCompositeFrameCostTime = nowTime - preTime;
+      endSubmit = DateTime.now().millisecondsSinceEpoch;
       pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
-      preTime = nowTime;
-      nowTime = DateTime.now().microsecondsSinceEpoch;
-      lastFlushSemanticsCostTime = nowTime - preTime;
     }
     // END
   }

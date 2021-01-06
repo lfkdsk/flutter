@@ -258,10 +258,14 @@ class RenderConstrainedBox extends RenderProxyBox {
     // BD ADD: fix http://t.wtturl.cn/J4L4mwA/
     constraints.normalize();
     if (child != null) {
-      child.layout(_additionalConstraints.enforce(constraints), parentUsesSize: true);
+      // BD MOD: fix http://t.wtturl.cn/J4L4mwA/
+      // child.layout(_additionalConstraints.enforce(constraints), parentUsesSize: true);
+      child.layout(_additionalConstraints.enforce(constraints.normalize()), parentUsesSize: true);
       size = child.size;
     } else {
-      size = _additionalConstraints.enforce(constraints).constrain(Size.zero);
+      // BD MOD: fix http://t.wtturl.cn/J4L4mwA/
+      // size = _additionalConstraints.enforce(constraints).constrain(Size.zero);
+      size = _additionalConstraints.enforce(constraints.normalize()).constrain(Size.zero);
     }
   }
 

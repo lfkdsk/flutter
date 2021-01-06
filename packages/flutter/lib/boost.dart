@@ -10,13 +10,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 typedef NotifyDrawFrameCallback = void Function(
-    int buildScopeCostTime,
-    int flushLayoutCostTime,
-    int flushCompositingBitsCostTime,
-    int flushPaintCostTime,
-    int compositeFrameCostTime,
-    int flushSemanticsCostTime,
-    int finalizeTreeCostTime);
+    int startBuild,
+    int startLayout,
+    int startPaint,
+    int startSubmit,
+    int endSubmit,
+    dynamic extra);
 
 // ignore: avoid_classes_with_only_static_members
 /// See also: https://jira.bytedance.com/browse/FLUTTER-15
@@ -253,5 +252,10 @@ class Boost {
   /// Get disable mipmaps state.
   static bool IsDisableMips() {
     return _disableMipmaps;
+  }
+
+  /// Warm Up before layout done
+  static void PerformWarmUpZeroSize({bool enable = true}) {
+    engine.warmUpZeroSizeOnce(enable);
   }
 }

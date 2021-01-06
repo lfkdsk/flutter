@@ -467,9 +467,13 @@ abstract class ScrollPosition extends ViewportOffset with ScrollMetrics {
     if (pixels == null)
       _pixels = 0;
     // END
-    if (pixels > minScrollExtent)
+    // BD MOD:
+    // if (pixels > minScrollExtent)
+    if (minScrollExtent != null && pixels > minScrollExtent)
       actions.add(backward);
-    if (pixels < maxScrollExtent)
+    // BD MOD:
+    // if (pixels < maxScrollExtent)
+    if (maxScrollExtent != null && pixels < maxScrollExtent)
       actions.add(forward);
 
     if (setEquals<SemanticsAction>(actions, _semanticActions))

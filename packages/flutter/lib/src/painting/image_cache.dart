@@ -207,6 +207,16 @@ class ImageCache {
     assert(_cache.length <= maximumSize);
     assert(_currentSizeBytes <= maximumSizeBytes);
   }
+
+  int getImageLiveBytesSize() {
+    int imageLive = 0;
+    _cache.forEach((_, image) {
+      if (image.completer.hasListeners) {
+        imageLive += image.sizeBytes;
+      }
+    });
+    return imageLive;
+  }
 }
 
 class _CachedImage {

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-6](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-4...bd1.22.3-6) (2021-01-07)
+
+
+### Bug Fixes
+
+* build aar buldInfo.treeShakeIcons is null ([e6f9b44](https://code.byted.org/tech_client/flutter/commit/e6f9b44))
+* 修复gradle error导致的build aar失败 ([f312b7a](https://code.byted.org/tech_client/flutter/commit/f312b7a))
+
+
 ### [1.22.3-5](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-4...bd1.22.3-5) (2021-01-06)
 
 

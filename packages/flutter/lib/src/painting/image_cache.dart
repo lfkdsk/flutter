@@ -544,7 +544,7 @@ class ImageCache {
     int imageLive = 0;
     _cache.forEach((_, image) {
       if (image.completer.hasListeners) {
-        imageLive += image.sizeBytes;
+        imageLive += image.sizeBytes!;
       }
     });
     return imageLive;

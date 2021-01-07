@@ -31,7 +31,7 @@ if (pluginsFile.exists()) {
         if (gradlePropertiesFile.exists()) {
             gradlePropertiesFile.withReader('UTF-8') { reader -> gradleProperties.load(reader) }
         } else {
-            println("$name has no gradle.properties")
+            println("${androidPlugin.name} has no gradle.properties")
         }
         def extraModules = gradleProperties.getProperty("extra_module_include")
         if (extraModules != null) {

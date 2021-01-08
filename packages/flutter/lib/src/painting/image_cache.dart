@@ -2,6 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// BD ADD: START
+import 'dart:async';
+
+import 'package:flutter/boost.dart';
+// BD ADD: END
+
 import 'image_stream.dart';
 
 const int _kDefaultSize = 1000;
@@ -31,6 +37,8 @@ const int _kDefaultSizeBytes = 100 << 20; // 100 MiB
 class ImageCache {
   final Map<Object, _PendingImage> _pendingImages = <Object, _PendingImage>{};
   final Map<Object, _CachedImage> _cache = <Object, _CachedImage>{};
+  // BD ADD:
+  final Map<Object, StreamSubscription<void>> _cacheTimeout = <Object, StreamSubscription<void>>{};
 
   /// Maximum number of entries to store in the cache.
   ///
@@ -100,6 +108,7 @@ class ImageCache {
   void clear() {
     _cache.clear();
     _pendingImages.clear();
+    _cacheTimeout.clear();
     _currentSizeBytes = 0;
   }
 
@@ -153,6 +162,8 @@ class ImageCache {
     // recently used position below.
     final _CachedImage image = _cache.remove(key);
     if (image != null) {
+      // BD ADD:
+      _setImageCacheTimeout(key, Boost.imageCacheTimeoutMilliseconds, false);
       _cache[key] = image;
       return image.completer;
     }
@@ -182,6 +193,8 @@ class ImageCache {
         pendingImage.removeListener();
       }
 
+      // BD ADD:
+      _setImageCacheTimeout(key, Boost.imageCacheTimeoutMilliseconds, false);
       _cache[key] = image;
       _checkCacheSize();
     }
@@ -193,6 +206,46 @@ class ImageCache {
     }
     return result;
   }
+
+  // BD ADD: START
+  void _setImageCacheTimeout(Object key, int timeoutMilliseconds, bool manual) {
+    if (!Boost.imageCacheTimeoutOn && !manual) {
+      return;
+    }
+    if (_cacheTimeout[key] != null) {
+      _cacheTimeout[key].cancel();
+    }
+    _cacheTimeout[key] = Future<void>.delayed(Duration(milliseconds: timeoutMilliseconds))
+        .asStream()
+        .listen((void event) {
+      _cacheTimeout.remove(key);
+      final _CachedImage image = _cache[key];
+      if (image == null) {
+        return;
+      }
+      // ignore: invalid_use_of_protected_member
+      if (image.completer.hasListeners) {
+        if (!manual) {
+          _setImageCacheTimeout(key, timeoutMilliseconds, manual);
+        }
+      } else {
+        _currentSizeBytes -= image.sizeBytes;
+        _cache.remove(key);
+      }
+    });
+  }
+
+  /// manual set a ImageCache clear timeout
+  void setImageCacheClearTimeout(int timeoutMilliseconds) {
+    if (timeoutMilliseconds <= 0) {
+      clear();
+    } else {
+      _cache.forEach((Object key, _) {
+        _setImageCacheTimeout(key, timeoutMilliseconds, true);
+      });
+    }
+  }
+  // BD ADD: END
 
   // Remove images from the cache until both the length and bytes are below
   // maximum, or the cache is empty.

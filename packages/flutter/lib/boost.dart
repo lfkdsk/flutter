@@ -50,6 +50,12 @@ class Boost {
   /// See also: https://jira.bytedance.com/browse/FLUTTER-3
   static bool _disabledSemantics = true;
 
+  /// if on, open ImageCache timeout
+  static bool _imageCacheTimeoutOn = false;
+
+  /// ImageCache timeout milliseconds
+  static int _imageCacheTimeoutMilliseconds = 5 * 60 * 1000; // 5 minutes
+
   /// return semantics status
   static bool get disabledSemantics => _disabledSemantics;
 
@@ -257,5 +263,26 @@ class Boost {
   /// Warm Up before layout done
   static void PerformWarmUpZeroSize({bool enable = true}) {
     engine.warmUpZeroSizeOnce(enable);
+  }
+
+  /// switch ImageCache timeout status
+  static void switchImageCacheTimeoutOn(bool on) {
+    _imageCacheTimeoutOn = on;
+  }
+
+  /// get ImageCache timeout status
+  static bool get imageCacheTimeoutOn => _imageCacheTimeoutOn;
+
+  /// set ImageCache timeout milliseconds
+  static void setImageCacheTimeoutMilliseconds(int timeout) {
+    _imageCacheTimeoutMilliseconds = timeout;
+  }
+
+  /// get ImageCache timeout milliseconds
+  static int get imageCacheTimeoutMilliseconds => _imageCacheTimeoutMilliseconds;
+
+  /// manual set a ImageCache clear timeout
+  static void manualImageCacheClearTimeout(int timeoutMilliseconds) {
+    PaintingBinding?.instance?.imageCache?.setImageCacheClearTimeout(timeoutMilliseconds);
   }
 }

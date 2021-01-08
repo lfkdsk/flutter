@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-6](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-4...bd1.22.3-6) (2021-01-07)
+
+
+### Bug Fixes
+
+* build aar buldInfo.treeShakeIcons is null ([e6f9b44](https://code.byted.org/tech_client/flutter/commit/e6f9b44))
+* 修复gradle error导致的build aar失败 ([f312b7a](https://code.byted.org/tech_client/flutter/commit/f312b7a))
+
+
+### [1.22.3-5](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-4...bd1.22.3-5) (2021-01-06)
+
+
+### Features
+
+* Plugin Android支持subproject ([a0a5885](https://code.byted.org/tech_client/flutter/commit/a0a5885))
+* Roll engine to 8d49c59bd8444f778fea4b0e5e76a617db757390 ([4cc8b7d](https://code.byted.org/tech_client/flutter/commit/4cc8b7d))
+* 增加首帧耗时明细监控 ([b71b039](https://code.byted.org/tech_client/flutter/commit/b71b039))
+
 ### [1.22.3-4](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-3...bd1.22.3-4) (2020-12-17)
 
 

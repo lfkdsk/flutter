@@ -149,6 +149,18 @@ projectsEvaluated {
     assert rootProject.hasProperty("is-plugin")
     if (rootProject.property("is-plugin").toBoolean()) {
         assert rootProject.hasProperty("output-dir")
+        // BD ADD: START
+        def extraModules = rootProject.properties.get("extra_module_include")
+        if (extraModules != null) {
+            def moduleIncludes = extraModules.split(",")
+            moduleIncludes.each {
+                println "configureProject for extra module $it"
+                Project extraProject = rootProject.findProject(":$it")
+                assert extraProject.hasProperty("output-dir")
+                configureProject(extraProject, extraProject.property("output-dir"))
+            }
+        }
+        // END
         // In plugin projects, the root project is the plugin.
         configureProject(rootProject, rootProject.property("output-dir"))
         return

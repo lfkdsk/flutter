@@ -708,7 +708,9 @@ Future<void> buildGradleAar({
   if (buildInfo.splitDebugInfoPath != null) {
     command.add('-Psplit-debug-info=${buildInfo.splitDebugInfoPath}');
   }
-  if (buildInfo.treeShakeIcons) {
+  // BD MOD:
+  // if (buildInfo.treeShakeIcons) {
+  if (buildInfo?.treeShakeIcons ?? false) {
     command.add('-Pfont-subset=true');
   }
   if (buildInfo.dartObfuscation) {

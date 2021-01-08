@@ -24,6 +24,25 @@ if (pluginsFile.exists()) {
         assert pluginDirectory.exists()
         include ":${androidPlugin.name}"
         project(":${androidPlugin.name}").projectDir = pluginDirectory
+
+        // BD ADD: START
+        Properties gradleProperties = new Properties()
+        File gradlePropertiesFile = moduleProjectRoot.toPath().resolve(androidPlugin.path).resolve('android').resolve("gradle.properties").toFile()
+        if (gradlePropertiesFile.exists()) {
+            gradlePropertiesFile.withReader('UTF-8') { reader -> gradleProperties.load(reader) }
+        } else {
+            println("${androidPlugin.name} has no gradle.properties")
+        }
+        def extraModules = gradleProperties.getProperty("extra_module_include")
+        if (extraModules != null) {
+            def moduleIncludes = extraModules.split(",")
+            moduleIncludes.each {
+                println "gradle include $it"
+                include ":$it"
+                project(":$it").projectDir = moduleProjectRoot.toPath().resolve(androidPlugin.path).resolve('android').resolve("$it").toFile()
+            }
+        }
+        // END
     }
 }
 

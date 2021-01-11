@@ -26,6 +26,9 @@ repositories {
     maven {
         url 'http://maven.byted.org/repository/android_public/'
     }
+    maven {
+        url 'http://tosv.byted.org/obj/toutiao.ios.arch/flutter/framework/'
+    }
 }
 
 File flutterRoot = projectDir.parentFile.parentFile.parentFile

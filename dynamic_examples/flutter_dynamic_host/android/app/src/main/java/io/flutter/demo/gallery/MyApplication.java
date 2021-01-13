@@ -196,6 +196,9 @@ public class MyApplication extends Application {
     private void initHomepage() {
         MyAdapter.setOnItemClickListener(new MyAdapter.OnDynamicItemClickListener() {
             public void onOpenRouteClick(Context context, String route) {
+                if(TextUtils.isEmpty(route)){
+                    route = "/";
+                }
                 Intent intent = RouteUtils.createIntent(context, route, null);
                 if (intent == null) {
                     Toast.makeText(context, "打开路由失败：" + route, Toast.LENGTH_SHORT).show();
@@ -206,10 +209,12 @@ public class MyApplication extends Application {
 
             @Override
             public void onOpenItemClick(Context context, String pluginName, String route, String dynamicDillPath) {
+                System.out.println("onOpenItemClick:"+route+","+pluginName+","+dynamicDillPath);
                 if (TextUtils.isEmpty(route)) {
                     Intent intent = new Intent(context, CommonRouteActivity.class);
                     intent.putExtra(RouteConstants.EXTRA_DYNAMIC_DILL_PATH, dynamicDillPath);
                     intent.putExtra(RouteConstants.EXTRA_VIEW_TOKEN, pluginName);
+                    intent.putExtra(RouteConstants.EXTRA_ROUTE, "/");
                     context.startActivity(intent);
                 } else {
                     onOpenRouteClick(context, route);

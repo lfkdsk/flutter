@@ -129,6 +129,10 @@ class Performance {
     return engine.getSkGraphicCacheMemoryUsage();
   }
 
+  static List<dynamic> getEngineInitApmInfo() {
+    return engine.getEngineInitApmInfo();
+  }
+
   static Future<List> GetGrResourceCacheMemKB() {
     return engine.getGrResourceCacheMemInfo();
   }

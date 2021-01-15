@@ -17,7 +17,7 @@ public class DynamicartAdapterImpl extends DynamicartAdapter {
 
     @Override
     public int getUpdateVersionCode() {
-        return 102;
+        return 104;
     }
 
 }

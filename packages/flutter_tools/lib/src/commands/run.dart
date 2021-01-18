@@ -40,6 +40,23 @@ abstract class RunCommandBase extends FlutterCommand with DeviceBasedDevelopment
         negatable: false,
         help: 'Trace application startup, then exit, saving the trace to a file.',
       )
+      // BD ADD: START
+      ..addOption('disable-ygc',
+        help: 'Disable ygc. 0: enable ygc; 1: disable forever; 2: disable for a fixed time(dis_ygc_end - dis_ygc_start).',
+      )
+      ..addOption('dis-ygc-start',
+        help: 'Disable ygc start time(s).',
+      )
+      ..addOption('dis-ygc-end',
+        help: 'Disable ygc end time(s).',
+      )
+      ..addOption('new-gen-size',
+        help: 'New gen semi size(MB).',
+      )
+      ..addOption('old-gen-size',
+        help: 'New gen semi size(MB).',
+      )
+      // END
       ..addFlag('verbose-system-logs',
         negatable: false,
         help: 'Include verbose logging from the flutter engine.',
@@ -87,6 +104,11 @@ abstract class RunCommandBase extends FlutterCommand with DeviceBasedDevelopment
   bool get purgePersistentCache => boolArg('purge-persistent-cache');
 
   String get route => stringArg('route');
+  String get disableYgc => stringArg('disable-ygc');
+  String get disygcStart => stringArg('dis-ygc-start');
+  String get disygcEnd => stringArg('dis-ygc-end');
+  String get newGenSize => stringArg('new-gen-size');
+  String get oldGenSize => stringArg('old-gen-size');
 }
 
 class RunCommand extends RunCommandBase {
@@ -573,6 +595,11 @@ class RunCommand extends RunCommandBase {
       runner = ColdRunner(
         flutterDevices,
         target: targetFile,
+        disableYgc: disableYgc,
+        disYgcStart: disygcStart,
+        disYgcEnd: disygcEnd,
+        newGenSize: newGenSize,
+        oldGenSize: oldGenSize,
         debuggingOptions: _createDebuggingOptions(),
         traceStartup: traceStartup,
         awaitFirstFrameWhenTracing: awaitFirstFrameWhenTracing,

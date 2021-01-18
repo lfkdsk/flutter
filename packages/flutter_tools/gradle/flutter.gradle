@@ -878,7 +878,7 @@ class FlutterPlugin implements Plugin<Project> {
                 type: Copy,
             ) {
                 dependsOn compileTask
-                with compileTask.assets
+                with compileTask.assets,compileTask.props
                 if (isUsedAsSubproject) {
                     dependsOn packageAssets
                     dependsOn cleanPackageAssets
@@ -898,6 +898,7 @@ class FlutterPlugin implements Plugin<Project> {
                 def processResources = variantOutput.hasProperty("processResourcesProvider") ?
                     variantOutput.processResourcesProvider.get() : variantOutput.processResources
                 processResources.dependsOn(copyFlutterAssetsTask)
+                // processResources.dependsOn(copyOptiPropTask)
                 return
             }
             // Flutter module included as a subproject in add to app.
@@ -934,6 +935,7 @@ class FlutterPlugin implements Plugin<Project> {
                         .findByPath(":${hostAppProjectName}:merge${appProjectVariant.name.capitalize()}Assets")
                     assert mergeAssets
                     mergeAssets.dependsOn(copyFlutterAssetsTask)
+                    // mergeAssets.dependsOn(copyOptiPropTask)
                 }
             }
         }
@@ -1180,7 +1182,13 @@ class FlutterTask extends BaseFlutterTask {
     CopySpec getAssets() {
         return project.copySpec {
             from "${intermediateDir}"
-            include "flutter_assets/**" // the working dir and its files
+                include "flutter_assets/**" // the working dir and its files
+        }
+    }
+
+    CopySpec getProps() {
+        return project.copySpec {
+            from "${project.buildDir}/../../lib/optimize.properties"
         }
     }
 

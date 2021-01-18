@@ -22,6 +22,11 @@ class ColdRunner extends ResidentRunner {
     this.traceStartup = false,
     this.awaitFirstFrameWhenTracing = true,
     this.applicationBinary,
+    this.disableYgc,
+    this.disYgcStart,
+    this.disYgcEnd,
+    this.newGenSize,
+    this.oldGenSize,
     bool ipv6 = false,
     bool stayResident = true,
     bool machine = false,
@@ -39,6 +44,11 @@ class ColdRunner extends ResidentRunner {
   final bool awaitFirstFrameWhenTracing;
   final File applicationBinary;
   bool _didAttach = false;
+  String disableYgc;
+  String disYgcStart;
+  String disYgcEnd;
+  String newGenSize;
+  String oldGenSize;
 
   @override
   bool get canHotReload => false;

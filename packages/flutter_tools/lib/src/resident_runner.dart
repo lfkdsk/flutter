@@ -619,6 +619,21 @@ class FlutterDevice {
     if (coldRunner.traceStartup != null) {
       platformArgs['trace-startup'] = coldRunner.traceStartup;
     }
+    if (coldRunner.disableYgc != null) {
+      platformArgs['disable-ygc'] = coldRunner.disableYgc;
+    }
+    if (coldRunner.disYgcStart != null) {
+      platformArgs['dis-ygc-start'] = coldRunner.disYgcStart;
+    }
+    if (coldRunner.disYgcEnd != null) {
+      platformArgs['dis-ygc-end'] = coldRunner.disYgcEnd;
+    }
+    if (coldRunner.newGenSize != null) {
+      platformArgs['new-gen-size'] = coldRunner.newGenSize;
+    }
+    if (coldRunner.oldGenSize != null) {
+      platformArgs['old-gen-size'] = coldRunner.oldGenSize;
+    }
 
     await startEchoingDeviceLog();
 

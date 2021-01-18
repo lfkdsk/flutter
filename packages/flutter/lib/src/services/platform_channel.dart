@@ -54,6 +54,30 @@ class BasicMessageChannel<T> {
   /// Returns a [Future] which completes to the received response, which may
   /// be null.
   Future<T> send(T message) async {
+    // BD ADD:
+    if (MethodChannel.onInvokeMethod != null) {
+      final int encodeStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData? callData = codec.encodeMessage(message);
+
+      final int awaitStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData? result = await binaryMessenger.send(name, callData);
+
+      final int decodeStart = DateTime.now().millisecondsSinceEpoch;
+      T typedResult = codec.decodeMessage(result);
+      final int decodeEnd = DateTime.now().millisecondsSinceEpoch;
+
+      final int encodeDuration = awaitStart - encodeStart;
+      final int asyncDuration = decodeStart - awaitStart;
+      final int decodeDuration = decodeEnd - decodeStart;
+
+      final int paramsSize = callData?.lengthInBytes ?? 0;
+      final int resultSize = result?.lengthInBytes ?? 0;
+
+      MethodChannel.onInvokeMethod?.call(MethodTiming(name, '(BasicMessageChannel)', encodeDuration, asyncDuration, 
+        decodeDuration, paramsSize, resultSize));
+      return typedResult;
+    }
+    // END
     return codec.decodeMessage(await binaryMessenger.send(name, codec.encodeMessage(message)));
   }
 
@@ -111,7 +135,16 @@ class MethodTiming {
 
   MethodTiming.exception(this.channelName, this.methodName, Exception exception) {
     exceptionType = exception.runtimeType.toString();
-    message = exception.toString();
+    if (exception is PlatformException) {
+      final e = exception as PlatformException;
+      message = e.message;
+      stacktrace = e.stacktrace;
+    } else if (exception is MissingPluginException) {
+      final e = exception as MissingPluginException;
+      message = e.message;
+    } else {
+      message = exception.toString();
+    }
   }
   
   /// key
@@ -130,6 +163,7 @@ class MethodTiming {
   /// exception
   String? exceptionType;
   String? message;
+  String? stacktrace;
   
   bool get hasError => (exceptionType != null || message != null);
 }

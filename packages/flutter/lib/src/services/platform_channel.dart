@@ -132,7 +132,16 @@ class MethodTiming {
 
   MethodTiming.exception(this.channelName, this.methodName, Exception exception) {
     exceptionType = exception.runtimeType.toString();
-    message = exception.toString();
+    if (exception is PlatformException) {
+      final e = exception as PlatformException;
+      message = e.message;
+      stacktrace = e.stacktrace;
+    } else if (exception is MissingPluginException) {
+      final e = exception as MissingPluginException;
+      message = e.message;
+    } else {
+      message = exception.toString();
+    }
   }
   
   /// key
@@ -151,7 +160,8 @@ class MethodTiming {
   /// exception
   String exceptionType;
   String message;
-  
+  String stacktrace;
+
   bool get hasError => (exceptionType != null || message != null);
 }
 // END

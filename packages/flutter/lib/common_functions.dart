@@ -1,3 +1,5 @@
+// @dart = 2.8
+
 import 'package:flutter/src/services/message_codec.dart';
 
 @pragma('vm:entry-point')

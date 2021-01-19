@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -33,6 +34,10 @@ mixin BytedanceProfileExtension {
       _debugServiceExtensionsRegistered = true;
       return true;
     }());
+
+    developer.postEvent('flutter.engineLaunchInfo', <String, Object>{
+      'result': Performance.getEngineInitApmInfo()
+    });
 
     registerServiceExtension(
       name: 'detectImages',

@@ -475,6 +475,7 @@ mixin RendererBinding on BindingBase, ServicesBinding, SchedulerBinding, Gesture
       if (sendFramesToEngine) {
         startSubmit = DateTime.now().millisecondsSinceEpoch;
         renderView.compositeFrame(); // this sends the bits to the GPU
+        endSubmit = DateTime.now().millisecondsSinceEpoch;
         pipelineOwner.flushSemantics(); // this also sends the semantics to the OS.
         _firstFrameSent = true;
       }

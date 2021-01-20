@@ -61,7 +61,6 @@ mixin BytedanceProfileExtension {
 
   _RegisterServiceExtensionCallback _registerServiceExtensionCallback;
 
-  @protected
   void registerServiceExtension({
     @required String name,
     @required ServiceExtensionCallback callback,

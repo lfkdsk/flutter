@@ -119,4 +119,5 @@ export 'src/widgets/will_pop_scope.dart';
 /// 移植Android滑动阻尼算法的physics和simulation
 export 'src/widgets/smooth_physics.dart';
 export 'src/widgets/smooth_simulation.dart';
+export 'src/widgets/bd_extension.dart';
 /// END

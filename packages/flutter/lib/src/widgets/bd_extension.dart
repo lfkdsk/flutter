@@ -19,15 +19,27 @@ class _BytedanceProfileExtension = Object with BytedanceProfileExtension;
 
 mixin BytedanceProfileExtension {
   static bool _debugServiceExtensionsRegistered = false;
+  static bool _inited = false;
 
   static BytedanceProfileExtension get instance => _instance;
   static final BytedanceProfileExtension _instance =
       _BytedanceProfileExtension();
+  static bool get isInit => _inited;
+
+  _RegisterServiceExtensionCallback _registerServiceExtensionCallback;
+  Map<dynamic, dynamic> _firstFrame = {};
+  Map<dynamic, dynamic> _firstScreen = {};
 
   void initServiceExtensions(
       _RegisterServiceExtensionCallback registerServiceExtensionCallback) {
 
+    if (isInit) {
+      return;
+    }
+
     _registerServiceExtensionCallback = registerServiceExtensionCallback;
+
+    _inited  = true;
 
     assert(!_debugServiceExtensionsRegistered);
     assert(() {
@@ -57,9 +69,17 @@ mixin BytedanceProfileExtension {
         };
       }
     );
+    registerServiceExtension(name: 'firstFrame', callback: (Map<String, String> parameters) async {
+      return <String, Object>{
+        'result': _firstFrame
+      };
+    });
+    registerServiceExtension(name: 'firstScreen', callback: (Map<String, String> parameters) async {
+      return <String, Object>{
+        'result': _firstScreen
+      };
+    });
   }
-
-  _RegisterServiceExtensionCallback _registerServiceExtensionCallback;
 
   void registerServiceExtension({
     @required String name,
@@ -69,6 +89,22 @@ mixin BytedanceProfileExtension {
       name: 'bd.profile.$name',
       callback: callback,
     );
+  }
+
+  void firstFrame(Map<dynamic, dynamic> data) {
+    if (!isInit) {
+      return;
+    }
+    developer.postEvent("flutter.firstFrame", {'result': data});
+    _firstFrame = data;
+  }
+
+  void firstScreen(Map<dynamic, dynamic> data) {
+    if (!isInit) {
+      return;
+    }
+    developer.postEvent("flutter.firstScreen", {'result': data});
+    _firstScreen = data;
   }
 
   Future<Map<String, Object>> _detectImages(Set<String> detectedImages) async {

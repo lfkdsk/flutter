@@ -141,16 +141,25 @@ class DevAndroidCommand extends FlutterCommand {
   }
 
   Future<void> _checkDownload(String url, Directory workingDir) async {
-    if ((url?.isEmpty ?? true) || url == 'local') {
+    if (url?.isEmpty ?? true) {
       return;
     }
-    if (workingDir.existsSync()) {
-      if (workingDir.listSync()?.isNotEmpty ?? false) {
-        throwToolExit(
-            '${workingDir.path} has File already,delete it if you want to forceDownload,'
-                'Or change the host location to "local" if you want to use it');
+    final File urlRecordFile = workingDir.childFile('url_record_file');
+    bool needDownload;
+    if (urlRecordFile.existsSync()) {
+      final String urlRecord = urlRecordFile.readAsStringSync();
+      if (urlRecord != url) {
+        needDownload = true;
+      } else {
+        needDownload = false;
       }
     } else {
+      needDownload = true;
+    }
+    if (!needDownload) {
+      return;
+    }
+    if (!workingDir.existsSync()) {
       workingDir.createSync(recursive: true);
     }
 
@@ -161,15 +170,37 @@ class DevAndroidCommand extends FlutterCommand {
       '-O',
       url,
     ], workingDirectory: workingDir.path);
+    urlRecordFile.writeAsStringSync(url);
   }
-
 
   Future<bool> _installApk() async {
     final Directory hostDir = _apkDir.childDirectory('host');
-    await _checkDownload(stringArg('host-location'), hostDir);
+    final String hostLocation = stringArg('host-location');
+    Directory workDir;
+    if (hostLocation == 'local') {
+      workDir = hostDir;
+    } else {
+      final String path = fs.path.join(FlutterProject.current().directory.path,
+          '.flutterw/cache/run_cache/fast_run_support/dart_mode/host/');
+      workDir = fs.directory(fs.path.normalize(path));
+      await _checkDownload(hostLocation, workDir);
+    }
+
+    if (!workDir.existsSync()) {
+      throwToolExit('Could not find host directory:${workDir.path}');
+    }
+
+    final List<FileSystemEntity> hostList = workDir.listSync();
+    if (hostList?.isEmpty ?? true) {
+      throwToolExit('No apk to install');
+    }
+    final FileSystemEntity entity = _getFirstApk(hostList);
+    if (entity == null) {
+      throwToolExit('No apk to install');
+    }
 
     /// Install host apk
-    final AndroidApk apkToInstall = AndroidApk.fromApk(_getHostApk() as File);
+    final AndroidApk apkToInstall = AndroidApk.fromApk(entity as File);
     if (await _device.isAppInstalled(apkToInstall)) {
       print('Uninstalling old version...');
       await _device.uninstallApp(apkToInstall);
@@ -183,15 +214,23 @@ class DevAndroidCommand extends FlutterCommand {
 
   Future<bool> _pushPluginApk() async {
     final Directory pluginDir = _apkDir.childDirectory('plugin');
-    await _checkDownload(stringArg('plugin-location'), pluginDir);
+    final String pluginLocation = stringArg('plugin-location');
+    Directory workDir;
+    if (pluginLocation == 'local') {
+      workDir = pluginDir;
+    } else {
+      final String path = fs.path.join(FlutterProject.current().directory.path,
+          '.flutterw/cache/run_cache/fast_run_support/dart_mode/plugin/');
+      workDir = fs.directory(fs.path.normalize(path));
+      await _checkDownload(pluginLocation, workDir);
+    }
 
-    if (!pluginDir.existsSync()) {
-      throwToolExit(
-          'Could not find plugin directory:YourProjectRoot/android/apks/plugin/');
+    if (!workDir.existsSync()) {
+      throwToolExit('Could not find plugin directory:${workDir.path}');
     }
 
     /// push Plugin apk if exists
-    final List<FileSystemEntity> pluginList = pluginDir.listSync();
+    final List<FileSystemEntity> pluginList = workDir.listSync();
     if (pluginList?.isEmpty ?? true) {
       throwToolExit('No plugin to push');
     }
@@ -207,23 +246,6 @@ class DevAndroidCommand extends FlutterCommand {
       throwToolExit('Push Plugin Failed');
     }
     return result;
-  }
-
-  FileSystemEntity _getHostApk() {
-    final Directory hostDir = _apkDir.childDirectory('host');
-    if (!hostDir.existsSync()) {
-      throwToolExit(
-          'Could not find host directory:YourProjectRoot/android/apks/host/');
-    }
-    final List<FileSystemEntity> list = hostDir.listSync();
-    if (list == null || list.isEmpty) {
-      throwToolExit('No apk in ${hostDir.path}');
-    }
-    final FileSystemEntity entity = _getFirstApk(list);
-    if (entity == null) {
-      throwToolExit('No apk in ${hostDir.path}');
-    }
-    return entity;
   }
 
   FileSystemEntity _getFirstApk(List<FileSystemEntity> list) {
@@ -318,6 +340,33 @@ class DevAndroidCommand extends FlutterCommand {
     ]);
   }
 
+  FileSystemEntity _getHostApk() {
+    final Directory hostDir = _apkDir.childDirectory('host');
+    if (hostDir.existsSync()) {
+      final List<FileSystemEntity> list = hostDir.listSync();
+      if (list?.isNotEmpty ?? false) {
+        final FileSystemEntity entity = _getFirstApk(list);
+        if (entity != null) {
+          return entity;
+        }
+      }
+    } else {
+      final String path = fs.path.join(FlutterProject.current().directory.path,
+          '.flutterw/cache/run_cache/fast_run_support/dart_mode/host/');
+      final Directory workDir = fs.directory(fs.path.normalize(path));
+      if (workDir.existsSync()) {
+        final List<FileSystemEntity> list = workDir.listSync();
+        if (list?.isNotEmpty ?? false) {
+          final FileSystemEntity entity = _getFirstApk(list);
+          if (entity != null) {
+            return entity;
+          }
+        }
+      }
+    }
+    throwToolExit(
+        'Do not find hostApk anyWhere, have you set the hostLocation parameters correctly?');
+  }
 }
 
 class DevIOSCommand extends FlutterCommand {

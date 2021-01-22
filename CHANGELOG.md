@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-7](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-6...bd1.22.3-7) (2021-01-22)
+
+
+### Bug Fixes
+
+* fix class CommonFunctions onMethodCall return null dart ccheck lint error ([1cae295](https://code.byted.org/tech_client/flutter/commit/1cae295))
+* http://t.wtturl.cn/J4L4mwA/ ([64baaf4](https://code.byted.org/tech_client/flutter/commit/64baaf4))
+* http://t.wtturl.cn/J4LYN2f/ ([a9f1102](https://code.byted.org/tech_client/flutter/commit/a9f1102))
+* imageCache int? error ([e516ee9](https://code.byted.org/tech_client/flutter/commit/e516ee9))
+* roll engine version to 198e89e735d3e7d35389dbc818d94862bf581222 ([bb96b45](https://code.byted.org/tech_client/flutter/commit/bb96b45))
+* roll engine version to 83ebc98d03e1d01d5f0f39bea68c820b976ebaf2 ([1617c5a](https://code.byted.org/tech_client/flutter/commit/1617c5a))
+
+
+### Features
+
+* add APIs which listen platform channel performance ([23d8ff4](https://code.byted.org/tech_client/flutter/commit/23d8ff4))
+* add callback in framework route/anim/scroll ([c0d9a72](https://code.byted.org/tech_client/flutter/commit/c0d9a72))
+* add common interface for onMethod call ([0dd074f](https://code.byted.org/tech_client/flutter/commit/0dd074f))
+* add engine launch info and detectImage ServiceExtension ([ba78dba](https://code.byted.org/tech_client/flutter/commit/ba78dba))
+* add extension event for flutter.engineLaunchInfo ([f94365d](https://code.byted.org/tech_client/flutter/commit/f94365d))
+* Add memory interface ([71f36b1](https://code.byted.org/tech_client/flutter/commit/71f36b1))
+* Add PerformWarmUpZeroSize interface ([83a86f2](https://code.byted.org/tech_client/flutter/commit/83a86f2))
+* allocate scheduling optimization ([d9e51b1](https://code.byted.org/tech_client/flutter/commit/d9e51b1))
+* Roll engine to 12fc5614de45d33e5583e82004c84bd5dedb3e99 ([ebd35cb](https://code.byted.org/tech_client/flutter/commit/ebd35cb))
+* Roll engine to dbfaf83a7af259c3ec10ac8fd43c25b966b20978 ([1925cf3](https://code.byted.org/tech_client/flutter/commit/1925cf3))
+* roll engine to e3a9e7223cdc1f54dd677ebca51f411d95325dc9 ([fa564fd](https://code.byted.org/tech_client/flutter/commit/fa564fd))
+* support native stacktrace in channel monitor ([ef1bd25](https://code.byted.org/tech_client/flutter/commit/ef1bd25))
+* 升级引擎监控 3413b8e22aff8d30ee41024b22c0d18ff564f768 ([6be0d2f](https://code.byted.org/tech_client/flutter/commit/6be0d2f))
+* 增加首帧耗时明细监控 ([382bc75](https://code.byted.org/tech_client/flutter/commit/382bc75))
+* 引擎增加 FlutterTextureView 空实现 ([0fec2cc](https://code.byted.org/tech_client/flutter/commit/0fec2cc))
+
 ### [1.22.3-6](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-4...bd1.22.3-6) (2021-01-07)
 
 

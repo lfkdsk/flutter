@@ -15,6 +15,9 @@ import 'binary_messenger.dart';
 import 'restoration.dart';
 import 'system_channels.dart';
 
+// BD ADD:
+import 'platform_channel.dart' show MethodChannel, ChannelListener, MethodTiming;
+
 /// Listens for platform messages and directs them to the [defaultBinaryMessenger].
 ///
 /// The [ServicesBinding] also registers a [LicenseEntryCollector] that exposes
@@ -227,6 +230,42 @@ mixin ServicesBinding on BindingBase, SchedulerBinding {
   RestorationManager createRestorationManager() {
     return RestorationManager();
   }
+  
+  // BD ADD: START
+
+  /// 监控 platform channel 的耗时与错误
+  final List<ChannelListener> _channelListeners = <ChannelListener>[];
+
+  /// 添加监听器，自动开始监听
+  void addChannelListener(ChannelListener listener) {
+    _channelListeners.add(listener);
+    if (_channelListeners.length == 1) {
+      assert(MethodChannel.onInvokeMethod == null);
+      MethodChannel.onInvokeMethod = _executeChannelListener;
+    }
+    assert(MethodChannel.onInvokeMethod == _executeChannelListener);
+  }
+
+  /// 删除监听器，自动停止监听
+  void removeChannelListener(ChannelListener listener) {
+    assert(_channelListeners.contains(listener));
+    _channelListeners.remove(listener);
+    if (_channelListeners.isEmpty) {
+      MethodChannel.onInvokeMethod = null;
+    }
+  }
+
+  /// Called in platform channel's invokeMethod
+  void _executeChannelListener(MethodTiming methodTiming) {
+    final List<ChannelListener> clonedListeners =
+        List<ChannelListener>.from(_channelListeners);
+    for (ChannelListener listener in clonedListeners) {
+      if (_channelListeners.contains(listener)) {
+        listener(methodTiming);
+      }
+    }
+  }
+  // END
 }
 
 /// The default implementation of [BinaryMessenger].

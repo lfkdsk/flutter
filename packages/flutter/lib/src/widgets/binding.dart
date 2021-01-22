@@ -18,6 +18,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 // BD ADD: START
+import 'package:flutter/src/widgets/bd_extension.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/boost.dart';
 // END
@@ -474,6 +475,9 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
       );
     }
 
+    // BD ADD:
+    BytedanceProfileExtension.instance.initServiceExtensions(registerServiceExtension);
+
     assert(() {
       registerBoolServiceExtension(
         name: 'invertOversizedImages',
@@ -512,6 +516,8 @@ mixin WidgetsBinding on BindingBase, ServicesBinding, SchedulerBinding, GestureB
       );
 
       WidgetInspectorService.instance.initServiceExtensions(registerServiceExtension);
+      // BD ADD:
+      BytedanceDebugExtension.instance.initServiceExtensions(registerServiceExtension);
 
       return true;
     }());

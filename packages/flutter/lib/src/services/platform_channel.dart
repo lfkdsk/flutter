@@ -54,6 +54,30 @@ class BasicMessageChannel<T> {
   /// Returns a [Future] which completes to the received response, which may
   /// be null.
   Future<T> send(T message) async {
+    // BD ADD:
+    if (MethodChannel.onInvokeMethod != null) {
+      final int encodeStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData? callData = codec.encodeMessage(message);
+
+      final int awaitStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData? result = await binaryMessenger.send(name, callData);
+
+      final int decodeStart = DateTime.now().millisecondsSinceEpoch;
+      T typedResult = codec.decodeMessage(result);
+      final int decodeEnd = DateTime.now().millisecondsSinceEpoch;
+
+      final int encodeDuration = awaitStart - encodeStart;
+      final int asyncDuration = decodeStart - awaitStart;
+      final int decodeDuration = decodeEnd - decodeStart;
+
+      final int paramsSize = callData?.lengthInBytes ?? 0;
+      final int resultSize = result?.lengthInBytes ?? 0;
+
+      MethodChannel.onInvokeMethod?.call(MethodTiming(name, '(BasicMessageChannel)', encodeDuration, asyncDuration, 
+        decodeDuration, paramsSize, resultSize));
+      return typedResult;
+    }
+    // END
     return codec.decodeMessage(await binaryMessenger.send(name, codec.encodeMessage(message)));
   }
 
@@ -101,6 +125,50 @@ class BasicMessageChannel<T> {
 Expando<Object> _methodChannelHandlers = Expando<Object>();
 Expando<Object> _methodChannelMockHandlers = Expando<Object>();
 
+// BD ADD:
+typedef ChannelListener = void Function(MethodTiming);
+
+class MethodTiming {
+
+  MethodTiming(this.channelName, this.methodName, this.encodeDuration,
+      this.asyncDuration, this.decodeDuration, this.paramsSize, this.resultSize);
+
+  MethodTiming.exception(this.channelName, this.methodName, Exception exception) {
+    exceptionType = exception.runtimeType.toString();
+    if (exception is PlatformException) {
+      final e = exception as PlatformException;
+      message = e.message;
+      stacktrace = e.stacktrace;
+    } else if (exception is MissingPluginException) {
+      final e = exception as MissingPluginException;
+      message = e.message;
+    } else {
+      message = exception.toString();
+    }
+  }
+  
+  /// key
+  final String channelName;
+  final String methodName;
+
+  /// timings, in ms
+  int? encodeDuration;
+  int? asyncDuration;
+  int? decodeDuration;
+
+  /// size, in Bytes
+  int? paramsSize;
+  int? resultSize;
+
+  /// exception
+  String? exceptionType;
+  String? message;
+  String? stacktrace;
+  
+  bool get hasError => (exceptionType != null || message != null);
+}
+// END
+
 /// A named channel for communicating with platform plugins using asynchronous
 /// method calls.
 ///
@@ -143,9 +211,46 @@ class MethodChannel {
   BinaryMessenger get binaryMessenger => _binaryMessenger ?? defaultBinaryMessenger;
   final BinaryMessenger? _binaryMessenger;
 
+  // BD ADD:
+  static ChannelListener? onInvokeMethod;
+
   @optionalTypeArgs
   Future<T?> _invokeMethod<T>(String method, { required bool missingOk, dynamic arguments }) async {
     assert(method != null);
+        // BD ADD:
+    if (onInvokeMethod != null) {
+      final int encodeStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData callData = codec.encodeMethodCall(MethodCall(method, arguments));
+
+      final int awaitStart = DateTime.now().millisecondsSinceEpoch;
+      final ByteData? result = await binaryMessenger.send(name, callData);
+      if (result == null) {
+        if (missingOk) {
+          return null;
+        }
+        final e = MissingPluginException('No implementation found for method $method on channel $name');
+        onInvokeMethod?.call(MethodTiming.exception(name, method, e));
+        throw e;
+      }
+      final int decodeStart = DateTime.now().millisecondsSinceEpoch;
+      T typedResult;
+      try {
+        typedResult = codec.decodeEnvelope(result) as T;
+      } on Exception catch (e) {
+        onInvokeMethod?.call(MethodTiming.exception(name, method, e));
+        rethrow;
+      }
+      final int decodeEnd = DateTime.now().millisecondsSinceEpoch;
+
+      final int encodeDuration = awaitStart - encodeStart;
+      final int asyncDuration = decodeStart - awaitStart;
+      final int decodeDuration = decodeEnd - decodeStart;
+
+      onInvokeMethod?.call(MethodTiming(name, method, encodeDuration, asyncDuration, 
+        decodeDuration, callData.lengthInBytes, result.lengthInBytes));
+      return typedResult;
+    }
+    // END
     final ByteData? result = await binaryMessenger.send(
       name,
       codec.encodeMethodCall(MethodCall(method, arguments)),

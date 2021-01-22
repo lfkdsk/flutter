@@ -679,6 +679,11 @@ class AndroidDevice extends Device {
     }
 
     final bool traceStartup = platformArgs['trace-startup'] as bool ?? false;
+    final String disableYgc = platformArgs['disable-ygc'] as String ?? null;
+    final String disygcStart = platformArgs['dis-ygc-start'] as String ?? null;
+    final String disygcEnd = platformArgs['dis-ygc-end'] as String ?? null;
+    final String newGenSize = platformArgs['new-gen-size'] as String ?? null;
+    final String oldGenSize = platformArgs['old-gen-size'] as String ?? null;
     _logger.printTrace('$this startApp');
 
     ProtocolDiscovery observatoryDiscovery;
@@ -704,6 +709,16 @@ class AndroidDevice extends Device {
       '--ez', 'enable-dart-profiling', 'true',
       if (traceStartup)
         ...<String>['--ez', 'trace-startup', 'true'],
+      if (disableYgc != null)
+        ...<String>['--ei', 'disable-ygc', disableYgc],
+      if (disygcStart != null)
+        ...<String>['--ei', 'dis-ygc-start', disygcStart],
+      if (disygcEnd != null)
+        ...<String>['--ei', 'dis-ygc-end', disygcEnd],
+      if (newGenSize != null)
+        ...<String>['--ei', 'new-gen-size', newGenSize],
+      if (oldGenSize != null)
+        ...<String>['--ei', 'old-gen-size', oldGenSize],
       if (route != null)
         ...<String>['--es', 'route', route],
       if (debuggingOptions.enableSoftwareRendering)

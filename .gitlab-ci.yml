@@ -23,6 +23,15 @@ flutter-precache:
   tags:
     - shared
 
+shell-test:
+  <<: *common
+  stage: test-stage-first
+  script:
+    - curl http://tosv.byted.org/obj/toutiao.ios.arch/flutter/shell_project_test_ci.py -o shell_project_test_ci.py
+    - python3 -u shell_project_test_ci.py "$CI_COMMIT_SHA"
+  tags:
+    - shared
+
 usability-benchmark:
   <<: *common
   stage: test-stage-first

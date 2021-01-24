@@ -389,6 +389,11 @@ class DevIOSCommand extends FlutterCommand {
       ..addOption('device-name',
           help: 'Device name.'
       )
+      ..addFlag('machine',
+        negatable: false,
+        help: 'Handle machine structured JSON command input and provide output '
+            'and progress in machine friendly format.',
+      )
       ..addFlag('dynamicart',
           help: 'Product App.framework that include dynamic function',
           defaultsTo: false,
@@ -833,7 +838,7 @@ class DevIOSCommand extends FlutterCommand {
       '--device-id=$deviceId',
       '--use-application-binary=$bundlePath',
       '--in-replace-mode',
-      '--machine',
+      if (boolArg('machine')) '--machine',
       '--dart-define=flutter.inspector.structuredErrors=true',
       stringArg('target')
     ]);

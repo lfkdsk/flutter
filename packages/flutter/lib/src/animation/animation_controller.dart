@@ -241,7 +241,7 @@ class AnimationController extends Animation<double>
     this.animationBehavior = AnimationBehavior.normal,
     required TickerProvider vsync,
     // BD ADD:
-    this.fpsKey = '',
+    this.fpsKey,
   }) : assert(lowerBound != null),
        assert(upperBound != null),
        assert(upperBound >= lowerBound),
@@ -278,7 +278,7 @@ class AnimationController extends Animation<double>
     required TickerProvider vsync,
     this.animationBehavior = AnimationBehavior.preserve,
     // BD ADD:
-    this.fpsKey = '',
+    this.fpsKey,
   }) : assert(value != null),
        assert(vsync != null),
        lowerBound = double.negativeInfinity,
@@ -329,7 +329,7 @@ class AnimationController extends Animation<double>
 
   // BD ADD: START
   /// FrameWork will auto record Fps when given a fpsKey
-  final String fpsKey;
+  final String? fpsKey;
   bool _isInAnim = false;
   // END
 

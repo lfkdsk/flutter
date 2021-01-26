@@ -84,6 +84,12 @@ class DevAndroidCommand extends FlutterCommand {
         negatable: false,
         help: 'Whether to split the APKs per ABIs. '
             'To learn more, see: https://developer.android.com/studio/build/configure-apk-splits#configure-abi-split',
+      )
+      ..addFlag(
+        'machine',
+        negatable: false,
+        help: 'Handle machine structured JSON command input and provide output '
+            'and progress in machine friendly format.',
       );
     usesTrackWidgetCreation(verboseHelp: false);
   }
@@ -329,7 +335,7 @@ class DevAndroidCommand extends FlutterCommand {
     await main(<String>[
       '--no-color',
       'run',
-      if (stringArg('flutter-path')?.isNotEmpty ?? false) '--machine',
+      if (boolArg('machine')) '--machine',
       if (boolArg('track-widget-creation')) '--track-widget-creation',
       '--device-id=${deviceManager.specifiedDeviceId}',
       '--start-paused',

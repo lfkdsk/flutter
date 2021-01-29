@@ -21,9 +21,6 @@ import java.nio.file.Paths
 
 repositories {
     maven {
-        url 'http://ttandroid.byted.org/repository/bd_framework/'
-    }
-    maven {
         url 'http://maven.byted.org/repository/android_public/'
     }
     maven {

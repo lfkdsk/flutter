@@ -793,6 +793,8 @@ abstract class FlutterCommand extends Command<void> {
       ? stringArg(FlutterOptions.kSplitDebugInfoOption)
       : null;
 
+    print("==========splitDebugInfoPath is: ${splitDebugInfoPath}");
+
     if (dartObfuscation && (splitDebugInfoPath == null || splitDebugInfoPath.isEmpty)) {
       throwToolExit(
         '"--${FlutterOptions.kDartObfuscationOption}" can only be used in '

@@ -57,6 +57,7 @@ Future<void> updateGeneratedXcodeProperties({
   bool isMinimumSize = false,
   List<String> dynamicPlugins,
   bool compressSize = false,
+  String splitDebugInfo,
 }) async {
   final List<String> xcodeBuildSettings = _xcodeBuildSettingsLines(
     project: project,
@@ -70,6 +71,7 @@ Future<void> updateGeneratedXcodeProperties({
     isMinimumSize: isMinimumSize,
     dynamicPlugins: dynamicPlugins,
     compressSize:compressSize,
+    splitDebugInfo: splitDebugInfo,
   );
 
   _updateGeneratedXcodePropertiesFile(
@@ -175,6 +177,7 @@ List<String> _xcodeBuildSettingsLines({
   bool isMinimumSize = false,
   List<String> dynamicPlugins,
   bool compressSize = false,
+  String splitDebugInfo,
 }) {
   final List<String> xcodeBuildSettings = <String>[];
 
@@ -252,6 +255,13 @@ List<String> _xcodeBuildSettingsLines({
   if (compressSize) {
     xcodeBuildSettings.add('COMPRESS_SIZE=true');
   }
+
+  if (splitDebugInfo != null) {
+    final StringBuffer buffer = StringBuffer();
+    buffer.write(splitDebugInfo);
+    xcodeBuildSettings.add('SPLIT_DEBUG_INFO=${buffer.toString()}');
+  }
+
   // 传给IOS xcode_backend.sh的dynamic_aot_plugins参数，注意：因为格式的最后一个为/，所以这个要写在最后面
   if (dynamicPlugins != null && dynamicPlugins.isNotEmpty) {
     final StringBuffer buffer = StringBuffer();

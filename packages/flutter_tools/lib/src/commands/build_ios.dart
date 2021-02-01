@@ -171,6 +171,11 @@ class BuildIOSCommand extends BuildSubCommand {
     final bool compressSize = (!isMinimumSize && (buildInfo.mode == BuildMode.release))
         ? boolArg('compress-size')
         : false;
+
+    final String splitDebugInfoPath = argParser.options.containsKey("split-debug-info")
+        ? stringArg("split-debug-info")
+        : null;
+    print("==========splitDebugInfoPath===== is: ${splitDebugInfoPath}");
     // END
     final XcodeBuildResult result = await buildXcodeProject(
       app: app,
@@ -183,7 +188,8 @@ class BuildIOSCommand extends BuildSubCommand {
       isDynamicart: (kEngineMode & ENGINE_DYNAMICART !=0),
       isMinimumSize: isMinimumSize,
       dynamicPlugins: dynamicPlugins,
-      compressSize: compressSize
+      compressSize: compressSize,
+      splitDebugInfoPath: splitDebugInfoPath,
     // END
     );
 

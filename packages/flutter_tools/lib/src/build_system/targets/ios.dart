@@ -50,7 +50,8 @@ abstract class AotAssemblyBase extends Target {
     final bool bitcode = environment.defines[kBitcodeFlag] == 'true';
     final BuildMode buildMode = getBuildModeForName(environment.defines[kBuildMode]);
     final TargetPlatform targetPlatform = getTargetPlatformForName(environment.defines[kTargetPlatform]);
-    final String splitDebugInfo = environment.defines[kSplitDebugInfo];
+    // final String splitDebugInfo = environment.defines[kSplitDebugInfo];
+    String splitDebugInfo = environment.splitDebugInfo;
     final bool dartObfuscation = environment.defines[kDartObfuscation] == 'true';
     final List<DarwinArch> darwinArchs = environment.defines[kIosArchs]
       ?.split(' ')

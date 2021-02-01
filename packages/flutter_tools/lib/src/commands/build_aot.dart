@@ -21,6 +21,7 @@ class BuildAotCommand extends BuildSubCommand with TargetPlatformBasedDevelopmen
     usesPubOption();
     usesDartDefineOption();
     usesExtraFrontendOptions();
+    addSplitDebugInfoOption();
     // BD ADD:
     addDynamicartModeFlags();
 

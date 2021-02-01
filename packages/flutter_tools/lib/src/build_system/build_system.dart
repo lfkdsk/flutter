@@ -316,6 +316,7 @@ class Environment {
     List<String>dynamicPlugins,
     bool isDynamicart,
     bool isMinimumSize,
+    String splitDebugInfo,
     bool compressSize,
     // END
   }) {
@@ -358,6 +359,7 @@ class Environment {
       dynamicPlugins: dynamicPlugins,
       isDynamicart: isDynamicart ?? false,
       isMinimumSize: isMinimumSize ?? false,
+      splitDebugInfo: splitDebugInfo,
       // END
     );
   }
@@ -413,7 +415,8 @@ class Environment {
     // BD ADD: START
     @required this.isDynamicart,
     @required this.isMinimumSize,
-    this.dynamicPlugins
+    this.dynamicPlugins,
+    this.splitDebugInfo,
     // END
   });
 
@@ -495,6 +498,7 @@ class Environment {
 
   // BD ADD: START
   final List<String>dynamicPlugins;
+  final String splitDebugInfo;
   final bool isDynamicart;
   final bool isMinimumSize;
 // END

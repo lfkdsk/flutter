@@ -104,6 +104,7 @@ Future<XcodeBuildResult> buildXcodeProject({
   bool isDynamicart = false,
   bool isMinimumSize = false,
   List<String> dynamicPlugins,
+  String splitDebugInfoPath,
 }) async {
   if (!upgradePbxProjWithFlutterAssets(app.project, globals.logger)) {
     return XcodeBuildResult(success: false);
@@ -196,7 +197,8 @@ Future<XcodeBuildResult> buildXcodeProject({
     isDynamicart: isDynamicart,
     isMinimumSize:isMinimumSize,
     dynamicPlugins:dynamicPlugins,
-    compressSize: compressSize
+    compressSize: compressSize,
+    splitDebugInfo: splitDebugInfoPath
   );
   await processPodsIfNeeded(project.ios, getIosBuildDirectory(), buildInfo.mode);
   if (configOnly) {

@@ -129,6 +129,7 @@ class AotBuilder {
       compressSize: compressSize,
       isDynamicart: isDynamicart,
       isMinimumSize: isMinimumSize,
+      splitDebugInfo: buildInfo.splitDebugInfoPath,
       // END
     );
     final BuildResult result = await globals.buildSystem.build(target, environment);

@@ -87,6 +87,11 @@ BuildApp() {
   if [[ -n "$DYNAMIC_AOT_PLUGINS" ]]; then
       dynamic_aot_plugins="${DYNAMIC_AOT_PLUGINS}"
   fi
+
+  local split_debug_info=""
+  if [[ -n "$SPLIT_DEBUG_INFO" ]]; then
+      split_debug_info="${SPLIT_DEBUG_INFO}"
+  fi
   # END
 
   local target_path="lib/main.dart"
@@ -267,6 +272,12 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
   if [[ "$dynamic_aot_plugins" != "" ]]; then
      dynamic_aot_plugins_command="--dynamic-aot-plugins=${dynamic_aot_plugins}"
   fi
+
+  local split_debug_info_command=""
+  if [[ "$split_debug_info" != "" ]]; then
+     split_debug_info_command="--split-debug-info=${split_debug_info}"
+  fi
+
   local dynamicart_command=""
   if [[ "$dynamicart_flag" == "YES" ]]; then
      dynamicart_command="--dynamicart"
@@ -274,6 +285,7 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
 
   local app_framework_dir="${derived_dir}/App.framework"
   local asset_dir="${app_framework_dir}/${assets_path}"
+
   # END
 
   if [[ "${build_mode}" != "debug" ]]; then
@@ -296,6 +308,7 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
       minimum_size_command="--minimum-size"
     fi
     EchoError "========================================================================${dynamic_aot_plugins_command}"
+    EchoError "=============================================split_debug_info_command===========================${split_debug_info_command}"
 
     RunCommand "${FLUTTER_ROOT}/bin/flutter" --suppress-analytics           \
       ${verbose_flag}                                                       \
@@ -308,6 +321,7 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
       ${flutter_engine_flag}                                                \
       ${local_engine_flag}                                                  \
       ${bitcode_flag}                                                       \
+      ${split_debug_info_command}                                           \
       ${dynamicart_command}                                                 \
       ${dynamic_aot_plugins_command}                                        \
       ${minimum_size_command}                                               \
@@ -393,7 +407,7 @@ is set to release or run \"flutter build ios --release\", then re-run Archive fr
     --target="${target_path}"                                               \
     --${build_mode}                                                         \
     --depfile="${build_dir}/snapshot_blob.bin.d"                            \
-    --asset-dir="${asset_dir}"               \
+    --asset-dir="${asset_dir}"                                              \
     ${precompilation_flag}                                                  \
     ${flutter_engine_flag}                                                  \
     ${local_engine_flag}                                                    \

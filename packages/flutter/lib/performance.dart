@@ -197,4 +197,11 @@ class Performance {
       'gc_time_old': gc_time_old
     };
   }
+	static void allocateSchedulingStart() {
+    engine.allocateSchedulingStart();
+  }
+
+  static void allocateSchedulingEnd() {
+    engine.allocateSchedulingEnd();
+  }
 }

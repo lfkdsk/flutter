@@ -888,9 +888,12 @@ class DevIOSCommand extends FlutterCommand {
       await _produceAotAppFrameworkIfNeeded(mode, iPhoneBuildOutput, destinationAppFrameworkDirectory);
     }
 
-    final File sourceInfoPlist = _project.ios.hostAppRoot.childDirectory('Flutter').childFile('AppFrameworkInfo.plist');
+    //flutterw会在module的project目录下生成ios目录 && 部分工程不存在.ios目录
+    File sourceInfoPlist = _project.ios.hostAppRoot.childDirectory('Flutter').childFile('AppFrameworkInfo.plist');
+    if (!sourceInfoPlist.existsSync()) {
+      sourceInfoPlist = _project.directory.childDirectory('.ios').childDirectory('Flutter').childFile('AppFrameworkInfo.plist');
+    }
     final File destinationInfoPlist = destinationAppFrameworkDirectory.childFile('Info.plist')..createSync(recursive: true);
-
     destinationInfoPlist.writeAsBytesSync(sourceInfoPlist.readAsBytesSync());
 
     final Status status = logger.startProgress(' ├─Assembling Flutter resources for App.framework...', timeout: timeoutConfiguration.slowOperation);

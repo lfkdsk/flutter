@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.22.3-10](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-9...bd1.22.3-10) (2021-02-05)
+
+*feat: 在-9的基础上增加了打包时把依赖关系打到assets里(https://code.byted.org/tech_client/flutter/commit/08688a901547bd58dbb75f8a72e4842cdedf2b06)
+
 ### [1.22.3-7](https://code.byted.org/tech_client/flutter/compare/bd1.22.3-6...bd1.22.3-7) (2021-01-22)
 
 

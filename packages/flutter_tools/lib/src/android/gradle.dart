@@ -101,13 +101,6 @@ String getAarTaskFor(BuildInfo buildInfo) {
 /// For example, when [splitPerAbi] is true, multiple APKs are created.
 Iterable<String> _apkFilesFor(AndroidBuildInfo androidBuildInfo) {
   String buildType = camelCase(androidBuildInfo.buildInfo.modeName);
-  if(androidBuildInfo.buildInfo.dynamicart){
-    if(buildType=='release'){
-      buildType = 'dynamicartRelease';
-    }else if(buildType=='profile'){
-      buildType = 'dynamicartProfile';
-    }
-  }
   final String productFlavor = androidBuildInfo.buildInfo.flavor ?? '';
   final String flavorString = productFlavor.isEmpty ? '' : '-$productFlavor';
   if (androidBuildInfo.splitPerAbi) {
@@ -285,13 +278,6 @@ Future<void> buildGradleApp({
   String assembleTask = isBuildingBundle
     ? getBundleTaskFor(buildInfo)
     : getAssembleTaskFor(buildInfo);
-
-  // BD ADD: START
-  if (buildInfo.dynamicart) {
-    assembleTask = assembleTask.replaceAll("Release", "DynamicartRelease");
-    assembleTask = assembleTask.replaceAll("Profile", "DynamicartProfile");
-  }
-  // END
 
   final Status status = globals.logger.startProgress(
     "Running Gradle task '$assembleTask'...",
@@ -672,12 +658,7 @@ Future<void> buildGradleAar({
 
   final BuildInfo buildInfo = androidBuildInfo.buildInfo;
   String aarTask = getAarTaskFor(buildInfo);
-  // BD ADD: START
-  if (androidBuildInfo.buildInfo.dynamicart) {
-    aarTask = aarTask.replaceAll("Release", "DynamicartRelease");
-    aarTask = aarTask.replaceAll("Profile", "DynamicartProfile");
-  }
-  // END
+
   final Status status = globals.logger.startProgress(
     "Running Gradle task '$aarTask'...",
     timeout: timeoutConfiguration.slowOperation,
@@ -1024,13 +1005,6 @@ Iterable<String> findApkFilesModule(
     final BuildInfo buildInfo = androidBuildInfo.buildInfo;
     String modeName = camelCase(buildInfo.modeName);
     // TODO: compare with method listApkPaths.
-    if(buildInfo.dynamicart){
-      if(modeName=='release'){
-        modeName = 'dynamicartRelease';
-      }else if(modeName=='profile'){
-        modeName = 'dynamicartProfile';
-      }
-    }
 
     apkFile = apkDirectory
       .childDirectory(modeName)
@@ -1068,15 +1042,6 @@ Iterable<String> listApkPaths(
   AndroidBuildInfo androidBuildInfo,
 ) {
   String buildType = camelCase(androidBuildInfo.buildInfo.modeName);
-
-  final BuildInfo buildInfo = androidBuildInfo.buildInfo;
-  if(buildInfo.dynamicart){
-    if(buildType =='release'){
-      buildType = 'dynamicart_release';
-    }else if(buildType =='profile'){
-      buildType = 'dynamicart_profile';
-    }
-  }
 
   final List<String> apkPartialName = <String>[
     if (androidBuildInfo.buildInfo.flavor?.isNotEmpty ?? false)

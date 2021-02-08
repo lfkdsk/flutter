@@ -182,22 +182,6 @@ class FlutterPlugin implements Plugin<Project> {
                     matchingFallbacks = ["debug", "release"]
                 }
             }
-
-            // BD ADD: START
-            // flutter run/build aot命令都是执行的gradle命令的--dynamicart参数映射到gradle命令上
-            dynamicartProfile {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            dynamicartRelease {
-                initWith debug
-                if (it.hasProperty('matchingFallbacks')) {
-                    matchingFallbacks = ['debug', 'release']
-                }
-            }
-            // END
         }
 
         if (shouldShrinkResources(project)) {
@@ -240,6 +224,15 @@ class FlutterPlugin implements Plugin<Project> {
      */
     void addFlutterDependencies(buildType) {
         String flutterBuildMode = buildModeFor(buildType)
+        // BD ADD: START
+        if(useDynamicart()){
+            if (buildType.name == "release") {
+                flutterBuildMode = "dynamicart_release"
+            } else if (buildType.name == "profile") {
+                flutterBuildMode = "dynamicart_profile"
+            }
+        }
+        // END
         if (!supportsBuildMode(flutterBuildMode)) {
             return
         }
@@ -371,6 +364,15 @@ class FlutterPlugin implements Plugin<Project> {
         }
         Closure addEmbeddingCompileOnlyDependency = { buildType ->
             String flutterBuildMode = buildModeFor(buildType)
+            // BD ADD: START
+            if(useDynamicart()){
+                if (buildType.name == "release") {
+                    flutterBuildMode = "dynamicart_release"
+                } else if (buildType.name == "profile") {
+                    flutterBuildMode = "dynamicart_profile"
+                }
+            }
+            // END
             // In AGP 3.5, the embedding must be added as an API implementation,
             // so java8 features are desugared against the runtime classpath.
             // For more, see https://github.com/flutter/flutter/issues/40126
@@ -397,15 +399,6 @@ class FlutterPlugin implements Plugin<Project> {
                 profile {
                     initWith debug
                 }
-                // BD ADD:
-                // 上面的buildTypes是给主工程加的，Android插件模块打包的话需要在这里重新加一次
-                dynamicartRelease {
-                    initWith debug
-                }
-                dynamicartProfile {
-                    initWith debug
-                }
-                // END
             }
             pluginProject.android.buildTypes.each addEmbeddingCompileOnlyDependency
             pluginProject.android.buildTypes.whenObjectAdded addEmbeddingCompileOnlyDependency
@@ -681,12 +674,6 @@ class FlutterPlugin implements Plugin<Project> {
         // END
         if (buildType.name == "profile") {
             return "profile"
-        // BD ADD: START
-        } else if (buildType.name == "dynamicartRelease") {
-            return "dynamicart_release"
-        } else if (buildType.name == "dynamicartProfile") {
-            return "dynamicart_profile"
-        // END
         } else if (buildType.debuggable) {
             return "debug"
         }
@@ -1029,11 +1016,6 @@ abstract class BaseFlutterTask extends DefaultTask {
 
         intermediateDir.mkdirs()
 
-        if(buildMode=='dynamicart_release'){
-            buildMode = "release";
-        }else if(buildMode=='dynamicart_profile'){
-            buildMode = "profile";
-        }
         // Compute the rule name for flutter assemble. To speed up builds that contain
         // multiple ABIs, the target name is used to communicate which ones are required
         // rather than the TargetPlatform. This allows multiple builds to share the same

@@ -296,7 +296,12 @@ class TransformerHooks {
         ]
       ]);
     }
-    return Future<List<String>>.value(<String>[]);
+    return Future<List<String>>.value(<String>[
+      '--pubspec-file',
+      FlutterProject.current().pubspecFile.absolute.path,
+      '--dart-sdk',
+      artifacts.getArtifactPath(Artifact.engineDartBinary),
+    ]);
   }
 
   static Future<ProcessResult> transformDill(

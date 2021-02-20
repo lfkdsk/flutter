@@ -90,6 +90,7 @@ enum Artifact {
   /// Tools related to subsetting or icon font files.
   fontSubset,
   constFinder,
+  dartPub,
 }
 
 // BD ADD: START
@@ -173,6 +174,8 @@ String _artifactToFileName(Artifact artifact, [ TargetPlatform platform, BuildMo
       return 'font-subset$exe';
     case Artifact.constFinder:
       return 'const_finder.dart.snapshot';
+    case Artifact.dartPub:
+      return platform == TargetPlatform.windows_x64 ? 'pub.bat' : 'pub';
     case Artifact.flutterWebLibrariesJson:
       return 'libraries.json';
     case Artifact.webPrecompiledSdk:
@@ -462,6 +465,8 @@ class CachedArtifacts implements Artifacts {
                      .childDirectory(getNameForTargetPlatform(platform))
                      .childFile(_artifactToFileName(artifact, platform, mode))
                      .path;
+      case Artifact.dartPub:
+        return _fileSystem.path.join(_dartSdkPath(_fileSystem), 'bin', _artifactToFileName(artifact, platform));
       case Artifact.webPrecompiledSdk:
         return _fileSystem.path.join(_getFlutterWebSdkPath(), 'kernel', 'amd', _artifactToFileName(artifact, platform, mode));
       case Artifact.webPrecompiledSdkSourcemaps:
@@ -692,6 +697,8 @@ class LocalEngineArtifacts implements Artifacts {
         return _fileSystem.path.join(_hostEngineOutPath, artifactFileName);
       case Artifact.constFinder:
         return _fileSystem.path.join(_hostEngineOutPath, 'gen', artifactFileName);
+      case Artifact.dartPub:
+        return _fileSystem.path.join(_hostEngineOutPath, 'dart-sdk', 'bin', artifactFileName);
       case Artifact.flutterWebLibrariesJson:
         return _fileSystem.path.join(_getFlutterWebSdkPath(), artifactFileName);
       case Artifact.webPrecompiledSdk:

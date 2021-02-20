@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import '../artifacts.dart';
+import '../globals.dart' as globals;
 import 'package:meta/meta.dart';
 import 'package:package_config/package_config.dart';
 import 'package:process/process.dart';
@@ -393,7 +395,8 @@ class _DefaultPub implements Pub {
       else
         'pub'
     ]);
-    return <String>[sdkPath, ...arguments];
+    final String path = globals.artifacts.getArtifactPath(Artifact.dartPub);
+    return <String>[path ?? sdkPath, ...arguments];
   }
 
   bool _shouldRunPubGet({ @required File pubSpecYaml, @required File packageConfigFile }) {

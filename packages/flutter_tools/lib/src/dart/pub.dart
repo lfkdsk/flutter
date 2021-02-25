@@ -219,6 +219,10 @@ class _DefaultPub implements Pub {
         ],
         if (offline)
           '--offline',
+        ...<String>[
+          '--version-name',
+          'bd_1_22',
+        ]
       ];
       try {
         await batch(
